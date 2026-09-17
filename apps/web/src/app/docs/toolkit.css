@@ -1,0 +1,60 @@
+.toolkit-content {
+	max-width: 720px;
+	padding: 70px 24px 110px;
+	margin: auto;
+}
+.toolkit-content h1 {
+	font-size: clamp(48px, 7vw, 76px);
+	font-weight: 500;
+	letter-spacing: -3px;
+	line-height: 1.05;
+	margin: 0 0 24px;
+}
+.toolkit-content h1 em {
+	font-family: var(--font-display-analog), Georgia, serif;
+	font-weight: 400;
+}
+.toolkit-content p {
+	color: var(--muted-foreground);
+	font-size: 14px;
+	line-height: 1.85;
+}
+.toolkit-content .toolkit-lead {
+	font-size: 17px;
+	max-width: 510px;
+	margin-bottom: 54px;
+}
+.toolkit-content section {
+	border-top: 1px solid var(--landing-line);
+	padding: 27px 0;
+}
+.toolkit-content h2 {
+	font-size: 16px;
+	font-weight: 550;
+	letter-spacing: -0.3px;
+}
+.toolkit-content pre {
+	background: var(--landing-soft);
+	border: 1px solid var(--landing-line);
+	border-radius: 4px;
+	padding: 22px;
+	overflow-x: auto;
+	font-size: 12px;
+	line-height: 2;
+}
+.toolkit-content blockquote {
+	border-left: 2px solid var(--border);
+	padding: 8px 20px;
+	margin: 26px 0;
+	line-height: 1.8;
+	font-family: var(--font-display-analog), Georgia, serif;
+	font-size: 24px;
+}
+.toolkit-note {
+	padding: 22px;
+	background: var(--landing-soft);
+	border-radius: 4px;
+}
+.toolkit-note p {
+	font-size: 12px;
+}

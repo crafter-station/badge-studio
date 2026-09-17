@@ -1,0 +1,188 @@
+@import "tailwindcss";
+@source "../../";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	--background: #f8f8f6;
+	--foreground: #20211f;
+	--card: #ffffff;
+	--card-foreground: #20211f;
+	--muted: #efefeb;
+	--muted-foreground: #666963;
+	--primary: #20211f;
+	--primary-foreground: #fff;
+	--secondary: #ebebe7;
+	--secondary-foreground: #20211f;
+	--accent: #e6e7e1;
+	--accent-foreground: #20211f;
+	--border: #dedfd8;
+	--input: #dedfd8;
+	--ring: #6b7763;
+	--destructive: #b12821;
+	--popover: #fff;
+	--popover-foreground: #20211f;
+	--radius: 0.4rem;
+	--control-height: 2rem;
+	--font-body: var(--font-geist-sans);
+}
+.dark {
+	--background: #0d0e0e;
+	--foreground: #eeeeea;
+	--card: #181919;
+	--card-foreground: #eeeeea;
+	--muted: #202121;
+	--muted-foreground: #91958e;
+	--primary: #eee;
+	--primary-foreground: #141514;
+	--secondary: #262826;
+	--secondary-foreground: #eee;
+	--accent: #30332d;
+	--accent-foreground: #eee;
+	--border: #2d302c;
+	--input: #373b35;
+	--ring: #a8b8a2;
+	--destructive: #faa49c;
+	--popover: #1d1f1d;
+	--popover-foreground: #eee;
+}
+* {
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: var(--font-geist-sans), Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+a {
+	color: inherit;
+	text-decoration: none;
+}
+button,
+input,
+textarea,
+select {
+	font: inherit;
+}
+button,
+a {
+	-webkit-tap-highlight-color: transparent;
+}
+button:not(:disabled) {
+	cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 5px;
+}
+::selection {
+	background: var(--accent);
+	color: var(--accent-foreground);
+}
+html {
+	scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	* {
+		scroll-behavior: auto !important;
+	}
+}
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-destructive: var(--destructive);
+	--color-syntax-text: var(--syntax-text);
+	--color-syntax-keyword: var(--syntax-keyword);
+	--color-syntax-string: var(--syntax-string);
+	--color-syntax-function: var(--syntax-function);
+	--color-syntax-number: var(--syntax-number);
+	--color-syntax-comment: var(--syntax-comment);
+	--color-syntax-punctuation: var(--syntax-punctuation);
+	--color-syntax-type: var(--syntax-type);
+	--color-syntax-background: var(--syntax-background);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-ring: var(--ring);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+	--font-sans: var(--font-sans);
+	--control-height: var(--control-height);
+}
+
+@font-face {
+	font-family: "Andes Brand";
+	src: url("/prism/andes/andes-brand.woff2") format("woff2");
+	font-weight: 200 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Andes Display";
+	src: url("/prism/andes/andes-display.woff2") format("woff2");
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Andes Mono";
+	src: url("/prism/andes/andes-mono.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Next Craft Script";
+	src: url("/prism/next-craft/Borel-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Next Craft Mono";
+	src: url("/prism/next-craft/IBMPlexMono-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Next Craft Pixel";
+	src: url("/prism/next-craft/Silkscreen-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-display: swap;
+}

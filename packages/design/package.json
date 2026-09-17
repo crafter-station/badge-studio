@@ -1,0 +1,56 @@
+{
+	"name": "@crafter-station/badge-studio-design",
+	"version": "0.0.1",
+	"type": "module",
+	"main": "./src/index.ts",
+	"exports": {
+		".": {
+			"bun": "./src/index.ts",
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./prism-style": {
+			"bun": "./src/prism-style.ts",
+			"types": "./dist/prism-style.d.ts",
+			"import": "./dist/prism-style.js"
+		},
+		"./prism-style-schema": {
+			"bun": "./src/prism-style-schema.ts",
+			"types": "./dist/prism-style-schema.d.ts",
+			"import": "./dist/prism-style-schema.js"
+		},
+		"./prism-shader": {
+			"bun": "./src/prism-shader.ts",
+			"types": "./dist/prism-shader.d.ts",
+			"import": "./dist/prism-shader.js"
+		},
+		"./badge-design": {
+			"bun": "./src/badge-design.ts",
+			"types": "./dist/badge-design.d.ts",
+			"import": "./dist/badge-design.js"
+		},
+		"./badge-design-examples": {
+			"bun": "./src/badge-design-examples.ts",
+			"types": "./dist/badge-design-examples.d.ts",
+			"import": "./dist/badge-design-examples.js"
+		},
+		"./catalog": {
+			"bun": "./src/catalog.ts",
+			"types": "./dist/catalog.d.ts",
+			"import": "./dist/catalog.js"
+		}
+	},
+	"scripts": {
+		"build": "tsup",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"zod": "^3.24.0"
+	},
+	"devDependencies": {
+		"tsup": "^8.4.0",
+		"typescript": "^5.8.3"
+	},
+	"private": true,
+	"license": "AGPL-3.0-only"
+}

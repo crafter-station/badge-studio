@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.next/
+.next-dev/
+*.tsbuildinfo
+.env*
+!.env.example
+.vercel/
+.prism-designs/
+.prism-data/
+.DS_Store
+apps/web/public/prism/demo/
