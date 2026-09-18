@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
 	existsSync,
 	mkdirSync,
@@ -22,6 +22,7 @@ const localTarball = existsSync(requested);
 const spec = localTarball ? resolve(requested) : requested;
 const folder = mkdtempSync(join(tmpdir(), "badgio-npm-"));
 const bin = join(folder, "bin");
+let preview;
 const find = (name) => {
 	const path = process.env.PATH?.split(delimiter)
 		.map((directory) => join(directory, name))
@@ -90,6 +91,47 @@ try {
 		assert.equal(readFileSync(file, "utf8"), before);
 	}
 	assert.equal(command(["schema"]).data.documentVersion, 1);
+	const guides = command(["skills", "list"]).data.skills;
+	assert.equal(guides.length, 3);
+	for (const { name } of guides) {
+		const markdown = run("node", [cli, "skills", "get", name]);
+		assert.equal(markdown.trim(), command(["skills", "get", name, "--json"]).data.content.trim());
+		assert.ok(markdown.startsWith("# "));
+	}
+	assert.equal(command(["doctor"]).data.ready, false);
+	preview = spawn("node", [cli, "studio", "start", "--no-open", "--json"], {
+		cwd: folder,
+		env,
+		stdio: ["ignore", "pipe", "pipe"],
+	});
+	const receipt = await new Promise((resolve, reject) => {
+		const timer = setTimeout(() => reject(new Error("Preview did not start.")), 5000);
+		preview.once("error", reject);
+		preview.stdout.once("data", (chunk) => {
+			clearTimeout(timer);
+			try {
+				resolve(JSON.parse(chunk.toString()));
+			} catch (error) {
+				reject(error);
+			}
+		});
+	});
+	const address = new URL(receipt.data.url);
+	const headers = { Authorization: `Bearer ${address.hash.slice(1)}` };
+	const tools = await fetch(`${address.origin}/tools`, {
+		headers,
+		signal: AbortSignal.timeout(5000),
+	});
+	assert.equal((await tools.json()).data.connected, false);
+	const shell = await fetch(address.origin, { signal: AbortSignal.timeout(5000) });
+	assert.ok((await shell.text()).includes("<iframe"));
+	const stopped = new Promise((resolve) => preview.once("exit", resolve));
+	await fetch(`${address.origin}/stop`, {
+		method: "POST",
+		headers,
+		signal: AbortSignal.timeout(5000),
+	});
+	await stopped;
 	console.log(
 		JSON.stringify(
 			{
@@ -103,6 +145,9 @@ try {
 				alias: true,
 				roundTrips: styles.length,
 				overwriteRejections: styles.length,
+				bundledGuides: guides.length,
+				localPreview: true,
+				doctorWithoutDependencies: true,
 				verifier: fileURLToPath(import.meta.url),
 			},
 			null,
@@ -110,5 +155,6 @@ try {
 		),
 	);
 } finally {
+	preview?.kill();
 	rmSync(folder, { recursive: true, force: true });
 }

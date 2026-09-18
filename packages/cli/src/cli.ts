@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { spawnSync } from "node:child_process";
 import { constants } from "node:fs";
 import { access, lstat, open, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
@@ -11,17 +12,28 @@ import { designCatalog, findDesign } from "@crafter-station/badge-studio-design/
 import type { ZodTypeAny } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { version } from "../package.json";
+import { InputError } from "./errors";
+import { extractImage, imageParams } from "./images";
 import { banner, column, machineOutput, style } from "./presentation";
+import { getSkill, skills } from "./skills";
+import { openBrowser, startStudio, studioRequest } from "./studio";
 
 const commands = [
+	"skills list",
+	"skills get core [--full]",
+	"doctor",
+	"studio start [--no-open]",
+	"studio tools --url <session-url>",
+	"studio call <tool> --url <session-url> --params <json|@file>",
+	"studio stop --url <session-url>",
+	"image params --file <image> --state <state.json> [--target portrait|artwork]",
+	"image extract --file <image-response.json> --out <new-file>",
 	"styles list",
 	"design create --style <id> [--out <new-file>] [--dry-run]",
 	"design validate --file <file>",
 	"schema",
 ];
-const nextSteps = ["npx badgio styles list", "npx badgio schema"];
-
-class InputError extends Error {}
+const nextSteps = ["badgio skills get core", "badgio doctor"];
 
 function emit(data: unknown, next: string[], human: string, json: boolean) {
 	process.stdout.write(
@@ -53,6 +65,14 @@ async function run() {
 			out: { type: "string" },
 			file: { type: "string" },
 			"dry-run": { type: "boolean" },
+			full: { type: "boolean" },
+			"no-open": { type: "boolean" },
+			site: { type: "string" },
+			port: { type: "string" },
+			url: { type: "string" },
+			params: { type: "string" },
+			state: { type: "string" },
+			target: { type: "string" },
 		},
 	});
 	const json = machineOutput(Boolean(values.json));
@@ -75,8 +95,19 @@ From a built checkout: npm run studio -- <command>`,
 		);
 		return;
 	}
-	const command = positionals.join(" ");
+	const command = ["skills get", "studio call"].includes(positionals.slice(0, 2).join(" "))
+		? positionals.slice(0, 2).join(" ")
+		: positionals.join(" ");
 	const allowed: Record<string, string[]> = {
+		"skills list": [],
+		"skills get": ["full"],
+		doctor: [],
+		"studio start": ["no-open", "site", "port"],
+		"studio tools": ["url"],
+		"studio call": ["url", "params"],
+		"studio stop": ["url"],
+		"image params": ["file", "state", "target"],
+		"image extract": ["file", "out"],
 		"styles list": [],
 		schema: [],
 		"design create": ["style", "out", "dry-run"],
@@ -86,6 +117,145 @@ From a built checkout: npm run studio -- <command>`,
 	for (const flag of Object.keys(values))
 		if (!["json", "help", "version", ...allowed[command]].includes(flag))
 			throw new InputError(`--${flag} is not supported by ${command}`);
+	if (command === "skills list") {
+		const entries = Object.entries(skills).map(([name, { description }]) => ({
+			name,
+			description,
+		}));
+		emit(
+			{ skills: entries },
+			nextSteps,
+			entries.map((entry) => `${entry.name} · ${entry.description}`).join("\n"),
+			json,
+		);
+		return;
+	}
+	if (command === "skills get") {
+		if (positionals.length !== 3)
+			throw new InputError("Supply one skill name. Run badgio skills list.");
+		let content: string;
+		try {
+			content = getSkill(positionals[2], values.full);
+		} catch (error) {
+			throw new InputError((error as Error).message);
+		}
+		if (values.json) emit({ name: positionals[2], content }, nextSteps, content, true);
+		else process.stdout.write(`${content.trim()}\n`);
+		return;
+	}
+	if (command === "doctor") {
+		const check = (command: string) => {
+			const result = spawnSync(command, ["--version"], {
+				encoding: "utf8",
+				timeout: 5000,
+				stdio: ["ignore", "pipe", "pipe"],
+			});
+			return {
+				installed: !result.error && result.status === 0,
+				version: result.status === 0 ? result.stdout.trim().slice(0, 200) : null,
+			};
+		};
+		const browser = check("agent-browser");
+		const images = check("ai");
+		const dependencies = {
+			"agent-browser": {
+				...browser,
+				purpose: "Browser inspection and visual verification",
+				install: "npm install --global agent-browser && agent-browser install",
+			},
+			"ai-cli": {
+				...images,
+				optional: true,
+				purpose: "Requested image generation only",
+				install: "npm install --global ai-cli",
+			},
+		};
+		emit(
+			{
+				node: process.versions.node,
+				ready: browser.installed,
+				dependencies,
+				installationRequiresConsent: true,
+			},
+			nextSteps,
+			`agent-browser: ${browser.installed ? "installed" : "missing; ask before installing"}\nai-cli: ${images.installed ? "installed" : "optional; only needed for image generation"}\nRun badgio skills get core for setup.`,
+			json,
+		);
+		return;
+	}
+	if (command === "studio start") {
+		const port = values.port === undefined ? 0 : Number(values.port);
+		if (!Number.isInteger(port) || port < 0 || port > 65535)
+			throw new InputError("Use a port from 0 to 65535.");
+		const studio = await startStudio({ site: values.site, port });
+		const stop = () => studio.close();
+		process.once("SIGINT", stop);
+		process.once("SIGTERM", stop);
+		studio.server.once("close", () => {
+			process.off("SIGINT", stop);
+			process.off("SIGTERM", stop);
+		});
+		emit(
+			{ url: studio.url, site: studio.site, pid: process.pid },
+			[
+				"Open this URL in your built-in browser, or your default browser. Keep this process running.",
+			],
+			`Your live canvas: ${studio.url}\nKeep this process running while you design.`,
+			json,
+		);
+		if (!values["no-open"]) {
+			try {
+				await openBrowser(studio.url);
+			} catch {
+				process.stderr.write(
+					"Could not open the default browser. Open the session URL above manually.\n",
+				);
+			}
+		}
+		return;
+	}
+	if (command.startsWith("studio ")) {
+		if (!values.url) throw new InputError("Supply --url with the complete session URL.");
+		let params: unknown = {};
+		if (command === "studio call") {
+			if (positionals.length !== 3) throw new InputError("Supply one discovered tool name.");
+			if (values.params?.startsWith("@")) {
+				const path = values.params.slice(1);
+				const info = await lstat(path);
+				if (!info.isFile() || info.size > 12_000_000)
+					throw new InputError("Expected a params file below 12 MB.");
+				params = JSON.parse(await readFile(path, "utf8"));
+			} else if (values.params) params = JSON.parse(values.params);
+		}
+		const result = await studioRequest(
+			values.url,
+			command === "studio tools" ? "/tools" : command === "studio stop" ? "/stop" : "/call",
+			command === "studio tools"
+				? undefined
+				: command === "studio stop"
+					? {}
+					: { name: positionals[2], params },
+		);
+		if (!result.ok) {
+			process.stdout.write(`${JSON.stringify({ ...result, version, nextSteps })}\n`);
+			process.stderr.write(`badgio: ${result.error?.message ?? "Studio operation failed."}\n`);
+			process.exitCode = 2;
+		} else emit(result.data, nextSteps, JSON.stringify(result.data, null, 2), json);
+		return;
+	}
+	if (command === "image params") {
+		if (!values.file || !values.state) throw new InputError("Supply --file and --state.");
+		process.stdout.write(
+			`${JSON.stringify(await imageParams(values.file, values.state, values.target))}\n`,
+		);
+		return;
+	}
+	if (command === "image extract") {
+		if (!values.file || !values.out) throw new InputError("Supply --file and a new --out path.");
+		const result = await extractImage(values.file, values.out);
+		emit(result, nextSteps, `Image saved: ${result.path}`, json);
+		return;
+	}
 	if (command === "styles list") {
 		const styles = designCatalog.map((design) => ({
 			id: design.source,

@@ -1,23 +1,20 @@
 "use client";
 
-import { ArrowDown, ArrowUpRight, Check, Copy } from "@phosphor-icons/react";
+import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useState } from "react";
+import { AgentSetup } from "../../components/agent-setup";
+import { Button } from "../../components/ui/button";
+import { agentFirstPrompt } from "../../lib/agent-setup";
 import { directions } from "./directions";
 import { LiveBadge } from "./live-badge";
 import { StudioOrbit } from "./studio-orbit";
 
 export function StudioLanding() {
 	const [category, setCategory] = useState("All styles");
-	const [copied, setCopied] = useState(false);
-	const command = "npx badgio design create --style gtm --out badge.json";
 	const filtered = directions.filter(
 		(direction) => category === "All styles" || direction.category === category,
 	);
-	async function copy() {
-		await navigator.clipboard.writeText(command);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 1800);
-	}
 	return (
 		<main className="studio-landing">
 			<a className="skip-link" href="#intro">
@@ -40,12 +37,15 @@ export function StudioLanding() {
 						Find your direction. Make it yours. Let it move.
 					</p>
 					<div className="intro-actions">
-						<a href="/design" className="primary-action">
-							Make your badge <ArrowUpRight />
-						</a>
-						<a href="#gallery" className="secondary-action">
-							Find a little inspiration <ArrowDown />
-						</a>
+						<Button variant="default" nativeButton={false} render={<Link href="#workflow" />}>
+							Create with your agent <ArrowDown data-icon="inline-end" />
+						</Button>
+						<Button variant="outline" nativeButton={false} render={<Link href="/design" />}>
+							Open the editor <ArrowUpRight data-icon="inline-end" />
+						</Button>
+						<Button variant="ghost" nativeButton={false} render={<Link href="#gallery" />}>
+							Find a little inspiration <ArrowDown data-icon="inline-end" />
+						</Button>
 					</div>
 					<div className="hero-footnote">
 						<span>Made for people.</span>
@@ -115,39 +115,16 @@ export function StudioLanding() {
 						<em>Your workflow.</em>
 					</h2>
 					<p>
-						Start in the editor or hand the design to your agent. The same editable document sits
-						underneath every badge.
+						Install the CLI and skill. Give your agent a photo and an idea. Keep refining your badge
+						in the same conversation, with a live canvas right beside you.
 					</p>
 					<a href="/docs" className="text-link">
 						Meet the design toolkit <ArrowUpRight />
 					</a>
 				</div>
-				<div className="terminal-example">
-					<div className="terminal-header">
-						<span>
-							<i />
-							<i />
-							<i />
-						</span>
-						<span>studio / your next idea</span>
-					</div>
-					<div className="terminal-body">
-						<p className="terminal-comment"># a starting point, ready to make your own</p>
-						<code>
-							<span>$ </span>
-							{command}
-						</code>
-						<div className="terminal-result">
-							<Check /> badge.json · 2 faces · editable layers
-						</div>
-					</div>
-					<button type="button" className="terminal-copy" onClick={() => void copy()}>
-						{copied ? <Check /> : <Copy />}
-						{copied ? "Copied" : "Copy command"}
-					</button>
-					<p className="terminal-caption">
-						Run badgio from your terminal. Bring the same editable document into the studio.
-					</p>
+				<div className="agent-workflow">
+					<AgentSetup />
+					<p className="agent-first-prompt">{agentFirstPrompt}</p>
 				</div>
 			</section>
 			<footer className="landing-footer">

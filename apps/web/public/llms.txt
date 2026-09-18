@@ -8,8 +8,27 @@
 - Human and agent guide: https://badge-studio.crafter.run/docs#agents
 - Source: https://github.com/crafter-station/badge-studio
 - Companion skill: https://raw.githubusercontent.com/crafter-station/badge-studio/main/skills/badge-studio/SKILL.md
+- Install CLI: npm install --global badgio
 - Install skill: npx skills add crafter-station/badge-studio --skill badge-studio
-- Offline CLI: npx badgio styles list
+- Load the versioned workflow: badgio skills get core
+
+Ask for a photo or local image path, then use badgio doctor to check dependencies.
+Ask before installing missing agent-browser. Offer ai-cli only for requested image transformations.
+Read badgio skills get design for editable typography, both faces, layers, graphics and materials.
+
+## Persistent preview
+
+badgio studio start opens the operating system's default browser.
+With an available built-in browser panel, start with --no-open --json and open data.url there.
+Keep that process and the same preview tab alive for all iterations.
+Only one tab owns the connection; do not open its private session URL in another browser for verification.
+
+badgio studio tools --url "$BADGE_STUDIO_URL" --json
+badgio studio call badge_inspect --url "$BADGE_STUDIO_URL" --params '{"section":"state"}' --json
+
+The local connection uses the same editor tools and validation even without native WebMCP.
+Use agent-browser for visual verification and connect to the existing preview when that browser supports it.
+Do not replace the user's preview with agent-browser's separate automation browser.
 
 ## Browser tools
 
@@ -31,4 +50,4 @@ The agent can explicitly export an image, transform it, inspect it, and import i
 Model reference support and transparent output vary. Gateway credits are separate from the coding agent subscription.
 
 Shared profile/photo data and saved designs stay in this browser. Exported JSON has no embedded photos.
-If WebMCP is unavailable, use manual controls or create/edit/validate JSON with badgio and import it.
+For an offline workflow, use badgio styles list, badgio design create and badgio design validate, then import the JSON and its images in the editor.

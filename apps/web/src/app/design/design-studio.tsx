@@ -138,7 +138,7 @@ export function DesignStudio() {
 			<div className="design-actions" aria-label="Acciones del diseño">
 				<a className="design-workspace-label" href="/docs#agents">
 					{agentConnection === "ready"
-						? "WebMCP listo · Usar mi agente ↗"
+						? "Agente conectado · Cómo usarlo ↗"
 						: "Usar mi coding agent ↗"}
 				</a>
 				<div className="design-header-actions">

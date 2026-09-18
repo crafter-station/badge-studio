@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Badge Studio · Your live canvas</title>
+<style>
+:root{color-scheme:light dark;--background:#ffffff;--foreground:#141414;--muted-foreground:#6b6b6b;--border:#e6e6e6}@media(prefers-color-scheme:dark){:root{--background:#141414;--foreground:#fafafa;--muted-foreground:#a3a3a3;--border:#404040}}html,body{margin:0;height:100%;background:var(--background);color:var(--foreground);font:13px system-ui,sans-serif}body{display:flex;flex-direction:column}header{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--border)}strong{font-weight:600}#status{margin-left:auto;color:var(--muted-foreground)}iframe{flex:1;width:100%;border:0;min-height:0}@media(max-width:600px){header{font-size:11px;padding:10px;gap:8px}}
+</style>
+</head>
+<body>
+<header><strong>✳ Badge Studio</strong><span>Your agent edits this canvas</span><span id="status" role="status">Connecting…</span></header>
+<iframe title="Your editable badge" allow="clipboard-write; web-share" referrerpolicy="no-referrer"></iframe>
+<script>
+const site=__STUDIO_ORIGIN__;
+const token=location.hash.slice(1);
+const frame=document.querySelector("iframe");
+const status=document.querySelector("#status");
+const client=crypto.randomUUID();
+let tools;
+let ready=false;
+const post=async(path,body)=>{
+ const response=await fetch(path,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({client,...body})});
+ if(!response.ok)throw new Error("Connection lost");
+};
+const forward=(message)=>frame.contentWindow.postMessage({channel:"badgio",token,...message},site);
+if(!/^[a-f0-9]{64}$/.test(token)){
+ status.textContent="Open the complete session URL from your agent.";
+}else{
+ const events=new EventSource(`/events?token=${token}&client=${client}`);
+ const announce=async()=>{
+  if(!ready||!tools)return;
+  try{await post("/ready",{tools});status.textContent="Connected · Keep this tab open";}
+  catch{status.textContent="Disconnected · Reopen the session URL";}
+ };
+ events.onopen=()=>{ready=true;void announce();forward({type:"discover"});};
+ events.onmessage=(event)=>{
+  const message=JSON.parse(event.data);
+  if(message.type==="closed"){ready=false;events.close();forward({type:"cancel-all"});status.textContent="Session ended · You can still edit and export this badge";}
+  else forward(message);
+ };
+ events.onerror=()=>{ready=false;forward({type:"cancel-all"});status.textContent="Disconnected · Close other preview tabs, then reconnect";};
+ window.addEventListener("message",async(event)=>{
+  const message=event.data;
+  if(event.source!==frame.contentWindow||event.origin!==site||message?.channel!=="badgio"||message.token!==token)return;
+  if(message.type==="ready"){tools=message.tools;await announce();}
+  if(message.type==="result"){
+   try{await post("/result",{id:message.id,output:message.output});}
+   catch{status.textContent="Disconnected · Ask your agent to inspect before retrying";}
+  }
+ });
+ window.addEventListener("pagehide",()=>{forward({type:"cancel-all"});events.close();});
+ frame.src=`${site}/design#badgio=${token}&parent=${encodeURIComponent(location.origin)}`;
+ setTimeout(()=>{if(!tools)status.textContent="Still connecting · Check that the website supports this CLI version";},15000);
+}
+</script>
+</body>
+</html>

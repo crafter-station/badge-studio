@@ -50,6 +50,7 @@
 	overflow-x: auto;
 	font-size: 12px;
 	line-height: 2;
+	white-space: pre;
 }
 .toolkit-content blockquote {
 	border-left: 2px solid var(--border);

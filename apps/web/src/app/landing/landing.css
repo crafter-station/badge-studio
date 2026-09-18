@@ -476,86 +476,32 @@
 	width: 14px;
 	height: 14px;
 }
-.terminal-example {
-	border: 1px solid var(--landing-line);
+.agent-setup {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
+}
+.agent-setup pre {
+	width: 100%;
+	margin: 0;
+	padding: 24px;
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
-	position: relative;
-	min-width: 0;
-}
-.terminal-header {
-	border-bottom: 1px solid var(--landing-line);
-	display: flex;
-	align-items: center;
-	gap: 24px;
-	padding: 14px 17px;
-	color: var(--muted-foreground);
-	font-size: 10px;
-}
-.terminal-header > span:first-child {
-	display: flex;
-	gap: 5px;
-}
-.terminal-header i {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: var(--landing-line);
-}
-.terminal-body {
-	padding: 32px 23px 22px;
+	background: var(--syntax-background);
+	color: var(--syntax-text);
+	font-family: var(--font-geist-mono), monospace;
+	font-size: 12px;
+	line-height: 2;
+	white-space: pre;
 	overflow-x: auto;
 }
-.terminal-body .terminal-comment {
-	font-family: var(--font-geist-mono), monospace;
-	font-size: 10px;
-	margin-bottom: 15px;
+.agent-workflow {
+	min-width: 0;
+}
+.landing-workflow .agent-first-prompt {
 	max-width: none;
-}
-.terminal-body code {
-	font-family: var(--font-geist-mono), monospace;
-	font-size: 11px;
-	white-space: pre;
-}
-.terminal-body code > span {
-	color: var(--muted-foreground);
-}
-.terminal-result {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin: 24px 0 6px;
-	font-family: var(--font-geist-mono), monospace;
-	font-size: 10px;
-	color: var(--muted-foreground);
-}
-.terminal-result svg {
-	width: 12px;
-	height: 12px;
-	color: #799270;
-}
-.terminal-copy {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	margin: 0 23px 24px;
-	padding: 7px 9px;
-	border: 1px solid var(--landing-line);
-	background: transparent;
-	color: var(--muted-foreground);
-	border-radius: var(--radius);
-	font-size: 10px;
-}
-.terminal-copy svg {
-	width: 12px;
-	height: 12px;
-}
-.landing-workflow .terminal-caption {
-	position: absolute;
-	bottom: -42px;
-	left: 0;
-	margin: 0;
-	font-size: 9px;
-	max-width: none;
+	margin-top: 24px;
 }
 .landing-footer {
 	max-width: 1400px;
@@ -612,9 +558,6 @@
 	}
 	.landing-workflow {
 		gap: 40px;
-	}
-	.terminal-body code {
-		font-size: 10px;
 	}
 	.landing-intro h1 {
 		letter-spacing: -3px;
@@ -766,15 +709,6 @@
 	.landing-workflow p {
 		font-size: 11px;
 		max-width: 320px;
-	}
-	.terminal-body {
-		padding-inline: 17px;
-	}
-	.terminal-body .terminal-comment {
-		font-size: 9px;
-	}
-	.terminal-result {
-		font-size: 9px;
 	}
 	.landing-footer {
 		padding: 25px 20px;

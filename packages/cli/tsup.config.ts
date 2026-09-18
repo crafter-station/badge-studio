@@ -7,4 +7,5 @@ export default defineConfig({
 	target: "node22",
 	clean: true,
 	noExternal: ["@crafter-station/badge-studio-design"],
+	loader: { ".md": "text", ".txt": "text" },
 });

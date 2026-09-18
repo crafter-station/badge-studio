@@ -6,41 +6,48 @@ Try [Badge Studio](https://badge-studio.crafter.run), or create a document from 
 
 The landing is a draggable orbit of nine event badges plus Térmico, Prisma and Cromo, with depth, inertia and optional synthesized mechanical ticks. It supports keyboard rotation, reduced motion and light/dark themes.
 
-## Use the CLI
+## Design with your agent
 
-Requires Node.js 22 or newer and npm.
-
-```sh
-npx badgio styles list
-npx badgio design create --style gtm --out badge.json
-npx badgio schema --json
-npx badgio design validate --file badge.json
-```
-
-An agent can edit the JSON using the versioned schema and semantic validator. Choose **Importar JSON** in the editor to continue visually.
-
-The npm package is `badgio`, with `badgio` and `badge-studio` commands. It bundles the same catalog and validator as the editor and runs directly on Node.js. Install it globally with `npm install --global badgio` to run `badgio` without `npx`.
-
-The CLI creates and validates editable JSON. The web studio renders and exports the badge. Image generation and LLM calls are not part of the CLI.
-
-See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
-
-## Use your coding agent in the browser
-
-The public web editor remains fully editable. Nine native WebMCP tools expose the current document, catalog and schema; atomic layer/material edits; participant data and image transfer; view controls; local save/load; PNG/JSON downloads; and explicit cancellation. Your coding agent supplies the layout reasoning through its own subscription. The page does not run a paid model.
+Requires Node.js 22 or newer.
 
 ```sh
+npm install --global badgio
 npx skills add crafter-station/badge-studio --skill badge-studio
-agent-browser --session badges --webgpu open https://badge-studio.crafter.run/design
-agent-browser --session badges webmcp list badge_inspect --json
-agent-browser --session badges webmcp invoke badge_inspect --params '{"section":"state"}' --json
 ```
 
-Use a native WebMCP-capable browser. Other clients need their own compatible browser connection; the manual editor and offline JSON workflow remain available without it. Edits require the current revision, preserve locks and use the same semantic validator as the editor. Invalid batches change nothing. Layout edits have undo; shared profile/photo changes are separate.
+Ask your agent to use the badge-studio skill, attach your photo or provide its path, and describe the badge you want. The agent asks before installing agent-browser for visual verification. It offers ai-cli only when a requested image transformation needs it.
 
-For image transformations, the agent can export the portrait, run [ai-cli](https://github.com/vercel-labs/ai-cli) locally through AI Gateway, inspect the result, then import it as a portrait or artwork. Credentials stay outside the page. Reference support and transparent output depend on the image model; Gateway generation credits are separate from the agent subscription.
+The skill is a small discovery stub. Versioned instructions, creative guidance and image-transfer helpers ship inside the CLI:
 
-The [skill](skills/badge-studio/SKILL.md) includes the workflow and Node image-transfer helper. See [the browser contract](docs/webmcp-contract.md) for tools, concurrency and validation.
+```sh
+badgio skills get core
+badgio skills get core --full
+badgio doctor
+```
+
+The preview opens in the coding session’s built-in browser when available, otherwise in your default browser. Keep asking for changes in the same conversation and watch the same editable canvas update. The seventeen catalog designs are starting points; agents can compose both faces using the full layer, typography, image and material schema.
+
+`badgio studio start` opens the default browser. Agents with browser panels use `--no-open --json` and open the returned local URL themselves. Keep that process alive while designing. The local connection and native WebMCP invoke the same nine editor tools, revision checks, locks, undo and validation. Only one preview tab owns a local session. A browser without native WebMCP can still use the local connection.
+
+```sh
+badgio studio tools --url "$BADGE_STUDIO_URL" --json
+badgio studio call badge_inspect --url "$BADGE_STUDIO_URL" --params '{"section":"state"}' --json
+```
+
+For image generation, your agent can use [ai-cli](https://github.com/vercel-labs/ai-cli) with your AI Gateway credentials and authorization, then import the result. Ordinary layouts and editable portrait filters need no model. Keys stay outside the page; image generation uses separate Gateway credits.
+
+See [the CLI guide](packages/cli/README.md), [CLI contract](docs/cli-contract.md), [browser contract](docs/webmcp-contract.md) and [skill stub](skills/badge-studio/SKILL.md).
+
+## Work with a document
+
+```sh
+badgio styles list
+badgio design create --style gtm --out badge.json
+badgio schema --json
+badgio design validate --file badge.json
+```
+
+Import the JSON in the editor to continue visually. Portraits and custom artwork are separate. The `badge-studio` command remains an alias. The CLI does not call a model or render PNGs; the editor renders and exports them.
 
 ## Develop the studio
 
@@ -66,7 +73,7 @@ The sample portrait has a transparent background so each badge supplies its own 
 - `apps/web`: Next.js landing, editor, local design API and assets.
 - `packages/design`: canonical schema, 17 directions, semantic validation.
 - `packages/renderer`: Canvas/WebGPU rendering and material system.
-- `packages/cli`: local document creation, schema inspection and validation.
+- `packages/cli`: bundled agent guides, live preview connection, image helpers and document validation.
 
 The current document format represents rectangular, two-sided badges. Additional formats such as pins and stickers need explicit shape, safe-area and export contracts before being added.
 
@@ -82,13 +89,13 @@ bun run build
 Verify a packed or published CLI with npm and npx in an isolated consumer:
 
 ```sh
-npm run test:npm -- /absolute/path/to/badgio-0.1.1.tgz
-npm run test:npm -- badgio@0.1.1
+npm run test:npm -- /absolute/path/to/badgio-0.2.0.tgz
+npm run test:npm -- badgio@0.2.0
 ```
 
 ## Service boundary
 
-The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a server. Export JSON and images to keep a separate copy. Public server-side AI generation and cloud sync are not enabled.
+The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a cloud server. Agent-supplied images travel through the local preview connection when it is used. Browser panels may partition storage. Export JSON and images to keep a separate copy. Public server-side AI generation and cloud sync are not enabled.
 
 The legacy file-backed experiment is available only with `NEXT_PUBLIC_BADGE_STORAGE=server` in local development. Hosted file storage is disabled. WebMCP exposes deterministic editor controls, never legacy generation endpoints or credentials.
 

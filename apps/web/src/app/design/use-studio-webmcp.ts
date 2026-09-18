@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { z } from "zod";
+import { registerPreviewTools } from "../../lib/studio-bridge";
 import { agentParticipantSchema, imageFileFromDataUrl } from "./design-agent";
 import { designAssetUrl, downloadFile } from "./design-client";
 import type { useDesignStudio } from "./use-design-studio";
@@ -76,10 +77,6 @@ export function useStudioWebMcp(options: Options) {
 
 	useEffect(() => {
 		const context = (document as Document & { modelContext?: PageModelContext }).modelContext;
-		if (!context) {
-			setConnection("unavailable");
-			return;
-		}
 		const registration = new AbortController();
 		const session = crypto.randomUUID();
 		let fingerprint = "";
@@ -548,14 +545,20 @@ export function useStudioWebMcp(options: Options) {
 				},
 			),
 		];
-		void registerPageTools(context, tools, registration.signal)
-			.then(() => {
-				if (!registration.signal.aborted) setConnection("ready");
-			})
-			.catch(() => {
-				registration.abort();
-				setConnection("unavailable");
-			});
+		const previewConnected = registerPreviewTools(tools, registration.signal);
+		if (previewConnected) setConnection("ready");
+		if (context)
+			void registerPageTools(context, tools, registration.signal)
+				.then(() => {
+					if (!registration.signal.aborted) setConnection("ready");
+				})
+				.catch(() => {
+					if (!previewConnected) {
+						registration.abort();
+						setConnection("unavailable");
+					}
+				});
+		else if (!previewConnected) setConnection("unavailable");
 		return () => {
 			registration.abort();
 			running?.controller.abort();

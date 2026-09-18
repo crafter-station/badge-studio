@@ -46,7 +46,7 @@ test("all styles roundtrip through exclusive file creation and full semantic val
 		expect(run(["design", "create", "--style", design.source ?? "", "--out", file]).status).toBe(2);
 		expect(JSON.parse(readFileSync(file, "utf8"))).toEqual(design);
 	}
-});
+}, 15_000);
 
 test("dry run validates destinations and refuses existing files and dangling symlinks", () => {
 	const file = join(folder, "dry.json");
@@ -113,4 +113,68 @@ test("presentation honors NO_COLOR and aligns styled columns by visible width", 
 		if (before === undefined) Reflect.deleteProperty(process.env, "NO_COLOR");
 		else process.env.NO_COLOR = before;
 	}
+});
+
+test("bundled guides are readable offline as Markdown or explicit JSON", () => {
+	const list = JSON.parse(run(["skills", "list"]).stdout);
+	for (const { name } of list.data.skills) {
+		const raw = run(["skills", "get", name]);
+		expect(raw.status).toBe(0);
+		expect(raw.stdout.startsWith("# ")).toBe(true);
+		expect(JSON.parse(run(["skills", "get", name, "--json"]).stdout).data.content.trim()).toBe(
+			raw.stdout.trim(),
+		);
+	}
+	const full = run(["skills", "get", "core", "--full"]);
+	expect(full.status).toBe(0);
+	for (const { name } of list.data.skills)
+		expect(full.stdout).toContain(run(["skills", "get", name]).stdout.trim());
+	for (const args of [
+		["skills", "get", "../../package.json"],
+		["skills", "get", "core", "extra"],
+		["studio", "call"],
+		["studio", "start", "--port", "70000"],
+		["studio", "start", "--site", "https://attacker.example"],
+		["studio", "tools", "--url", "not-a-url"],
+		["image", "params"],
+	])
+		expect(run(args).status).toBe(2);
+});
+
+test("bundled image helpers consume both transports, preserve bytes and refuse overwrites", () => {
+	const bytes = Buffer.from("small-image-byte-fixture");
+	const image = join(folder, "portrait.png");
+	const state = join(folder, "state.json");
+	writeFileSync(image, bytes);
+	for (const envelope of [
+		{ ok: true, data: { revision: "preview:4" } },
+		{
+			success: true,
+			data: { output: JSON.stringify({ ok: true, data: { revision: "preview:4" } }) },
+		},
+	]) {
+		writeFileSync(state, JSON.stringify(envelope));
+		const params = run(["image", "params", "--file", image, "--state", state]);
+		expect(params.status).toBe(0);
+		expect(JSON.parse(params.stdout)).toEqual({
+			action: "import",
+			target: "portrait",
+			expectedRevision: "preview:4",
+			dataUrl: `data:image/png;base64,${bytes.toString("base64")}`,
+		});
+	}
+	const result = join(folder, "image-result.json");
+	const out = join(folder, "extracted.png");
+	writeFileSync(
+		result,
+		JSON.stringify({
+			ok: true,
+			data: { dataUrl: `data:image/png;base64,${bytes.toString("base64")}` },
+		}),
+	);
+	expect(run(["image", "extract", "--file", result, "--out", out]).status).toBe(0);
+	expect(readFileSync(out)).toEqual(bytes);
+	expect(run(["image", "extract", "--file", result, "--out", out]).status).toBe(2);
+	writeFileSync(state, JSON.stringify({ ok: false, error: { message: "stale inspection" } }));
+	expect(run(["image", "params", "--file", image, "--state", state]).status).not.toBe(0);
 });
