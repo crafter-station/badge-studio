@@ -9,7 +9,6 @@ import { designAssetUrl } from "./design-client";
 import { DesignLayerActions } from "./design-layer-actions";
 import { DesignLayerControls } from "./design-layer-controls";
 import { DesignPhotoPicker } from "./design-photo-picker";
-import { DesignPortraitPicker } from "./design-portrait-picker";
 import type { useDesignStudio } from "./use-design-studio";
 
 export function DesignSelectedLayer({
@@ -71,7 +70,10 @@ export function DesignSelectedLayer({
 				<p className="design-help">Capa oculta. Activa el ojo para verla.</p>
 			) : null}
 			{layer.kind === "portrait" ? (
-				<DesignPortraitPicker studio={studio} />
+				<p className="design-help">
+					Tu foto se comparte entre todos los estilos. Ajusta el recorte y el filtro de esta capa
+					aquí.
+				</p>
 			) : layer.kind === "image" ? (
 				<DesignPhotoPicker
 					artwork

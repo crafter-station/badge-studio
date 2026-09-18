@@ -4,6 +4,7 @@ import type {
 	PrismBadgeData,
 	PrismEdition,
 } from "@crafter-station/badge-studio-renderer";
+import { sampleParticipant } from "../../lib/sample-participant";
 import { andesAppearance, andesData } from "../hack-the-andes/andes-data";
 import { gtmFlow } from "./gtm-flow";
 
@@ -146,9 +147,8 @@ function edition(input: EditionInput): BadgeEdition {
 		sourceLabel: input.source ? "Repositorio original" : "Identidad del evento",
 		sourceUrl: input.source ?? input.url,
 		data: {
-			name: "Railly Hugo",
+			...sampleParticipant,
 			role: "attendee",
-			organization: "Vercel",
 			number: 1,
 			eventName: input.name,
 			accentColor: input.colors[2],

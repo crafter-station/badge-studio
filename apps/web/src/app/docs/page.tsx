@@ -65,8 +65,9 @@ export default function ToolkitPage() {
 				<section>
 					<h2>04 / Bring it to life</h2>
 					<p>
-						Open the editor and choose <strong>Importar JSON</strong> in the header. Upload your
-						portrait, refine either face, and export PNG or the editable JSON.
+						Open the editor and upload your photo or try the example portrait. Then choose{" "}
+						<strong>Importar JSON</strong> in the toolbar, refine either face, and export PNG or the
+						editable JSON. Your photo and name stay with you across every style.
 					</p>
 					<p>
 						Artwork references are separate from the document. Built-in assets ship with the studio;
@@ -84,9 +85,9 @@ export default function ToolkitPage() {
 						creation.
 					</p>
 					<p>
-						The public studio saves designs and illustrations in this browser. Export your work to
-						keep a separate copy. Cloud sync, public AI generation and additional physical formats
-						are future work.
+						The public studio saves your profile, photo, designs and illustrations in this browser.
+						Your photo is not uploaded to a server. Export your work to keep a separate copy. Cloud
+						sync, public AI generation and additional physical formats are future work.
 					</p>
 				</aside>
 			</article>

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { designCatalog, findDesign } from "@crafter-station/badge-studio-design/catalog";
+import { demoPortraitUrl, resolveStudioPortrait } from "./portrait-studies";
 import {
 	demoBadgeForDesign,
 	demoParticipantForDesign,
@@ -7,12 +8,24 @@ import {
 } from "./studio-participant";
 
 describe("shared gallery and editor participants", () => {
+	test("every sample uses the same fictional participant", () => {
+		for (const design of designCatalog) {
+			const sample = demoBadgeForDesign(design);
+			expect(sample.name).toBe("Alex Rivera");
+			expect(sample.portraitUrl).toBe(
+				resolveStudioPortrait(demoPortraitUrl, design.source, "event"),
+			);
+			expect(sample.organization).toBe("Creative community");
+			expect(sample.document).toBe(design);
+			expect(sample.publicUrl).toBe(demoParticipantForDesign(design).publicUrl);
+		}
+	});
 	test("event demos include the prepared portraits, actual event details and QR destinations", () => {
 		const expected = [
-			["hackzero-winter", "hackzero-winter-v2", "https://hack0.dev/"],
-			["peru-ai", "peru-ai-v2", "https://www.peru.ai-hackathon.co/"],
-			["next-craft", "next-craft", "https://thenextcraft.crafter.run/"],
-			["vibecode", "vibecode-v2", "https://crafter.run/vibe"],
+			["hackzero-winter", "alex-hackzero-winter", "https://hack0.dev/"],
+			["peru-ai", "alex-peru-ai", "https://www.peru.ai-hackathon.co/"],
+			["next-craft", "alex-next-craft", "https://thenextcraft.crafter.run/"],
+			["vibecode", "alex-vibecode", "https://crafter.run/vibe"],
 		];
 		for (const [source, portrait, publicUrl] of expected) {
 			const design = findDesign(source);
@@ -31,7 +44,7 @@ describe("shared gallery and editor participants", () => {
 		expect(demoBadgeForDesign(christmas).signature?.seed).toBe(3189940044);
 		const sheShips = findDesign("she-ships");
 		if (!sheShips) throw new Error("Missing She Ships");
-		expect(demoBadgeForDesign(sheShips).portraitUrl).toBe("/api/demo-portrait");
+		expect(demoBadgeForDesign(sheShips).portraitUrl).toBe(demoPortraitUrl);
 		expect(demoBadgeForDesign(sheShips).metadata?.location).toBe("Bogotá, Colombia");
 	});
 
@@ -51,7 +64,7 @@ describe("shared gallery and editor participants", () => {
 			] as const) {
 				expect(preview[key]).toEqual(editor[key]);
 			}
-			expect(editor.portraitUrl).toBe("/api/demo-portrait");
+			expect(editor.portraitUrl).toBe(demoPortraitUrl);
 		}
 	});
 

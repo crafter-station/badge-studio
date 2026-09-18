@@ -5,7 +5,7 @@ import { designCatalog } from "../packages/design/src/catalog";
 
 const root = resolve(import.meta.dir, "..");
 const baseUrl = process.argv[2] ?? "http://127.0.0.1:3004";
-const session = "badge-preview-assets";
+const session = process.env.BADGE_PREVIEW_SESSION ?? "badge-preview-assets";
 const studies = new Set([
 	"herbario-azul",
 	"frecuencia-acida",

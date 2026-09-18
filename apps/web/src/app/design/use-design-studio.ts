@@ -1,8 +1,9 @@
 "use client";
 
 import { preparePhoto } from "@/app/badge/prepare-photo";
+import { useParticipantProfile } from "@/components/participant-profile-provider";
 import { designPresets as badgeDesignExamples } from "@/lib/design-presets";
-import { type PortraitMode, demoPortraitUrl, resolveStudioPortrait } from "@/lib/portrait-studies";
+import { applyParticipantIdentity } from "@/lib/participant-profile";
 import {
 	demoParticipant,
 	demoParticipantForDesign,
@@ -15,7 +16,7 @@ import {
 	badgeDesignSchema,
 } from "@crafter-station/badge-studio-design/badge-design";
 import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
-import { useEffect, useRef, useState } from "react";
+import { type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import {
 	type DesignLibrary,
 	type DesignReference,
@@ -41,8 +42,12 @@ export function useDesignStudio() {
 		locks: { front: [], back: [], material: false },
 		past: [],
 	}));
-	const [participant, setParticipant] = useState<PrismBadgeData>(demoParticipant);
-	const [portraitMode, setPortraitMode] = useState<PortraitMode>("event");
+	const profile = useParticipantProfile();
+	const [baseParticipant, setBaseParticipant] = useState<PrismBadgeData>(demoParticipant);
+	const participant = useMemo(
+		() => applyParticipantIdentity(baseParticipant, profile.identity, profile.portraitUrl),
+		[baseParticipant, profile.identity, profile.portraitUrl],
+	);
 	const [reference, setReference] = useState<DesignReference>();
 	const [proposals, setProposals] = useState<BadgeDesign[]>([]);
 	const [library, setLibrary] = useState<DesignLibrary>();
@@ -56,8 +61,6 @@ export function useDesignStudio() {
 	const [autoArtwork, setAutoArtwork] = useState(true);
 	const active = useRef<AbortController | null>(null);
 	const mounted = useRef(true);
-	const photoUrl = useRef<string | undefined>(undefined);
-	const photoRevision = useRef(0);
 	const retry = useRef<{ fingerprint: string; requestId: string } | undefined>(undefined);
 	const dirty = savedFingerprint !== JSON.stringify(editor.design);
 
@@ -67,7 +70,7 @@ export function useDesignStudio() {
 		const source = new URLSearchParams(window.location.search).get("style");
 		const base = badgeDesignExamples.find((design) => design.source === source) ?? defaultDesign;
 		setEditor({ design: base, locks: { front: [], back: [], material: false }, past: [] });
-		setParticipant(demoParticipantForDesign(base));
+		setBaseParticipant(demoParticipantForDesign(base));
 		void designRequest<DesignLibrary>("", { signal: controller.signal })
 			.then((result) => {
 				if (controller.signal.aborted) return;
@@ -79,7 +82,7 @@ export function useDesignStudio() {
 					setEditor({ design, locks: { front: [], back: [], material: false }, past: [] });
 					setSaved(entry);
 					setSavedFingerprint(JSON.stringify(design));
-					setParticipant((person) => participantForDesign(person, design));
+					setBaseParticipant((person) => participantForDesign(person, design));
 				}
 			})
 			.catch((reason) => {
@@ -101,8 +104,6 @@ export function useDesignStudio() {
 			mounted.current = false;
 			controller.abort();
 			active.current?.abort();
-			photoRevision.current++;
-			if (photoUrl.current) URL.revokeObjectURL(photoUrl.current);
 		};
 	}, []);
 
@@ -141,7 +142,7 @@ export function useDesignStudio() {
 	function select(design: BadgeDesign, sameDirection = false) {
 		if (active.current) return;
 		setEditor((state) => replaceDesign(state, design, sameDirection));
-		setParticipant((person) => participantForDesign(person, design));
+		setBaseParticipant((person) => participantForDesign(person, design));
 		if (!sameDirection) {
 			setSaved(undefined);
 			setSavedFingerprint("");
@@ -336,7 +337,7 @@ export function useDesignStudio() {
 			const design = badgeDesignSchema.parse(result.design);
 			return () => {
 				setEditor((state) => replaceDesign(state, design, false));
-				setParticipant((person) => participantForDesign(person, design));
+				setBaseParticipant((person) => participantForDesign(person, design));
 				setSaved(result);
 				history.replaceState(history.state, "", `/design?design=${encodeURIComponent(result.id)}`);
 				setSavedFingerprint(JSON.stringify(design));
@@ -346,38 +347,15 @@ export function useDesignStudio() {
 		});
 	}
 
-	async function changePhoto(file: File) {
-		if (active.current) return;
-		const revision = ++photoRevision.current;
-		setError("");
-		try {
-			const image = await preparePhoto(file);
-			if (!mounted.current || revision !== photoRevision.current) return;
-			const next = URL.createObjectURL(image);
-			const previous = photoUrl.current;
-			photoUrl.current = next;
-			setParticipant((data) => ({ ...data, portraitUrl: next }));
-			if (previous) URL.revokeObjectURL(previous);
-		} catch (reason) {
-			if (mounted.current && revision === photoRevision.current)
-				setError((reason as Error).message);
-		}
-	}
-
-	function changePortraitMode(mode: PortraitMode) {
-		if (active.current) return;
-		photoRevision.current++;
-		setPortraitMode(mode);
-	}
-
-	function restoreDemoPortrait() {
-		if (active.current) return;
-		photoRevision.current++;
-		if (photoUrl.current) URL.revokeObjectURL(photoUrl.current);
-		photoUrl.current = undefined;
-		setParticipant((person) => ({ ...person, portraitUrl: demoPortraitUrl }));
-		setPortraitMode("event");
-		setError("");
+	function setParticipant(update: SetStateAction<PrismBadgeData>) {
+		const next = typeof update === "function" ? update(participant) : update;
+		setBaseParticipant(next);
+		const patch = Object.fromEntries(
+			(["name", "role", "organization", "number"] as const)
+				.filter((key) => next[key] !== participant[key])
+				.map((key) => [key, next[key] ?? ""]),
+		);
+		profile.updateIdentity(patch);
 	}
 
 	function toggleLock(side: DesignSide, id: string) {
@@ -513,7 +491,7 @@ export function useDesignStudio() {
 	}
 
 	function setEvent(event: string) {
-		setParticipant((person) => ({ ...person, eventName: event }));
+		setBaseParticipant((person) => ({ ...person, eventName: event }));
 		if (event.trim() && event.length <= 80 && !active.current)
 			setEditor((state) => ({ ...state, design: { ...state.design, event } }));
 	}
@@ -557,18 +535,8 @@ export function useDesignStudio() {
 
 	return {
 		...editor,
-		participant: {
-			...participant,
-			portraitUrl: resolveStudioPortrait(
-				participant.portraitUrl,
-				editor.design.source,
-				portraitMode,
-			),
-		},
-		demoPortrait: participant.portraitUrl === demoPortraitUrl,
-		portraitMode,
-		changePortraitMode,
-		restoreDemoPortrait,
+		participant,
+		profile,
 		setParticipant,
 		reference,
 		proposals,
@@ -591,7 +559,6 @@ export function useDesignStudio() {
 		generateArtwork,
 		save,
 		load,
-		changePhoto,
 		changeArtwork,
 		toggleLock,
 		toggleVisibility,

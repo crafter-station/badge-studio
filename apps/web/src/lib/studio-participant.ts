@@ -1,15 +1,13 @@
 import type { BadgeDesign } from "@crafter-station/badge-studio-design/badge-design";
 import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
 import { badgeEditions } from "../app/collection/editions";
-import { demoPortraitUrl, resolveStudioPortrait } from "./portrait-studies";
+import { resolveStudioPortrait } from "./portrait-studies";
+import { sampleParticipant } from "./sample-participant";
 
 export const demoParticipant: PrismBadgeData = {
-	name: "Railly Hugo",
-	role: "Builder",
-	organization: "Vercel",
+	...sampleParticipant,
 	number: 1,
 	eventName: "The GTM Hackathon",
-	portraitUrl: demoPortraitUrl,
 	publicUrl: "https://crafters.chat/",
 	signature: { seed: 42091, version: 1 },
 };

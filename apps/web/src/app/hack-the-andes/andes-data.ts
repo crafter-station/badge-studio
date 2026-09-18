@@ -1,5 +1,6 @@
 import type { PrismRecipe } from "@crafter-station/badge-studio-design/prism-style";
 import type { PrismAppearance, PrismBadgeData } from "@crafter-station/badge-studio-renderer";
+import { sampleParticipant } from "../../lib/sample-participant";
 
 export const andesRecipe: PrismRecipe = {
 	version: 1,
@@ -59,13 +60,11 @@ export const andesAppearance: PrismAppearance = {
 
 export const andesData = {
 	design: "andes",
-	name: "Railly Hugo",
+	...sampleParticipant,
 	role: "attendee",
-	organization: "Vercel",
 	number: 1,
 	eventName: "Hack the Andes",
 	accentColor: "#6f9bff",
-	portraitUrl: "/api/demo-portrait",
 	signature: { seed: 1838327995, version: 1 },
 	publicUrl: "https://theandeshackathon.com/",
 	metadata: {

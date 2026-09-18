@@ -1,6 +1,8 @@
+import { sampleParticipant } from "./sample-participant";
+
 export type PortraitMode = "event" | "photo";
 
-export const demoPortraitUrl = "/api/demo-portrait";
+export const demoPortraitUrl = sampleParticipant.portraitUrl;
 
 export const portraitStudies = [
 	{
@@ -25,7 +27,7 @@ export const portraitStudies = [
 	},
 ].map((study) => ({
 	...study,
-	url: `/prism/portraits/${study.source}${study.source === "next-craft" ? "" : "-v2"}.webp`,
+	url: `/prism/portraits/alex-${study.source}.webp`,
 }));
 
 export function portraitStudyFor(source?: string) {

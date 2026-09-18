@@ -5,7 +5,7 @@ describe("editor portrait identity", () => {
 	test("each event resolves its own portrait and can return to the original", () => {
 		for (const source of ["peru-ai", "next-craft", "vibecode", "hackzero-winter"]) {
 			expect(resolveStudioPortrait(demoPortraitUrl, source, "event")).toBe(
-				`/prism/portraits/${source}${source === "next-craft" ? "" : "-v2"}.webp`,
+				`/prism/portraits/alex-${source}.webp`,
 			);
 			expect(resolveStudioPortrait(demoPortraitUrl, source, "photo")).toBe(demoPortraitUrl);
 		}

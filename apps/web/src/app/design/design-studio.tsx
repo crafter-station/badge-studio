@@ -1,5 +1,6 @@
 "use client";
 
+import { BadgeSnapshot } from "@/components/badge-snapshot";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { designPresets as badgeDesignExamples } from "@/lib/design-presets";
+import { participantForDesign } from "@/lib/studio-participant";
 import { badgeDesignSchema } from "@crafter-station/badge-studio-design/badge-design";
 import {
 	PrismBadge,
@@ -35,6 +37,7 @@ import { browserStorageEnabled } from "./browser-design-store";
 import { designAssetUrl, downloadFile } from "./design-client";
 import { DesignInspector } from "./design-inspector";
 import { DesignPreview } from "./design-preview";
+import { DesignProfile } from "./design-profile";
 import { useDesignStudio } from "./use-design-studio";
 
 export function DesignStudio() {
@@ -98,8 +101,23 @@ export function DesignStudio() {
 		}
 	}
 
+	if (!studio.profile.ready || !studio.profile.identity.started) {
+		return (
+			<main className="design-studio design-studio-welcome" lang="es">
+				{studio.profile.ready && studio.fontsReady ? (
+					<DesignProfile welcome />
+				) : (
+					<output className="design-loading">
+						<Spinner /> Preparando tu espacio…
+					</output>
+				)}
+			</main>
+		);
+	}
+
 	return (
 		<main className="design-studio" lang="es" data-mobile-panel={mobilePanel}>
+			<DesignProfile />
 			<div className="design-actions" aria-label="Acciones del diseño">
 				<span className="design-workspace-label">Tu espacio de diseño</span>
 				<div className="design-header-actions">
@@ -154,7 +172,9 @@ export function DesignStudio() {
 					spacing={0}
 					aria-label="Vista del estudio"
 				>
-					<ToggleGroupItem value="create">Crear</ToggleGroupItem>
+					<ToggleGroupItem value="create">
+						{browserStorageEnabled ? "Estilos" : "Crear"}
+					</ToggleGroupItem>
 					<ToggleGroupItem value="preview">Badge</ToggleGroupItem>
 					<ToggleGroupItem value="edit">Editar</ToggleGroupItem>
 				</ToggleGroup>
@@ -167,7 +187,7 @@ export function DesignStudio() {
 					</div>
 					<p className="design-intro">
 						{browserStorageEnabled
-							? "Elige una dirección. Sube tu foto. Cambia cada detalle."
+							? "Tu foto ya está en toda la colección. Elige un estilo y cambia cada detalle."
 							: "Una referencia. Una idea. Un badge que se sienta tuyo."}
 					</p>
 					<FieldGroup>
@@ -371,13 +391,27 @@ export function DesignStudio() {
 							{badgeDesignExamples.map((design) => (
 								<Button
 									key={design.name}
+									className="design-seed"
 									variant={design.name === studio.design.name ? "secondary" : "ghost"}
 									size="sm"
 									disabled={pending}
 									onClick={() => studio.select(design)}
 									data-design-source={design.source}
+									aria-pressed={design.name === studio.design.name}
+									aria-label={design.name}
 								>
-									{design.name}
+									<span className="design-seed-art">
+										<BadgeSnapshot
+											data={{
+												...participantForDesign(studio.participant, design),
+												document: design,
+												artworkUrl: design.artwork?.assetId
+													? designAssetUrl(design.artwork.assetId)
+													: undefined,
+											}}
+										/>
+									</span>
+									<span className="design-seed-name">{design.name}</span>
 								</Button>
 							))}
 						</div>

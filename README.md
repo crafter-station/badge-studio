@@ -40,7 +40,7 @@ Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide
 
 Browsing, editing, JSON import/export and PNG export do not need credentials. Prompt-based generation and artwork generation use an optional Vercel AI Gateway key. Copy `apps/web/.env.example` to `apps/web/.env.local` and add your own key to enable those operations.
 
-The bundled demo portrait and prepared event studies show the sample participant. You can upload a different photo in the editor; changing events preserves your uploaded photo.
+Upload a photo once in the editor, or choose **Probar con foto de ejemplo** to try the fictional sample portrait. Your photo and name carry across all 17 styles, the gallery and the landing page. The profile is saved in this browser and restored on your next visit. Replace or remove the photo from the profile bar at any time.
 
 ## Structure
 
@@ -69,11 +69,15 @@ npm run test:npm -- badgio@0.1.1
 
 ## Service boundary
 
-The public studio uses `NEXT_PUBLIC_BADGE_STORAGE=browser` to save designs and illustrations in IndexedDB. Export JSON and images to keep a separate copy. Public AI generation and cloud sync are not enabled.
+The public studio uses `NEXT_PUBLIC_BADGE_STORAGE=browser` to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a server. Export JSON and images to keep a separate copy. Public AI generation and cloud sync are not enabled.
 
 Local development can use the file-backed design API and an optional AI Gateway key. Hosted file storage is disabled. Multi-user generation needs account-scoped storage and consumption controls before it can be enabled.
 
 Event SDK remains a separate initiative. See [provenance](docs/provenance.md).
+
+## Brand assets
+
+Open Graph images, a square social card, vector marks, favicon and app icons are in `apps/web/public/brand-assets`. Regenerate them from the bundled badge renders with `bun run --cwd apps/web brand:assets`. The web metadata uses the 1200 × 630 PNG. Icon artwork follows the existing Phosphor Stack mark; the renderer, event credits and font licenses remain in [provenance](docs/provenance.md).
 
 ## License
 

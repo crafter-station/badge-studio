@@ -1,7 +1,7 @@
 "use client";
 
 import type { BadgeDesign } from "@crafter-station/badge-studio-design/badge-design";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { designAppearance } from "./design";
 import type { StudioController, StudioOptions } from "./renderer";
 import type { PrismBadgeData, PrismSide, PrismStatus } from "./types";
@@ -10,11 +10,13 @@ export function PrismPreview({
 	data,
 	active,
 	fallbackUrl,
+	fallback,
 	side = "front",
 }: {
 	data: PrismBadgeData & { document: BadgeDesign };
 	active: boolean;
 	fallbackUrl: string;
+	fallback?: ReactNode;
 	side?: PrismSide;
 }) {
 	const canvas = useRef<HTMLCanvasElement>(null);
@@ -77,7 +79,7 @@ export function PrismPreview({
 
 	return (
 		<span data-material-status={status} data-material-active={active}>
-			{status !== "ready" ? <img src={fallbackUrl} alt="" draggable={false} /> : null}
+			{status !== "ready" ? (fallback ?? <img src={fallbackUrl} alt="" draggable={false} />) : null}
 			<canvas
 				ref={canvas}
 				tabIndex={-1}

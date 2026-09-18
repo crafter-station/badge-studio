@@ -25,7 +25,7 @@ body:has(.design-studio)::before {
 	min-width: 0;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	grid-template-rows: 44px minmax(0, 1fr);
+	grid-template-rows: auto 44px minmax(0, 1fr);
 	background: var(--background);
 	color: var(--foreground);
 	font-family: var(--font-geist-sans), Arial, sans-serif;
@@ -75,6 +75,206 @@ body:has(.design-studio)::before {
 }
 .design-mobile-tabs {
 	display: none;
+}
+.design-studio-welcome {
+	display: block;
+	overflow-y: auto;
+}
+.design-welcome {
+	display: grid;
+	grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+	gap: clamp(40px, 6vw, 100px);
+	align-items: center;
+	max-width: 1200px;
+	min-height: 100%;
+	margin-inline: auto;
+	padding: 60px 48px;
+}
+.design-welcome-copy {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+.design-welcome-eyebrow {
+	font-size: 12px;
+	color: var(--muted-foreground);
+	margin: 0 0 24px;
+}
+.design-welcome h1 {
+	font-size: clamp(36px, 4vw, 56px);
+	font-weight: 450;
+	line-height: 1.05;
+	letter-spacing: -2.5px;
+	margin: 0 0 24px;
+}
+.design-welcome-description {
+	font-size: 15px;
+	line-height: 1.8;
+	color: var(--muted-foreground);
+	max-width: 340px;
+	margin: 0 0 32px;
+}
+.design-welcome [data-slot="field"] {
+	width: 100%;
+	max-width: 340px;
+	gap: 10px;
+}
+.design-welcome [data-slot="field-label"] {
+	gap: 8px;
+}
+.design-welcome input {
+	height: 42px;
+}
+.design-welcome-upload {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 20px;
+}
+.design-welcome-upload button {
+	height: 44px;
+	padding-inline: 20px;
+}
+.design-welcome-upload > span,
+.design-welcome-privacy {
+	font-size: 11px;
+	color: var(--muted-foreground);
+	line-height: 1.8;
+}
+.design-example-photo {
+	margin-top: 12px;
+	height: 44px;
+	gap: 10px;
+	padding: 5px 16px 5px 6px;
+}
+.design-example-photo > img {
+	width: 28px;
+	height: 30px;
+	object-fit: cover;
+}
+.design-welcome-privacy {
+	margin: 16px 0 24px;
+}
+.design-welcome-skip {
+	color: var(--muted-foreground);
+	margin-left: -8px;
+}
+.design-welcome-showcase {
+	min-width: 0;
+}
+.design-welcome-fan {
+	position: relative;
+	height: 450px;
+}
+.design-welcome-card {
+	position: absolute;
+	width: 230px;
+	aspect-ratio: 2 / 3;
+	top: 52px;
+	left: calc(50% - 115px);
+	filter: drop-shadow(0 12px 16px #0002);
+}
+.design-welcome-card:first-child {
+	transform: translate(-94px, 12px) rotate(-15deg);
+}
+.design-welcome-card:nth-child(2) {
+	z-index: 2;
+	transform: translateY(-16px) rotate(-3deg);
+}
+.design-welcome-card:nth-child(3) {
+	transform: translate(104px, 25px) rotate(14deg);
+}
+.design-welcome-showcase > p {
+	font-size: 11px;
+	text-align: center;
+	color: var(--muted-foreground);
+	margin: 16px 0 0;
+}
+.design-profile {
+	border-bottom: 1px solid var(--design-line);
+	padding: 12px 24px;
+}
+.design-profile-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+.design-profile-avatar {
+	flex: 0 0 auto;
+	width: 36px;
+	height: 42px;
+	object-fit: cover;
+	border-radius: 3px;
+	background: var(--muted);
+}
+.design-profile-name {
+	display: grid;
+	gap: 3px;
+	width: 210px;
+	min-width: 0;
+}
+.design-profile-name input {
+	height: 25px;
+	padding: 0 4px;
+	border-color: transparent;
+	box-shadow: none;
+	font-size: 13px;
+	font-weight: 500;
+}
+.design-profile-name input:hover {
+	border-color: var(--input);
+}
+.design-profile-name > span {
+	padding-left: 4px;
+	font-size: 10px;
+	color: var(--muted-foreground);
+}
+.design-profile-saved {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	color: var(--muted-foreground);
+	margin: 0 0 0 auto;
+}
+.design-profile-saved svg {
+	width: 13px;
+	height: 13px;
+}
+.design-profile-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: auto;
+}
+.design-profile-feedback {
+	margin-top: 12px;
+}
+.design-profile-feedback [data-slot="alert-description"] {
+	font-size: 12px;
+}
+.design-photo-drop {
+	position: fixed;
+	inset: 16px;
+	z-index: 100;
+	background: color-mix(in srgb, var(--background) 96%, transparent);
+	color: var(--foreground);
+	border: 1px dashed var(--foreground);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 18px;
+	pointer-events: none;
+}
+.design-photo-drop strong {
+	font-size: 32px;
+	font-weight: 450;
+	letter-spacing: -1px;
+}
+.design-photo-drop span {
+	font-size: 14px;
+	color: var(--muted-foreground);
 }
 .design-workspace {
 	display: grid;
@@ -209,6 +409,36 @@ body:has(.design-studio)::before {
 .design-seeds > button,
 .design-saved-list > button {
 	justify-content: flex-start;
+}
+.design-seeds {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px 8px;
+}
+.design-seeds > .design-seed {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+	padding: 6px;
+	height: auto;
+	gap: 9px;
+	border: 1px solid transparent;
+}
+.design-seed[aria-pressed="true"] {
+	border-color: var(--foreground);
+}
+.design-seed-art {
+	display: block;
+	aspect-ratio: 2 / 3;
+	width: 100%;
+	min-height: 0;
+}
+.design-seed-name {
+	white-space: normal;
+	text-align: left;
+	font-size: 10px;
+	line-height: 1.5;
 }
 .design-saved-list > button > span {
 	margin-left: auto;
@@ -566,7 +796,75 @@ body:has(.design-studio)::before {
 
 @media (max-width: 850px) {
 	.design-studio {
-		grid-template-rows: 44px 42px minmax(0, 1fr);
+		grid-template-rows: auto 44px 42px minmax(0, 1fr);
+	}
+	.design-welcome {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 8px;
+		padding: 28px 24px 32px;
+		max-width: 470px;
+		align-content: center;
+	}
+	.design-welcome-showcase {
+		grid-row: 1;
+	}
+	.design-welcome-fan {
+		height: 210px;
+	}
+	.design-welcome-card {
+		width: 116px;
+		left: calc(50% - 58px);
+		top: 22px;
+	}
+	.design-welcome-card:first-child {
+		transform: translate(-64px, 5px) rotate(-15deg);
+	}
+	.design-welcome-card:nth-child(2) {
+		transform: translateY(-6px) rotate(-3deg);
+	}
+	.design-welcome-card:nth-child(3) {
+		transform: translate(65px, 9px) rotate(14deg);
+	}
+	.design-welcome-showcase > p {
+		display: none;
+	}
+	.design-welcome-eyebrow {
+		margin-bottom: 12px;
+	}
+	.design-welcome h1 {
+		margin-bottom: 16px;
+		letter-spacing: -1.5px;
+	}
+	.design-welcome-description {
+		font-size: 13px;
+		margin-bottom: 20px;
+	}
+	.design-welcome-privacy {
+		margin: 12px 0;
+	}
+	.design-profile {
+		padding: 8px 12px;
+	}
+	.design-profile-row {
+		gap: 8px;
+	}
+	.design-profile-saved {
+		display: none;
+	}
+	.design-profile-name {
+		flex: 1;
+		width: auto;
+	}
+	.design-profile-name input,
+	.design-welcome input {
+		font-size: 16px;
+	}
+	.design-profile-name > span {
+		font-size: 9px;
+	}
+	.design-profile-avatar {
+		width: 28px;
+		height: 34px;
 	}
 	.design-actions {
 		padding-inline: 16px;
@@ -641,6 +939,9 @@ body:has(.design-studio)::before {
 }
 
 @media (max-width: 850px) and (max-height: 650px) {
+	.design-welcome-fan {
+		display: none;
+	}
 	.design-preview-art {
 		height: 50px;
 	}

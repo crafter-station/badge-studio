@@ -5,10 +5,10 @@ export const runtime = "nodejs";
 
 export async function GET() {
 	const root = join(process.cwd(), "public", "prism");
-	const image = await readFile(join(root, "demo", "railly.webp")).catch(() =>
+	const image = await readFile(join(root, "demo", "alex.webp")).catch(() =>
 		readFile(join(root, "portrait-placeholder.webp")),
 	);
 	return new Response(new Uint8Array(image), {
-		headers: { "Content-Type": "image/webp", "Cache-Control": "private, max-age=3600" },
+		headers: { "Content-Type": "image/webp", "Cache-Control": "no-store" },
 	});
 }

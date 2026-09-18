@@ -10,7 +10,6 @@ import type { PrismSide } from "@crafter-station/badge-studio-renderer";
 import { ArrowCounterClockwise, LockSimple, Stack } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import { DesignLayerActions } from "./design-layer-actions";
-import { DesignPortraitPicker } from "./design-portrait-picker";
 import { DesignSelectedLayer } from "./design-selected-layer";
 import type { useDesignStudio } from "./use-design-studio";
 
@@ -122,7 +121,6 @@ export function DesignInspector({
 					<p className="design-help">
 						Selecciona una capa para editarla. El ojo muestra u oculta; el candado protege.
 					</p>
-					<DesignPortraitPicker studio={studio} />
 					<select
 						className="design-select"
 						aria-label="Añadir elemento"
@@ -255,14 +253,14 @@ export function DesignInspector({
 			) : (
 				<>
 					<div className="design-section-heading">
-						<h2>La misma dirección, otra persona</h2>
+						<h2>Tus datos, en todos los estilos</h2>
 					</div>
-					<p className="design-help">Cambia los datos sin volver a generar el arte.</p>
-					<DesignPortraitPicker studio={studio} />
+					<p className="design-help">
+						La foto y el nombre se cambian arriba. Tus datos se conservan al explorar la colección.
+					</p>
 					<FieldGroup>
 						{(
 							[
-								["name", "Nombre"],
 								["role", "Rol"],
 								["organization", "Organización"],
 							] as const
@@ -276,7 +274,7 @@ export function DesignInspector({
 											? studio.participant.metadata?.roleLabel || studio.participant.role
 											: (studio.participant[key] ?? "")
 									}
-									maxLength={key === "name" ? 80 : 100}
+									maxLength={100}
 									onChange={(event) =>
 										studio.setParticipant((person) => ({
 											...person,

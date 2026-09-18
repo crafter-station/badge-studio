@@ -71,7 +71,16 @@ export const directions = [
 export const previewUrl = (id: string, side = "front") =>
 	`/prism/collection/previews/${id}-${side}.webp`;
 
-export const orbitObjects = directions.map((direction) => ({
+const orbitOrder = [
+	directions.find((direction) => direction.id === "vibecode"),
+	directions.find((direction) => direction.id === "gtm"),
+	...directions.filter(
+		(direction) => !["vibecode", "gtm", "hackzero-winter"].includes(direction.id),
+	),
+	directions.find((direction) => direction.id === "hackzero-winter"),
+].filter((direction) => direction !== undefined);
+
+export const orbitObjects = orbitOrder.map((direction) => ({
 	id: direction.id,
 	label: direction.name,
 	physical: direction.category === "Materials",

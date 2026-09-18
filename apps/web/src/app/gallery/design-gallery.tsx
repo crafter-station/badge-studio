@@ -1,5 +1,6 @@
 "use client";
 
+import { useParticipantProfile } from "@/components/participant-profile-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ArrowsClockwise } from "@phosphor-icons/react";
@@ -17,6 +18,7 @@ type Direction = {
 };
 
 export function DesignGallery({ directions }: { directions: Direction[] }) {
+	const profile = useParticipantProfile();
 	const [category, setCategory] = useState("All");
 	const [flipped, setFlipped] = useState<string[]>([]);
 	const shown = directions.filter((item) => category === "All" || item.category === category);
@@ -26,8 +28,14 @@ export function DesignGallery({ directions }: { directions: Direction[] }) {
 		<main className="badge-gallery">
 			<section className="gallery-heading">
 				<p className="gallery-eyebrow">The collection · {directions.length} art directions</p>
-				<h1>Find your kind of badge.</h1>
-				<p>From real gatherings to new possibilities. Pick a starting point and make it yours.</p>
+				<h1>
+					{profile.identity.started ? "Your photo. Every possibility." : "Find your kind of badge."}
+				</h1>
+				<p>
+					{profile.identity.started
+						? "One profile across the collection. Choose your favorite, or update your photo in the studio."
+						: "From real gatherings to new possibilities. Pick a starting point and make it yours."}
+				</p>
 			</section>
 			<div className="gallery-controls">
 				<ToggleGroup
