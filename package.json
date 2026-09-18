@@ -9,7 +9,8 @@
 		"check": "biome check .",
 		"typecheck": "tsc --noEmit -p apps/web/tsconfig.json && bun run --cwd packages/cli typecheck",
 		"test": "bun run --cwd packages/cli build && bun test packages apps/web/src/lib apps/web/src/app/design",
-		"studio": "bun packages/cli/src/cli.ts"
+		"studio": "node packages/cli/dist/cli.js",
+		"test:npm": "node scripts/verify-cli-package.mjs"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

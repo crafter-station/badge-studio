@@ -10,16 +10,16 @@ import {
 import { designCatalog, findDesign } from "@crafter-station/badge-studio-design/catalog";
 import type { ZodTypeAny } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { version } from "../package.json";
 import { banner, column, machineOutput, style } from "./presentation";
 
-const version = "0.1.0";
 const commands = [
 	"styles list",
 	"design create --style <id> [--out <new-file>] [--dry-run]",
 	"design validate --file <file>",
 	"schema",
 ];
-const nextSteps = ["badgio styles list", "badgio schema"];
+const nextSteps = ["npx badgio styles list", "npx badgio schema"];
 
 class InputError extends Error {}
 
@@ -61,7 +61,7 @@ async function run() {
 		return;
 	}
 	if (values.help || !positionals.length) {
-		if (!json) banner();
+		if (!json) banner(version);
 		emit(
 			{
 				commands,
@@ -69,7 +69,8 @@ async function run() {
 				exitCodes: { success: 0, invalidInput: 2, systemFailure: 1 },
 			},
 			nextSteps,
-			`${style("Commands", "1", !json)}\n${commands.map((command) => `  badgio ${command}`).join("\n")}\n\nJSON is automatic when piped. --out creates new files only.\nFrom a checkout: bun run studio <command>`,
+			`${style("Commands", "1", !json)}\n${commands.map((command) => `  npx badgio ${command}`).join("\n")}\n\nJSON is automatic when piped. --out creates new files only.\nInstall globally: npm install --global badgio
+From a built checkout: npm run studio -- <command>`,
 			json,
 		);
 		return;
@@ -95,7 +96,7 @@ async function run() {
 		}));
 		emit(
 			{ styles },
-			["badgio design create --style opalo-lunar --out badge.json"],
+			["npx badgio design create --style opalo-lunar --out badge.json"],
 			`${style(`${styles.length} starting points`, "1", !json)}\n\n${styles
 				.map((entry) => `${column(entry.id ?? "", 25)}${entry.name}`)
 				.join("\n")}`,
@@ -120,14 +121,14 @@ async function run() {
 					"Run design validate for full semantic validation. Artwork IDs require matching local assets.",
 				],
 			},
-			["badgio design validate --file badge.json"],
+			["npx badgio design validate --file badge.json"],
 			"Use --json to inspect the complete versioned design schema.",
 			json,
 		);
 		return;
 	}
 	if (command === "design create") {
-		if (!values.style) throw new InputError("Supply --style. Run badgio styles list for IDs.");
+		if (!values.style) throw new InputError("Supply --style. Run npx badgio styles list for IDs.");
 		const preset = findDesign(values.style);
 		if (!preset) throw new InputError(`Unknown style: ${values.style}`);
 		const design = badgeDesignSchema.parse(structuredClone(preset));
@@ -146,7 +147,7 @@ async function run() {
 			{ design, path, written: Boolean(path && !dryRun), dryRun },
 			path
 				? [
-						`badgio design validate --file ${JSON.stringify(path)}`,
+						`npx badgio design validate --file ${JSON.stringify(path)}`,
 						"Import the JSON in the Badge Studio editor.",
 					]
 				: ["Run again with --out badge.json to create an importable document."],
@@ -203,6 +204,6 @@ run().catch((error: Error & { code?: string }) => {
 	};
 	if (machineOutput(process.argv.includes("--json")))
 		process.stdout.write(`${JSON.stringify(payload)}\n`);
-	process.stderr.write(`badge-studio: ${error.message}\n`);
+	process.stderr.write(`badgio: ${error.message}\n`);
 	process.exitCode = exitCode;
 });

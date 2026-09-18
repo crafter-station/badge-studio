@@ -2,21 +2,23 @@
 
 Create editable badges with personality from your terminal or coding agent.
 
+Requires Node.js 22 or newer and npm. The CLI runs directly on Node.js.
+
 ```sh
-bunx badgio styles list
-bunx badgio design create --style gtm --out badge.json
-bunx badgio schema --json
-bunx badgio design validate --file badge.json
+npx badgio styles list
+npx badgio design create --style gtm --out badge.json
+npx badgio schema --json
+npx badgio design validate --file badge.json
 ```
 
 Or install the command:
 
 ```sh
-bun add --global badgio
+npm install --global badgio
 badgio --help
 ```
 
-Requires Node.js 22 or newer. Open [Badge Studio](https://badge-studio.crafter.run/design), choose **Importar JSON**, upload your photo and export your badge.
+Open [Badge Studio](https://badge-studio.crafter.run/design), choose **Importar JSON**, upload your photo and export your badge.
 
 The package is `badgio`; the app is Badge Studio. The `badge-studio` command remains available as an alias.
 

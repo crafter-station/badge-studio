@@ -2,13 +2,32 @@
 
 A design studio for badges with personality. Explore nine event art directions, three physical originals and five custom studies. Edit every layer, flip the badge, change its material and export it.
 
-Try [Badge Studio](https://badge-studio.crafter.run), or create a document from your terminal with `bunx badgio styles list`.
+Try [Badge Studio](https://badge-studio.crafter.run), or create a document from your terminal with `npx badgio styles list`.
 
 The landing is a draggable orbit of nine event badges plus Térmico, Prisma and Cromo, with depth, inertia and optional synthesized mechanical ticks. It supports keyboard rotation, reduced motion and light/dark themes.
 
-## Run
+## Use the CLI
 
-Requires Bun 1.3+.
+Requires Node.js 22 or newer and npm.
+
+```sh
+npx badgio styles list
+npx badgio design create --style gtm --out badge.json
+npx badgio schema --json
+npx badgio design validate --file badge.json
+```
+
+An agent can edit the JSON using the versioned schema and semantic validator. Choose **Importar JSON** in the editor to continue visually.
+
+The npm package is `badgio`, with `badgio` and `badge-studio` commands. It bundles the same catalog and validator as the editor and runs directly on Node.js. Install it globally with `npm install --global badgio` to run `badgio` without `npx`.
+
+The CLI creates and validates editable JSON. The web studio renders and exports the badge. Image generation and LLM calls are not part of the CLI.
+
+See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
+
+## Develop the studio
+
+The monorepo uses Bun 1.3+ for workspace installation and its test runner. Published CLI users only need Node.js and npm.
 
 ```sh
 bun install
@@ -17,26 +36,11 @@ bun run build:packages
 bun run dev
 ```
 
-Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide at `/docs`.
+Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide at `/docs`. After building, run the local CLI on Node with `npm run studio -- styles list`.
 
 Browsing, editing, JSON import/export and PNG export do not need credentials. Prompt-based generation and artwork generation use an optional Vercel AI Gateway key. Copy `apps/web/.env.example` to `apps/web/.env.local` and add your own key to enable those operations.
 
 The bundled demo portrait and prepared event studies show the sample participant. You can upload a different photo in the editor; changing events preserves your uploaded photo.
-
-## Use the CLI
-
-```sh
-bunx badgio styles list
-bunx badgio design create --style gtm --out badge.json
-bunx badgio schema --json
-bunx badgio design validate --file badge.json
-```
-
-An agent can edit the JSON using the versioned schema and semantic validator. Choose **Importar JSON** in the editor to continue visually.
-
-The npm package is `badgio`, with `badgio` and `badge-studio` commands. It requires Node.js 22 or newer and bundles the same catalog and validator as the editor. The CLI works locally and does not generate images, call an LLM or render PNGs. From a source checkout, use `bun run studio`.
-
-See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
 
 ## Structure
 
@@ -54,6 +58,13 @@ bun run check
 bun run typecheck
 bun test
 bun run build
+```
+
+Verify a packed or published CLI with npm and npx in an isolated consumer:
+
+```sh
+npm run test:npm -- /absolute/path/to/badgio-0.1.1.tgz
+npm run test:npm -- badgio@0.1.1
 ```
 
 ## Service boundary

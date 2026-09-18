@@ -1,4 +1,4 @@
-# CLI contract, version 0.1.0
+# CLI contract, version 0.1.1
 
 Badge Studio owns this contract. A design is the version 1 document in `packages/design`: two 1024 × 1536 faces, ordered layers, bound participant text, portrait filters, artwork references and a physical material recipe.
 
@@ -18,4 +18,6 @@ Success output is `{ok:true, version, data, nextSteps}`. Failure output is `{ok:
 
 The JSON Schema covers structure; `design validate` additionally checks bounds, bindings, QR placement and contrast. Artwork UUIDs reference assets served by the app and are not embedded in JSON. The shipped catalog's artwork assets are included in the web app. Custom generated assets must be transferred separately.
 
-Distribution: the `badgio` npm package contains a Node 22-compatible binary and bundles the shared catalog and validator. Run `bunx badgio`, install `badgio` globally, or use `bun run studio` from a source checkout. The `badge-studio` binary remains an alias.
+Distribution: the `badgio` npm package contains a Node 22-compatible binary and bundles the shared catalog and validator. Run `npx badgio`, install with `npm install --global badgio`, or use `npm run studio -- <command>` from a built source checkout. For unattended agents, `npx --yes badgio` accepts npm's installation prompt. The `badge-studio` binary remains an alias.
+
+`npm run test:npm -- <tarball-or-package>` verifies npx's binary resolution, a clean npm install, all 17 style round trips, schema output, overwrite protection and the compatibility alias. It runs outside the monorepo with a separate npm cache and a PATH without Bun.

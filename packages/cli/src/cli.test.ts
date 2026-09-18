@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { badgeDesignSchema } from "@crafter-station/badge-studio-design/badge-design";
 import { designCatalog } from "@crafter-station/badge-studio-design/catalog";
+import { version } from "../package.json";
 import { column, style } from "./presentation";
 
 const folder = mkdtempSync(join(tmpdir(), "badge-studio-cli-"));
@@ -25,7 +26,7 @@ test("bare invocation, help, version and catalog are machine readable without AN
 		expect(result.status).toBe(0);
 		expect(result.stderr).toBe("");
 		expect(result.stdout).not.toContain("\u001b");
-		expect(JSON.parse(result.stdout)).toMatchObject({ ok: true, version: "0.1.0" });
+		expect(JSON.parse(result.stdout)).toMatchObject({ ok: true, version });
 	}
 	expect(JSON.parse(run(["styles", "list"]).stdout).data.styles).toHaveLength(17);
 });

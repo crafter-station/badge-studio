@@ -9,7 +9,7 @@ import { StudioOrbit } from "./studio-orbit";
 export function StudioLanding() {
 	const [category, setCategory] = useState("All styles");
 	const [copied, setCopied] = useState(false);
-	const command = "bunx badgio design create --style gtm --out badge.json";
+	const command = "npx badgio design create --style gtm --out badge.json";
 	const filtered = directions.filter(
 		(direction) => category === "All styles" || direction.category === category,
 	);

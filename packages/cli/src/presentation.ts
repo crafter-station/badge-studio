@@ -12,8 +12,8 @@ export function column(text: string, width: number) {
 	return text + " ".repeat(Math.max(0, width - stripVTControlCharacters(text).length));
 }
 
-export function banner() {
+export function banner(version: string) {
 	process.stderr.write(
-		`\n  ${style("✳ Badge Studio", "1", Boolean(process.stderr.isTTY))}  v0.1.0\n  Editable design, from your terminal.\n\n`,
+		`\n  ${style("✳ Badge Studio", "1", Boolean(process.stderr.isTTY))}  v${version}\n  Editable design, from your terminal.\n\n`,
 	);
 }

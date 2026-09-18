@@ -5,12 +5,12 @@ description: Create or customize editable Badge Studio designs from the local ca
 
 # Badge Studio
 
-Run with `bunx badgio`, install `badgio` globally, or use `bun run studio` from the repository root. The package is `badgio`; the app is Badge Studio. The `badge-studio` command remains an alias.
+Requires Node.js 22 or newer and npm. Run with `npx --yes badgio`, install with `npm install --global badgio`, or use `npm run studio -- <command>` from a built repository checkout. The package is `badgio`; the app is Badge Studio. The `badge-studio` command remains an alias.
 
-1. Inspect `badgio schema --json` and `badgio styles list`.
-2. Create a starting document: `badgio design create --style gtm --out badge.json`.
+1. Inspect `npx --yes badgio schema --json` and `npx --yes badgio styles list`.
+2. Create a starting document: `npx --yes badgio design create --style gtm --out badge.json`.
 3. Edit that document according to the user's art direction. Preserve schema version, both faces and participant bindings.
-4. Run `badgio design validate --file badge.json`. Correct errors until validation passes.
+4. Run `npx --yes badgio design validate --file badge.json`. Correct errors until validation passes.
 5. Hand the file to the user and open `https://badge-studio.crafter.run/design` or the local editor. Use **Importar JSON**, then inspect front and back before declaring visual success.
 
 Use `--dry-run` on `design create` to preview. Output JSON is automatic when piped. `--out` refuses existing files; choose a new path rather than deleting or replacing user work. Without `--out`, the complete design is returned in `data.design`.
