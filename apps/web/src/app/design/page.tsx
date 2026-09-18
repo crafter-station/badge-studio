@@ -1,5 +1,6 @@
 import { DesignStudio } from "./design-studio";
 import "./design.css";
+import "../community/community.css";
 
 export const metadata = {
 	title: "Diseña una dirección",

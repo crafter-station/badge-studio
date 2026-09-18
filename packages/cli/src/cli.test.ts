@@ -28,7 +28,7 @@ test("bare invocation, help, version and catalog are machine readable without AN
 		expect(result.stdout).not.toContain("\u001b");
 		expect(JSON.parse(result.stdout)).toMatchObject({ ok: true, version });
 	}
-	expect(JSON.parse(run(["styles", "list"]).stdout).data.styles).toHaveLength(17);
+	expect(JSON.parse(run(["styles", "list"]).stdout).data.styles).toHaveLength(18);
 });
 
 test("all styles roundtrip through exclusive file creation and full semantic validation", () => {

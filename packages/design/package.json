@@ -39,6 +39,11 @@
 			"types": "./dist/catalog.d.ts",
 			"import": "./dist/catalog.js",
 			"default": "./dist/catalog.js"
+		},
+		"./qr": {
+			"bun": "./src/qr.ts",
+			"types": "./dist/qr.d.ts",
+			"import": "./dist/qr.js"
 		}
 	},
 	"scripts": {
@@ -46,11 +51,13 @@
 		"test": "bun test"
 	},
 	"dependencies": {
-		"zod": "^3.24.0"
+		"zod": "^3.24.0",
+		"qrcode": "1.5.4"
 	},
 	"devDependencies": {
 		"tsup": "^8.4.0",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"@types/qrcode": "1.5.6"
 	},
 	"private": true,
 	"license": "AGPL-3.0-only"

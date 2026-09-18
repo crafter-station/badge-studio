@@ -31,7 +31,8 @@
 			"**/*.tsbuildinfo",
 			"**/.prism-designs/**",
 			"**/.prism-data/**",
-			"**/.next-dev/**"
+			"**/.next-dev/**",
+			"**/.next-community-qa/**"
 		]
 	}
 }

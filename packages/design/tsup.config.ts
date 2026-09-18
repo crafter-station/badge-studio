@@ -8,6 +8,7 @@ export default defineConfig({
 		"src/prism-style.ts",
 		"src/prism-style-schema.ts",
 		"src/prism-shader.ts",
+		"src/qr.ts",
 	],
 	format: ["esm"],
 	dts: true,

@@ -3,7 +3,7 @@ import type {
 	BadgeLayer,
 	DesignSide,
 } from "@crafter-station/badge-studio-design/badge-design";
-import QRCode from "qrcode";
+import { badgeQrLayout } from "@crafter-station/badge-studio-design/qr";
 import { paintDesignGraphic } from "./design-graphics";
 import { coverDesignImage, paintDesignPhoto } from "./design-photo";
 import { paintDesignText } from "./design-text";
@@ -231,17 +231,11 @@ function paint(
 			ctx.fillRect(0, (layer.h - layer.stroke) / 2, layer.w, layer.stroke);
 		} else ctx.fill();
 	} else if (layer.kind === "qr") {
-		const url = new URL(data.publicUrl || "https://crafters.chat/");
-		if (
-			!["http:", "https:"].includes(url.protocol) ||
-			url.username ||
-			url.password ||
-			url.href.length > 400
-		)
-			throw new Error("El destino del QR no es válido.");
-		const matrix = QRCode.create(url.href, { errorCorrectionLevel: "M" }).modules;
-		const cell = Math.min(layer.maxCellSize ?? 20, Math.floor(layer.w / (matrix.size + 8)));
-		if (cell < 2) throw new Error("El QR necesita más espacio.");
+		const { matrix, cell } = badgeQrLayout(
+			data.publicUrl || "https://crafters.chat/",
+			layer.w,
+			layer.maxCellSize,
+		);
 		const offset =
 			layer.align === "start" ? cell * 4 : Math.floor((layer.w - cell * matrix.size) / 2);
 		ctx.fillStyle = layer.background ?? "#ffffff";

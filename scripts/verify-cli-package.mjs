@@ -78,7 +78,7 @@ try {
 	assert.match(readFileSync(cli, "utf8"), /^#!\/usr\/bin\/env node/);
 	const command = (args, status = 0) => JSON.parse(run("node", [cli, ...args], status));
 	const { styles } = command(["styles", "list"]).data;
-	assert.equal(styles.length, 17);
+	assert.equal(styles.length, 18);
 	for (const { id } of styles) {
 		const file = join(folder, `${id}.json`);
 		assert.equal(command(["design", "create", "--style", id, "--out", file]).data.written, true);

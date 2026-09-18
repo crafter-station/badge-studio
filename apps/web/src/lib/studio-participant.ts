@@ -3,6 +3,9 @@ import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
 import { badgeEditions } from "../app/collection/editions";
 import { resolveStudioPortrait } from "./portrait-studies";
 import { sampleParticipant } from "./sample-participant";
+import studioSamples from "./studio-samples.json";
+
+const samples: Record<string, Partial<PrismBadgeData> | undefined> = studioSamples;
 
 export const demoParticipant: PrismBadgeData = {
 	...sampleParticipant,
@@ -14,6 +17,7 @@ export const demoParticipant: PrismBadgeData = {
 
 export function participantForDesign(person: PrismBadgeData, design: BadgeDesign): PrismBadgeData {
 	const edition = badgeEditions.find((item) => item.id === design.source);
+	const event = edition?.data ?? samples[design.source ?? ""];
 	return {
 		...person,
 		design: undefined,
@@ -28,13 +32,13 @@ export function participantForDesign(person: PrismBadgeData, design: BadgeDesign
 				1,
 			version: 1,
 		},
-		...(edition
+		...(event
 			? {
-					publicUrl: edition.data.publicUrl,
+					publicUrl: event.publicUrl,
 					metadata: {
-						...(edition.data.metadata ?? {
+						...(event.metadata ?? {
 							roleLabel: "",
-							eventName: edition.name,
+							eventName: design.event,
 							eventDate: "",
 							location: "",
 							website: "",
@@ -60,7 +64,10 @@ export function participantForDesign(person: PrismBadgeData, design: BadgeDesign
 
 export function demoParticipantForDesign(design: BadgeDesign) {
 	const edition = badgeEditions.find((item) => item.id === design.source);
-	return participantForDesign(edition?.data ?? demoParticipant, design);
+	return participantForDesign(
+		edition?.data ?? { ...demoParticipant, ...samples[design.source ?? ""] },
+		design,
+	);
 }
 
 export function demoBadgeForDesign(

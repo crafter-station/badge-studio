@@ -34,15 +34,18 @@ import {
 } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import { browserStorageEnabled } from "./browser-design-store";
+import { CommunityPublishPanel } from "./community-publish-panel";
 import { designAssetUrl, downloadFile } from "./design-client";
 import { DesignInspector } from "./design-inspector";
 import { DesignPreview } from "./design-preview";
 import { DesignProfile } from "./design-profile";
+import { useCommunityPublishing } from "./use-community-publishing";
 import { useDesignStudio } from "./use-design-studio";
 import { useStudioWebMcp } from "./use-studio-webmcp";
 
 export function DesignStudio() {
 	const studio = useDesignStudio();
+	const publishing = useCommunityPublishing(studio);
 	const [prompt, setPrompt] = useState("");
 	const [refinement, setRefinement] = useState("");
 	const [side, setSide] = useState<PrismSide>("front");
@@ -63,6 +66,7 @@ export function DesignStudio() {
 		setMoving,
 		setMobilePanel,
 		badge,
+		publishing,
 	});
 	const pending = Boolean(studio.phase);
 	const appearance = {
@@ -135,6 +139,7 @@ export function DesignStudio() {
 			data-webmcp={agentConnection}
 		>
 			<DesignProfile />
+			<CommunityPublishPanel publishing={publishing} />
 			<div className="design-actions" aria-label="Acciones del diseño">
 				<a className="design-workspace-label" href="/docs#agents">
 					{agentConnection === "ready"

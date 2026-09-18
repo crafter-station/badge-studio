@@ -212,6 +212,14 @@ export const badgeDesignObjectSchema = z.object({
 });
 export type BadgeDesign = z.infer<typeof badgeDesignObjectSchema>;
 export type BadgeLayer = z.infer<typeof badgeLayerSchema>;
+export function isRoleBoundLayer(layer: BadgeLayer) {
+	return (
+		layer.kind === "text" &&
+		(["role", "roleOrganization", "admissionRole"].includes(layer.binding) ||
+			(layer.binding === "template" &&
+				/\{(?:role|roleOrganization|admissionRole)\}/.test(layer.text)))
+	);
+}
 export type DesignSide = "front" | "back";
 
 function overlaps(a: BadgeLayer, b: BadgeLayer) {
@@ -304,15 +312,7 @@ export function designIssues(design: BadgeDesign) {
 		if (design[side].layers.filter((layer) => layer.kind === "effect").length > 24)
 			issues.push(`${side}: máximo 24 efectos`);
 	if (!design.back.layers.some((l) => l.kind === "qr")) issues.push("back: falta el QR");
-	if (
-		!design.back.layers.some(
-			(l) =>
-				l.kind === "text" &&
-				(["role", "roleOrganization", "admissionRole"].includes(l.binding) ||
-					(l.binding === "template" && /\{(?:role|roleOrganization|admissionRole)\}/.test(l.text))),
-		)
-	)
-		issues.push("back: falta el rol vinculado");
+	if (!design.back.layers.some(isRoleBoundLayer)) issues.push("back: falta el rol vinculado");
 	return issues;
 }
 export const badgeDesignSchema = badgeDesignObjectSchema.superRefine((design, context) => {

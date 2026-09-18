@@ -4,7 +4,8 @@
 - Use Bun for monorepo maintenance and Biome for linting and formatting.
 - Keep Event SDK independent. Do not edit a sibling repository as a side effect.
 - The schema and catalog in `packages/design` are shared by the editor, CLI and renderer.
-- Landing content is the nine event reference badges plus Térmico, Prisma and Cromo. Custom explorations remain inside the editor.
+- Landing content is the nine event reference badges plus Térmico, Prisma and Cromo. Approved custom designs may also be listed in the gallery.
+- Use Neon CLI and Clerk CLI with the owner's existing GitHub-linked accounts. Do not provision these services through Vercel Marketplace.
 - Preserve both faces, participant bindings, QR readability and physical material semantics.
 - Use agent-browser for browser verification. Verify actual rendered and interactive results.
 - No code comments or coauthor trailers unless requested.

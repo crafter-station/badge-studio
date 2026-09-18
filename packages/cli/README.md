@@ -52,8 +52,14 @@ badgio image params --file photo.png --state state.json > image-params.json
 badgio image extract --file image-response.json --out portrait.webp
 ```
 
-The 17 catalog designs are starting points. Your agent can compose both faces, move and reorder layers, change typography, graphics, portrait treatments and material effects using the full schema. The editor renders and exports PNG; the CLI does not call a model or render images itself. Portraits and custom artwork are separate from exported design JSON.
+The catalog designs are starting points. Your agent can compose both faces, move and reorder layers, change typography, graphics, portrait treatments and material effects using the full schema. The editor renders and exports PNG; the CLI does not call a model or render images itself. Portraits and custom artwork are separate from exported design JSON.
 
 Most commands return `{ok:true,version,data,nextSteps}` or `{ok:false,version,error,nextSteps}`. JSON is automatic when piped. `skills get` returns plain Markdown unless `--json` is explicit. `image params` returns the raw invocation object so it can be passed directly with `--params @file`. Exit codes are 0 success, 2 invalid input or a rejected editor call, and 1 system failure. File outputs are exclusive and never overwrite existing files.
+
+## Publish with your agent
+
+When you like the result, the skill offers to submit it to the public gallery. Say “Publish this badge.” Your agent prepares the complete document and images through `badge_community`, opens Clerk sign-in only when needed, and confirms the actual public preview. Anyone can browse and design without an account. Only the author can update or withdraw a publication.
+
+Local saves stay local. Public submission explicitly shares the selected photo, participant details and editable design. Your agent checks the durable publication receipt and public page before calling it done.
 
 The package is `badgio`; `badge-studio` remains a command alias. Licensed under AGPL-3.0-only. [Source and skill](https://github.com/crafter-station/badge-studio).

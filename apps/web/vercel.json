@@ -1,6 +1,3 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json",
-	"framework": "nextjs",
-	"buildCommand": "cd ../.. && bun run build",
-	"installCommand": "bun install --frozen-lockfile"
+	"crons": [{ "path": "/api/community/cleanup", "schedule": "*/10 * * * *" }]
 }

@@ -15,7 +15,9 @@ describe("shared gallery and editor participants", () => {
 			expect(sample.portraitUrl).toBe(
 				resolveStudioPortrait(demoPortraitUrl, design.source, "event"),
 			);
-			expect(sample.organization).toBe("Creative community");
+			expect(sample.organization).toBe(
+				design.source === "noche-abierta" ? "ESTUDIO ABIERTO" : "Creative community",
+			);
 			expect(sample.document).toBe(design);
 			expect(sample.publicUrl).toBe(demoParticipantForDesign(design).publicUrl);
 		}
@@ -92,5 +94,16 @@ describe("shared gallery and editor participants", () => {
 		expect(updated.eventName).toBe(nextCraft.event);
 		expect(updated.publicUrl).toBe("https://thenextcraft.crafter.run/");
 		expect(demoParticipantForDesign(winter)).toEqual(original);
+		const noche = findDesign("noche-abierta");
+		if (!noche) throw new Error("Missing Noche Abierta");
+		const remixed = participantForDesign(person, noche);
+		expect(remixed.name).toBe("Alex");
+		expect(remixed.role).toBe("speaker");
+		expect(remixed.organization).toBe("Independent");
+		expect(remixed.portraitUrl).toBe(person.portraitUrl);
+		expect(remixed.publicUrl).toBe("https://badge-studio.crafter.run/");
+		expect(remixed.metadata?.eventDate).toBe("24 OCT 2026");
+		expect(remixed.metadata?.roleLabel).toBe("Speaker");
+		expect(demoParticipantForDesign(noche).number).toBe(27);
 	});
 });

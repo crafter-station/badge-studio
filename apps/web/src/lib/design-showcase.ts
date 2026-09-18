@@ -6,6 +6,7 @@ const sources = new Set([
 	"terracota-postal",
 	"opalo-lunar",
 	"radio-risografica",
+	"noche-abierta",
 ]);
 export const showcaseDesigns = designCatalog.filter((design) => sources.has(design.source ?? ""));
 export const showcaseAssets = new Set([

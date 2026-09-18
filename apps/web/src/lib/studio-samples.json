@@ -1,0 +1,17 @@
+{
+	"noche-abierta": {
+		"name": "Alex Rivera",
+		"role": "CREATIVE DEV",
+		"organization": "ESTUDIO ABIERTO",
+		"number": 27,
+		"publicUrl": "https://badge-studio.crafter.run/",
+		"metadata": {
+			"roleLabel": "CREATIVE DEV",
+			"eventName": "Noche Abierta",
+			"eventDate": "24 OCT 2026",
+			"location": "BUENOS AIRES",
+			"website": "badge-studio.crafter.run",
+			"bio": "Concepto ficticio para la prueba integral de badgio 0.2.0."
+		}
+	}
+}

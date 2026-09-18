@@ -9,10 +9,12 @@
 		"brand:assets": "node scripts/generate-brand-assets.mjs"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1131.0",
 		"@base-ui/react": "^1.8.0",
 		"@clerk/nextjs": "^7.9.2",
 		"@crafter-station/badge-studio-design": "workspace:*",
 		"@crafter-station/badge-studio-renderer": "workspace:*",
+		"@neondatabase/serverless": "^1.1.0",
 		"@phosphor-icons/react": "^2.1.10",
 		"ai": "^7.0.0",
 		"class-variance-authority": "^0.7.1",

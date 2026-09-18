@@ -1,18 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { showcaseDesigns } from "../apps/web/src/lib/design-showcase";
 import { designCatalog } from "../packages/design/src/catalog";
 
 const root = resolve(import.meta.dir, "..");
 const baseUrl = process.argv[2] ?? "http://127.0.0.1:3004";
 const session = process.env.BADGE_PREVIEW_SESSION ?? "badge-preview-assets";
-const studies = new Set([
-	"herbario-azul",
-	"frecuencia-acida",
-	"terracota-postal",
-	"opalo-lunar",
-	"radio-risografica",
-]);
+const studies = new Set(showcaseDesigns.map((design) => design.source));
 
 function browser(...args: string[]) {
 	const response = JSON.parse(

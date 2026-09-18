@@ -38,6 +38,9 @@ export function DesignGallery({ directions }: { directions: Direction[] }) {
 				</p>
 			</section>
 			<div className="gallery-controls">
+				<Link href="/community" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+					Made by the community ↗
+				</Link>
 				<ToggleGroup
 					aria-label="Filter gallery"
 					value={[category]}

@@ -25,6 +25,22 @@ These are prompts for invention, not recipes to repeat. Explain the direction br
 
 Layout changes are freeform inside the current rectangular badge format. Do not promise arbitrary shaders, HTML/CSS layers, new fonts, cut shapes or layer types outside the renderer. Use supported controls creatively. Optional generated artwork can add texture or illustration, while names and important text should remain editable layers.
 
+## Make the composition survive different people
+
+Use the event title, artwork and material for the most expressive typography. Give variable identity text enough space to stay readable when the person changes. A composition that works only for a short example name is unfinished.
+
+Default to the complete `name` binding, with `segment: "all"` or no segment. `first` means every word except the last, and `last` means the last word; these are not cultural given-name/surname fields. Two such layers repeat a single-word name and can squeeze a compound name into the smaller block. Use a split only when the person's requested display name and the intended reuse justify it.
+
+For a reusable name area, prefer a generous width and enough height for multiple lines with `fit: "wrap"`, `baseline: "top"` and neutral tracking. Set its type size and line height together. Keep the entire area on a predictable contrasting surface, including where extra lines appear. Move decoration or resize the portrait before sacrificing name legibility.
+
+Wrapping can still split an oversized word in the middle. Check wide and hyphenated surnames in the rendered result; a narrower supported typeface or a different size can keep them intact. Give long roles and organizations their own line budget so they do not become tiny after the name is fixed.
+
+`shrink` only fits the width; it can make text arbitrarily small. `spread` also distributes characters across the line, which can look broken for a short name. Negative tracking can collide when a long value shrinks. These settings are useful for controlled display text, but are not a substitute for a variable-content layout. Keep full names, accents and compound surnames; do not silently abbreviate them to rescue the composition.
+
+Before presenting a reusable design, render both faces with the actual name, a short single-word name and a long compound name. Include a wide or unbroken name and the intended writing system when relevant. Try realistic long role and organization values too. Use an isolated verification session for these substitutions, and restore its original participant afterward. Do not change the person's shared profile just to run a test.
+
+Inspect the results at the preview's normal size: complete identity, legible type, sensible line breaks, contrast across the whole name area, portrait clearance and unchanged QR space. A schema pass or an oversized PNG does not establish readability. If a case fails, adjust the composition and rerender it; do not call the design universally adaptive after checking only one person.
+
 ## Constraints that keep the badge usable
 
 The canvas is 1024 × 1536. Array order is paint order. Keep rotated bounds inside the canvas and reserve the top 90 pixels for the physical clip. Both faces need a name binding. The front needs 1–4 portraits. The back needs a role binding and an unrotated, unobstructed, square QR at least 280 pixels wide with contrast of 4.5 or greater. The schema and validator also enforce effect budgets and other bounds.

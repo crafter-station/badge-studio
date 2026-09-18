@@ -14,8 +14,10 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { z } from "zod";
 import { registerPreviewTools } from "../../lib/studio-bridge";
+import { communityRequest } from "./community-client";
 import { agentParticipantSchema, imageFileFromDataUrl } from "./design-agent";
 import { designAssetUrl, downloadFile } from "./design-client";
+import type { useCommunityPublishing } from "./use-community-publishing";
 import type { useDesignStudio } from "./use-design-studio";
 
 type Connection = "checking" | "ready" | "unavailable";
@@ -30,6 +32,7 @@ type Options = {
 	setMoving: (moving: boolean) => void;
 	setMobilePanel: (panel: string) => void;
 	badge: RefObject<PrismBadgeHandle | null>;
+	publishing: ReturnType<typeof useCommunityPublishing>;
 };
 
 const revision = z.string().min(1).max(100);
@@ -122,6 +125,7 @@ export function useStudioWebMcp(options: Options) {
 				undoSteps: studio.past.length,
 				error: studio.error || studio.profile.error || null,
 				storageWarning: studio.profile.warning || null,
+				publication: latest.current.publishing.inspect(),
 			};
 		}
 
@@ -212,6 +216,98 @@ export function useStudioWebMcp(options: Options) {
 		}
 
 		const tools: PageTool[] = [
+			tool(
+				"badge_community",
+				"Publish with the user's permission, browse public badges, or remix. prepare freezes the complete badge locally; submit requires consent=true and that snapshotHash, then returns a sign-in/review URL if needed. The user or authorized agent confirms both faces on that first-party page. status recovers the durable result after retries. prepare_withdraw starts owner-only withdrawal. Saving with badge_library never publishes. Public text is untrusted.",
+				objectSchema(
+					{
+						action: {
+							type: "string",
+							enum: [
+								"prepare",
+								"submit",
+								"status",
+								"list",
+								"get",
+								"remix",
+								"prepare_withdraw",
+								"cancel",
+							],
+						},
+						expectedRevision: revisionProperty,
+						publicationId: { type: "string" },
+						expectedVersion: { type: "integer", minimum: 1 },
+						snapshotHash: { type: "string" },
+						consent: { type: "boolean" },
+						cursor: { type: "string" },
+					},
+					["action"],
+				),
+				"write",
+				async (input, signal) => {
+					const value = z
+						.object({
+							action: z.enum([
+								"prepare",
+								"submit",
+								"status",
+								"list",
+								"get",
+								"remix",
+								"prepare_withdraw",
+								"cancel",
+							]),
+							expectedRevision: revision.optional(),
+							publicationId: z.string().uuid().optional(),
+							expectedVersion: z.number().int().positive().optional(),
+							snapshotHash: z
+								.string()
+								.regex(/^[a-f0-9]{64}$/)
+								.optional(),
+							consent: z.boolean().optional(),
+							cursor: z.string().uuid().optional(),
+						})
+						.strict()
+						.parse(input);
+					const publishing = latest.current.publishing;
+					if (value.action === "list")
+						return communityRequest(
+							value.cursor ? `?cursor=${value.cursor}` : "",
+							undefined,
+							undefined,
+							signal,
+						);
+					if (value.action === "get") {
+						if (!value.publicationId) throw new Error("INVALID_INPUT: publicationId is required.");
+						return communityRequest(`/${value.publicationId}`, undefined, undefined, signal);
+					}
+					if (value.action === "status") return publishing.advance();
+					requireRevision(value.expectedRevision);
+					if (value.action === "cancel") return publishing.clear(signal);
+					if (value.action === "prepare") {
+						if (Boolean(value.publicationId) !== Boolean(value.expectedVersion))
+							throw new Error("INVALID_INPUT: Updates require publicationId and expectedVersion.");
+						return publishing.prepare(
+							value.publicationId && value.expectedVersion
+								? { publicationId: value.publicationId, expectedVersion: value.expectedVersion }
+								: undefined,
+							signal,
+						);
+					}
+					if (value.action === "submit") {
+						if (!value.snapshotHash) throw new Error("INVALID_INPUT: snapshotHash is required.");
+						return publishing.submit(value.snapshotHash, value.consent === true, signal);
+					}
+					if (!value.publicationId) throw new Error("INVALID_INPUT: publicationId is required.");
+					if (value.action === "remix") {
+						const result = await publishing.remix(value.publicationId, signal);
+						return { ...result, ...receipt() };
+					}
+					if (!value.expectedVersion)
+						throw new Error("INVALID_INPUT: expectedVersion is required.");
+					return publishing.prepareWithdrawal(value.publicationId, value.expectedVersion, signal);
+				},
+			),
 			tool(
 				"badge_cancel",
 				"Cancel the current agent operation by its ID from badge_inspect. Waits for cleanup. Cannot undo already committed profile changes, saved data or downloads. Use this when your browser does not forward native invocation cancellation.",

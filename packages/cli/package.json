@@ -1,6 +1,6 @@
 {
 	"name": "badgio",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "An agent-friendly CLI for creating and validating editable badges with personality.",
 	"homepage": "https://badge-studio.crafter.run",
 	"repository": {

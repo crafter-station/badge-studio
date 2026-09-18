@@ -10,14 +10,22 @@ export function BadgeSnapshot({
 	data,
 	side = "front",
 	active = true,
+	eager = false,
+	onReady,
+	onError,
 }: {
 	data: PrismBadgeData & { document: BadgeDesign };
 	side?: PrismSide;
 	active?: boolean;
+	eager?: boolean;
+	onReady?: () => void;
+	onError?: () => void;
 }) {
 	const canvas = useRef<HTMLCanvasElement>(null);
 	const [visible, setVisible] = useState(false);
 	const [rendered, setRendered] = useState("");
+	const callbacks = useRef({ onReady, onError });
+	callbacks.current = { onReady, onError };
 	const key = JSON.stringify([data, side]);
 	useEffect(() => {
 		const element = canvas.current;
@@ -28,7 +36,7 @@ export function BadgeSnapshot({
 	}, []);
 
 	useEffect(() => {
-		if (!active || !visible) return;
+		if (!active || (!visible && !eager)) return;
 		const controller = new AbortController();
 		const timer = setTimeout(() => {
 			drawing = drawing
@@ -67,14 +75,17 @@ export function BadgeSnapshot({
 					context.fill();
 					context.restore();
 					setRendered(key);
+					callbacks.current.onReady?.();
 				})
-				.catch(() => {});
+				.catch(() => {
+					if (!controller.signal.aborted) callbacks.current.onError?.();
+				});
 		}, 100);
 		return () => {
 			clearTimeout(timer);
 			controller.abort();
 		};
-	}, [key, active, visible]);
+	}, [key, active, visible, eager]);
 
 	return (
 		<canvas

@@ -60,6 +60,21 @@ export default function ToolkitPage() {
 					</p>
 				</section>
 				<section>
+					<h2>Like it? Let your agent publish it.</h2>
+					<p>
+						When the badge is ready, your agent offers to share it with the community. Say yes, sign
+						in with Clerk and confirm the actual front and back. Your agent handles the design and
+						image uploads, then returns the public link.
+					</p>
+					<blockquote>“I love it. Publish this badge to the community gallery.”</blockquote>
+					<p>
+						Browsing and designing need no account. Publishing shares the selected photo, name,
+						badge details and editable layers. Only its author can update or withdraw it. Others can
+						use the layout with their own photo and name.
+					</p>
+					<Link href="/community">Explore community badges ↗</Link>
+				</section>
+				<section>
 					<h2>A starting point, never a ceiling.</h2>
 					<p>
 						Ask for the energy of Vibecode Fest, the photographic character of She Ships, a
@@ -68,7 +83,7 @@ export default function ToolkitPage() {
 						physical material.
 					</p>
 					<p>
-						The seventeen styles are references. Every supported layer and material control is
+						The catalog styles are references. Every supported layer and material control is
 						available to your agent. Names, roles and the QR stay useful as the design gets more
 						expressive.
 					</p>
@@ -152,9 +167,10 @@ export default function ToolkitPage() {
 					<h2>Your work stays in your hands.</h2>
 					<p>
 						The website keeps your profile, photo, designs and artwork in browser storage. The local
-						connection carries edits between your agent and the preview; it does not add cloud sync.
-						Browser panels may keep separate storage, so export work you want to keep outside the
-						session. Image generation sends only the images you authorize to your chosen provider.
+						connection carries edits between your agent and the preview. Local saves stay local; an
+						explicitly confirmed publication is stored in the public community gallery. Browser
+						panels may keep separate storage, so export work you want to keep outside the session.
+						Image generation sends only the images you authorize to your chosen provider.
 					</p>
 				</aside>
 			</article>

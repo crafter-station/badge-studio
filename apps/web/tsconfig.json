@@ -16,6 +16,12 @@
 		"incremental": true,
 		"allowJs": true
 	},
-	"include": [".next/types/**/*.ts", "next-env.d.ts", "src", ".next-dev/types/**/*.ts"],
+	"include": [
+		".next-dev/types/**/*.ts",
+		".next/types/**/*.ts",
+		"next-env.d.ts",
+		"src",
+		".next-community-qa/types/**/*.ts"
+	],
 	"exclude": ["node_modules"]
 }

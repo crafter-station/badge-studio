@@ -25,9 +25,9 @@ badgio skills get core --full
 badgio doctor
 ```
 
-The preview opens in the coding session’s built-in browser when available, otherwise in your default browser. Keep asking for changes in the same conversation and watch the same editable canvas update. The seventeen catalog designs are starting points; agents can compose both faces using the full layer, typography, image and material schema.
+The preview opens in the coding session’s built-in browser when available, otherwise in your default browser. Keep asking for changes in the same conversation and watch the same editable canvas update. The catalog designs are starting points; agents can compose both faces using the full layer, typography, image and material schema.
 
-`badgio studio start` opens the default browser. Agents with browser panels use `--no-open --json` and open the returned local URL themselves. Keep that process alive while designing. The local connection and native WebMCP invoke the same nine editor tools, revision checks, locks, undo and validation. Only one preview tab owns a local session. A browser without native WebMCP can still use the local connection.
+`badgio studio start` opens the default browser. Agents with browser panels use `--no-open --json` and open the returned local URL themselves. Keep that process alive while designing. The local connection and native WebMCP invoke the same editor tools, revision checks, locks, undo and validation. Only one preview tab owns a local session. A browser without native WebMCP can still use the local connection.
 
 ```sh
 badgio studio tools --url "$BADGE_STUDIO_URL" --json
@@ -37,6 +37,12 @@ badgio studio call badge_inspect --url "$BADGE_STUDIO_URL" --params '{"section":
 For image generation, your agent can use [ai-cli](https://github.com/vercel-labs/ai-cli) with your AI Gateway credentials and authorization, then import the result. Ordinary layouts and editable portrait filters need no model. Keys stay outside the page; image generation uses separate Gateway credits.
 
 See [the CLI guide](packages/cli/README.md), [CLI contract](docs/cli-contract.md), [browser contract](docs/webmcp-contract.md) and [skill stub](skills/badge-studio/SKILL.md).
+
+## Publish with your agent
+
+When you like the result, your agent offers to publish it. Say yes once and the agent prepares the complete badge, guides you through Clerk sign-in when needed, verifies both faces and submits it through WebMCP. The public gallery includes editable layers, the selected name and photo, and both faces.
+
+Browsing, designing and saving locally remain anonymous. Publishing requires your account. Only the author can update or withdraw a badge. Retries use the same prepared operation; a lost response does not create another publication. Remixing a public design preserves the visitor's own photo and name.
 
 ## Work with a document
 
@@ -64,7 +70,7 @@ Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide
 
 Browsing, editing, JSON import/export, PNG export and WebMCP do not need credentials. Browser storage is the default. Image generation belongs to the external coding agent and its own ai-cli environment.
 
-Upload a photo once in the editor, or choose **Probar con foto de ejemplo** to try the fictional sample portrait. Your photo and name carry across all 17 styles, the gallery and the landing page. The profile is saved in this browser and restored on your next visit. Replace or remove the photo from the profile bar at any time.
+Upload a photo once in the editor, or choose **Probar con foto de ejemplo** to try the fictional sample portrait. Your photo and name carry across the collection, the gallery and the landing page. The profile is saved in this browser and restored on your next visit. Replace or remove the photo from the profile bar at any time.
 
 The sample portrait has a transparent background so each badge supplies its own setting. Transparent PNG/WebP uploads retain their alpha through resizing, portrait filters and export. Background removal for arbitrary uploaded photos is not included. Run `bun run test:portraits` with agent-browser installed to verify real Canvas2D compositing and image resizing.
 
@@ -89,13 +95,27 @@ bun run build
 Verify a packed or published CLI with npm and npx in an isolated consumer:
 
 ```sh
-npm run test:npm -- /absolute/path/to/badgio-0.2.0.tgz
-npm run test:npm -- badgio@0.2.0
+npm run test:npm -- /absolute/path/to/badgio-0.2.1.tgz
+npm run test:npm -- badgio@0.2.1
 ```
 
 ## Service boundary
 
-The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a cloud server. Agent-supplied images travel through the local preview connection when it is used. Browser panels may partition storage. Export JSON and images to keep a separate copy. Public server-side AI generation and cloud sync are not enabled.
+The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos remain local until you explicitly publish a badge. Agent-supplied images travel through the local preview connection when it is used. Browser panels may partition storage. Export JSON and images to keep a separate copy. Public server-side AI generation and automatic draft sync are not enabled. The community collection uses Neon and a private Cloudflare R2 bucket.
+
+To enable community publishing, configure these values in `apps/web/.env.local` and Vercel:
+
+- `DATABASE_URL`: the dedicated Neon PostgreSQL connection.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`: keys from the same Clerk instance. Use development locally and production for the public domain.
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`: a dedicated Standard R2 bucket and an object read/write credential scoped to that bucket. Keep both the `r2.dev` URL and custom-domain public access disabled. The server checks publication or owner access before serving each image.
+- `CRON_SECRET`: a random server-only secret for retiring unreferenced images.
+- `NEXT_PUBLIC_APP_URL`: the exact site origin, including the port in development.
+
+Run `bun run --cwd apps/web scripts/migrate-community.ts` before deployment. `apps/web/vercel.json` schedules abandoned-media cleanup every ten minutes. Each run drains up to 512 objects, eight at a time, within a 45-second budget. Failed or interrupted deletions become eligible again after ten minutes. The media proxy serves only the current public version or its signed-in owner's active review.
+
+Run `bun run --cwd apps/web scripts/test-community-database.ts` for disposable transaction checks. This exercises Neon; Clerk login and R2 upload/withdrawal also require browser verification.
+
+Images use stable object keys reserved in Neon before upload. Retrying an interrupted upload writes the same normalized bytes to the same key. Withdrawal immediately removes access through the app; scheduled cleanup deletes unreferenced objects after the one-hour grace period. Images are proxied with `private, no-store` so draft access and withdrawal are enforced on every request. R2 storage and request allowances are account-wide; R2's free egress does not remove the web host's compute or transfer charges.
 
 The legacy file-backed experiment is available only with `NEXT_PUBLIC_BADGE_STORAGE=server` in local development. Hosted file storage is disabled. WebMCP exposes deterministic editor controls, never legacy generation endpoints or credentials.
 

@@ -2,6 +2,7 @@ node_modules/
 dist/
 .next/
 .next-dev/
+.next-community-qa/
 *.tsbuildinfo
 .env*
 !.env.example
