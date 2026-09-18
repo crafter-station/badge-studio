@@ -1,6 +1,8 @@
 # Badge Studio
 
-A local design studio for badges with personality. Explore nine event art directions and three physical originals, edit every layer, flip the badge, change its material and export it. Five original directions are also available in the editor.
+A design studio for badges with personality. Explore nine event art directions, three physical originals and five custom studies. Edit every layer, flip the badge, change its material and export it.
+
+Try [Badge Studio](https://badge-studio.crafter.run), or create a document from your terminal with `bunx badg styles list`.
 
 The landing is a draggable orbit of nine event badges plus Térmico, Prisma and Cromo, with depth, inertia and optional synthesized mechanical ticks. It supports keyboard rotation, reduced motion and light/dark themes.
 
@@ -19,20 +21,20 @@ Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide
 
 Browsing, editing, JSON import/export and PNG export do not need credentials. Prompt-based generation and artwork generation use an optional Vercel AI Gateway key. Copy `apps/web/.env.example` to `apps/web/.env.local` and add your own key to enable those operations.
 
-The development portrait can be placed at `apps/web/public/prism/demo/railly.webp`; that directory is ignored. If it is absent, the renderer uses its neutral portrait fallback. You can upload a different photo in the editor. Preview images contain a sample participant and are included in this private repository.
+The bundled demo portrait and prepared event studies show the sample participant. You can upload a different photo in the editor; changing events preserves your uploaded photo.
 
 ## Use the CLI
 
 ```sh
-bun run studio styles list
-bun run studio design create --style gtm --out badge.json
-bun run studio schema --json
-bun run studio design validate --file badge.json
+bunx badg styles list
+bunx badg design create --style gtm --out badge.json
+bunx badg schema --json
+bunx badg design validate --file badge.json
 ```
 
 An agent can edit the JSON using the versioned schema and semantic validator. Choose **Importar JSON** in the editor to continue visually.
 
-The CLI is local and does not generate images or call an LLM. It uses the same catalog and validator as the editor. It can build a Node 22-compatible binary; the package is not published.
+The npm package is `badg`, with `badg` and `badge-studio` commands. It requires Node.js 22 or newer and bundles the same catalog and validator as the editor. The CLI works locally and does not generate images, call an LLM or render PNGs. From a source checkout, use `bun run studio`.
 
 See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
 
@@ -56,7 +58,9 @@ bun run build
 
 ## Service boundary
 
-This is a local prototype, not a production multi-tenant service. The inherited API stores designs and assets in local files and refuses to run on Vercel. Hosting the landing alone does not make the editor's persistence or generation production-ready. A hosted release needs durable storage, authorization, quotas and asset access tied to the account model.
+The public studio uses `NEXT_PUBLIC_BADGE_STORAGE=browser` to save designs and illustrations in IndexedDB. Export JSON and images to keep a separate copy. Public AI generation and cloud sync are not enabled.
+
+Local development can use the file-backed design API and an optional AI Gateway key. Hosted file storage is disabled. Multi-user generation needs account-scoped storage and consumption controls before it can be enabled.
 
 Event SDK remains a separate initiative. See [provenance](docs/provenance.md).
 

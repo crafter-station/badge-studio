@@ -1,24 +1,39 @@
 {
-	"name": "@crafter-station/badge-studio",
+	"name": "badg",
 	"version": "0.1.0",
-	"private": true,
+	"description": "An agent-friendly CLI for creating and validating editable badges with personality.",
+	"homepage": "https://badge-studio.crafter.run",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/crafter-station/badge-studio.git",
+		"directory": "packages/cli"
+	},
+	"bugs": {
+		"url": "https://github.com/crafter-station/badge-studio/issues"
+	},
+	"keywords": ["badges", "design", "cli", "agents", "events", "webgpu"],
 	"type": "module",
 	"license": "AGPL-3.0-only",
 	"bin": {
+		"badg": "./dist/cli.js",
 		"badge-studio": "./dist/cli.js"
 	},
-	"files": ["dist"],
+	"files": ["dist", "README.md", "LICENSE"],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
 	"scripts": {
 		"build": "tsup",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@crafter-station/badge-studio-design": "workspace:*",
 		"zod-to-json-schema": "^3.25.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
+		"@crafter-station/badge-studio-design": "workspace:*",
 		"@types/node": "^22",
 		"@types/bun": "^1.3.0",
 		"tsup": "^8.4.0",

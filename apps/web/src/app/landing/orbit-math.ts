@@ -21,3 +21,11 @@ export function tickIndex(phase: number) {
 export function settleVelocity(velocity: number, seconds: number) {
 	return velocity * Math.exp(-3.5 * seconds);
 }
+
+export function orbitLiveIndices(phase: number, count: number, compact: boolean) {
+	if (!compact || count <= 3) return Array.from({ length: count }, (_, index) => index);
+	const front = Math.round((-phase * count) / (Math.PI * 2));
+	return [-1, 0, 1]
+		.map((offset) => (((front + offset) % count) + count) % count)
+		.sort((a, b) => a - b);
+}

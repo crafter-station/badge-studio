@@ -2,19 +2,19 @@ export const directions = [
 	{
 		id: "thermal",
 		name: "Térmico",
-		note: "A human frequency. Heat, held in ink.",
+		note: "Heat Signal. A human frequency, turned all the way up.",
 		category: "Materials",
 	},
 	{
 		id: "prism",
 		name: "Prisma",
-		note: "Cut glass. A different light at every angle.",
+		note: "Afterlight. An optical gathering, a different point of view.",
 		category: "Materials",
 	},
 	{
 		id: "chrome",
 		name: "Cromo",
-		note: "Cast in light. Polished to a mirror.",
+		note: "Chrome Club. Brushed steel for objects in motion.",
 		category: "Materials",
 	},
 	{

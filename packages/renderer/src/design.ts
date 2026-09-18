@@ -340,7 +340,7 @@ export function createDesignMask(data: PrismBadgeData) {
 					{
 						...layer,
 						kind: "shape",
-						shape: "rectangle",
+						shape: layer.kind === "portrait" ? (layer.clip ?? "rectangle") : "rectangle",
 						color,
 						radius: "radius" in layer ? layer.radius : 0,
 						opacity: 1,

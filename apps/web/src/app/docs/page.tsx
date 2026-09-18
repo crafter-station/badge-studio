@@ -7,17 +7,6 @@ export const metadata = { title: "Design toolkit" };
 export default function ToolkitPage() {
 	return (
 		<main className="studio-landing toolkit-page">
-			<header className="landing-nav">
-				<Link href="/" className="studio-wordmark">
-					<span className="studio-mark" aria-hidden="true">
-						✳
-					</span>
-					Badge Studio.
-				</Link>
-				<Link href="/design" className="nav-open">
-					Open studio ↗
-				</Link>
-			</header>
 			<article className="toolkit-content">
 				<span className="section-kicker">The design toolkit · 0.1.0</span>
 				<h1>
@@ -30,23 +19,21 @@ export default function ToolkitPage() {
 					move.
 				</p>
 				<section>
-					<h2>01 / Run it from the source</h2>
-					<p>The CLI is available in this repository. It has not been published as a package.</p>
+					<h2>01 / Meet badg</h2>
+					<p>Badge Studio from your terminal. Run the CLI without installing it globally.</p>
 					<pre>
-						<code>{"bun install\nbun run build:packages\nbun run studio --help\nbun run dev"}</code>
+						<code>{"bunx badg --help\nbunx badg styles list"}</code>
 					</pre>
 					<p>
-						The local app opens on port 3004. Browsing, editing and exporting work without an AI
-						key. Prompt generation needs your own gateway key.
+						The package is called badg. It runs on Node.js 22 or newer and works without an account
+						or AI key. Install it globally with <code>bun add --global badg</code> if you prefer.
 					</p>
 				</section>
 				<section>
 					<h2>02 / Pick your starting point</h2>
 					<pre>
 						<code>
-							{
-								"bun run studio styles list\nbun run studio design create --style gtm --out badge.json"
-							}
+							{"bunx badg styles list\nbunx badg design create --style gtm --out badge.json"}
 						</code>
 					</pre>
 					<p>
@@ -58,9 +45,7 @@ export default function ToolkitPage() {
 				<section>
 					<h2>03 / Make it yours with your agent</h2>
 					<pre>
-						<code>
-							{"bun run studio schema --json\nbun run studio design validate --file badge.json"}
-						</code>
+						<code>{"bunx badg schema --json\nbunx badg design validate --file badge.json"}</code>
 					</pre>
 					<p>
 						Ask your agent to edit badge.json using the schema: typography, positions, shapes,
@@ -84,7 +69,7 @@ export default function ToolkitPage() {
 					</p>
 					<p>
 						Artwork references are separate from the document. Built-in assets ship with the studio;
-						custom artwork must also be available in the same local app.
+						custom artwork can be imported into your browser's design library.
 					</p>
 					<Link href="/design?style=gtm" className="primary-action">
 						Open the editor ↗
@@ -98,8 +83,9 @@ export default function ToolkitPage() {
 						creation.
 					</p>
 					<p>
-						This is a local studio. Shared accounts, durable hosted storage, package distribution
-						and additional physical formats are future work.
+						The public studio saves designs and illustrations in this browser. Export your work to
+						keep a separate copy. Cloud sync, public AI generation and additional physical formats
+						are future work.
 					</p>
 				</aside>
 			</article>

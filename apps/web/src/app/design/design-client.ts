@@ -3,6 +3,11 @@ import {
 	badgeDesignSchema,
 } from "@crafter-station/badge-studio-design/badge-design";
 import { showcaseAssets } from "../../lib/design-showcase";
+import {
+	browserAssetUrl,
+	browserDesignRequest,
+	browserStorageEnabled,
+} from "./browser-design-store";
 
 export type SavedDesign = {
 	id: string;
@@ -22,10 +27,12 @@ export type DesignReference = { id: string; url: string; name: string };
 
 export function designAssetUrl(id: string) {
 	if (showcaseAssets.has(id)) return `/prism/showcase/${encodeURIComponent(id)}.png`;
+	if (browserStorageEnabled) return browserAssetUrl(id);
 	return `/api/designs/assets/${encodeURIComponent(id)}`;
 }
 
 export async function designRequest<T>(path = "", init?: RequestInit): Promise<T> {
+	if (browserStorageEnabled) return browserDesignRequest<T>(path, init);
 	const timeout = AbortSignal.timeout(["/artwork", "/generate"].includes(path) ? 180_000 : 120_000);
 	const response = await fetch(`/api/designs${path}`, {
 		...init,

@@ -1,16 +1,15 @@
 "use client";
 
-import { ArrowDown, ArrowUpRight, Check, Copy, Moon, Sun } from "@phosphor-icons/react";
-import { useTheme } from "next-themes";
+import { ArrowDown, ArrowUpRight, Check, Copy } from "@phosphor-icons/react";
 import { useState } from "react";
-import { directions, previewUrl } from "./directions";
+import { directions } from "./directions";
+import { LiveBadge } from "./live-badge";
 import { StudioOrbit } from "./studio-orbit";
 
 export function StudioLanding() {
-	const { resolvedTheme, setTheme } = useTheme();
 	const [category, setCategory] = useState("All styles");
 	const [copied, setCopied] = useState(false);
-	const command = "bun run studio design create --style gtm --out badge.json";
+	const command = "bunx badg design create --style gtm --out badge.json";
 	const filtered = directions.filter(
 		(direction) => category === "All styles" || direction.category === category,
 	);
@@ -24,32 +23,6 @@ export function StudioLanding() {
 			<a className="skip-link" href="#intro">
 				Skip to introduction
 			</a>
-			<header className="landing-nav">
-				<a href="/" className="studio-wordmark" aria-label="Badge Studio home">
-					<span className="studio-mark" aria-hidden="true">
-						✳
-					</span>{" "}
-					Badge Studio<span className="wordmark-period">.</span>
-				</a>
-				<nav aria-label="Main navigation">
-					<a href="#gallery">The gallery</a>
-					<a href="#workflow">For your agent</a>
-				</nav>
-				<div className="landing-nav-actions">
-					<button
-						type="button"
-						className="theme-button"
-						aria-label="Switch color theme"
-						onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-					>
-						<Sun className="theme-sun" />
-						<Moon className="theme-moon" />
-					</button>
-					<a href="/design" className="nav-open">
-						Open studio <ArrowUpRight />
-					</a>
-				</div>
-			</header>
 			<div className="landing-hero">
 				<StudioOrbit />
 				<section id="intro" className="landing-intro">
@@ -107,21 +80,19 @@ export function StudioLanding() {
 						</button>
 					))}
 				</fieldset>
-				<div className="direction-grid">
+				<div key={category} className="direction-grid">
 					{filtered.map((direction, index) => (
 						<a key={direction.id} href={`/design?style=${direction.id}`} className="direction-tile">
 							<div className="direction-art">
 								<span className="direction-index">
 									{String(directions.indexOf(direction) + 1).padStart(2, "0")}
 								</span>
-								<img
-									src={previewUrl(direction.id)}
-									alt={`${direction.name} badge design`}
-									width={512}
-									height={768}
-									loading="lazy"
-									style={{ "--rest-angle": `${index % 2 ? 5 : -5}deg` } as React.CSSProperties}
-								/>
+								<div
+									className="direction-material"
+									style={{ "--rest-angle": `${index % 2 ? 4 : -4}deg` } as React.CSSProperties}
+								>
+									<LiveBadge source={direction.id} />
+								</div>
 								<span className="direction-open">
 									<ArrowUpRight />
 								</span>
@@ -175,7 +146,7 @@ export function StudioLanding() {
 						{copied ? "Copied" : "Copy command"}
 					</button>
 					<p className="terminal-caption">
-						Available from the source checkout. Package publishing comes next.
+						Run badg from your terminal. Bring the same editable document into the studio.
 					</p>
 				</div>
 			</section>
@@ -186,7 +157,7 @@ export function StudioLanding() {
 					</span>{" "}
 					Badge Studio.
 				</a>
-				<p>An experiment in making things personal.</p>
+				<a href="/design">Find your direction ↗</a>
 				<a href="https://crafter.run">
 					By Crafter Station <ArrowUpRight />
 				</a>

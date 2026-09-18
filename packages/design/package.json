@@ -37,7 +37,8 @@
 		"./catalog": {
 			"bun": "./src/catalog.ts",
 			"types": "./dist/catalog.d.ts",
-			"import": "./dist/catalog.js"
+			"import": "./dist/catalog.js",
+			"default": "./dist/catalog.js"
 		}
 	},
 	"scripts": {

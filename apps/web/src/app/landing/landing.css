@@ -88,7 +88,7 @@
 	display: none;
 }
 .landing-hero {
-	min-height: calc(100svh - 76px);
+	min-height: calc(100svh - var(--app-header-height));
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 42px;
@@ -101,7 +101,8 @@
 .orbit-stage {
 	height: clamp(430px, 46vh, 500px);
 	position: relative;
-	overflow: hidden;
+	overflow-x: clip;
+	overflow-y: visible;
 	touch-action: pan-y;
 	user-select: none;
 	cursor: grab;
@@ -132,57 +133,29 @@
 	-webkit-user-drag: none;
 }
 .object-badge {
-	width: 184px;
-	height: 276px;
-	margin: -138px 0 0 -92px;
-	border-radius: 14px;
-	background: #d3d2cd;
-	box-shadow: 1px 2px 0 #989996, 2px 3px 1px #c5c5c1, 7px 18px 26px #10131627;
+	width: 256px;
+	height: 340px;
+	margin: -170px 0 0 -128px;
+	background: transparent;
 }
-.object-badge::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 3;
-	border: 1px solid #ffffff84;
-	border-radius: inherit;
-	box-shadow: inset 0 0 0 2px #ffffff22;
-	pointer-events: none;
-}
-.object-badge::after {
-	content: "";
-	position: absolute;
-	width: 33px;
-	height: 5px;
-	left: calc(50% - 16.5px);
-	top: 14px;
-	border-radius: 10px;
-	background: #313432;
-	border-bottom: 1px solid #ffffffbd;
-	z-index: 5;
-	box-shadow: inset 0 1px 3px #000;
-}
-.object-badge[data-physical="true"]::after {
-	display: none;
-}
-.object-badge img {
+.live-badge,
+.live-badge > span {
+	display: block;
+	position: relative;
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
-	border-radius: inherit;
-	pointer-events: none;
 }
-.object-sheen {
+.live-badge canvas,
+.live-badge img {
 	position: absolute;
 	inset: 0;
-	border-radius: inherit;
-	pointer-events: none;
-	z-index: 4;
-	background: radial-gradient(ellipse at var(--light-x, 25%) 0, #ffffff55, #ffffff00 64%);
-	mix-blend-mode: screen;
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }
-.dark .object-badge {
-	box-shadow: 1px 2px 0 #777, 2px 3px 1px #555, 7px 18px 26px #0008;
+.live-badge img {
+	pointer-events: none;
 }
 .orbit-watermark {
 	position: absolute;
@@ -301,7 +274,7 @@
 	min-height: 44px;
 	font-size: 12px;
 	border: 1px solid var(--foreground);
-	border-radius: 4px;
+	border-radius: var(--radius);
 	transition: opacity 180ms, transform 180ms;
 }
 .primary-action:hover {
@@ -380,7 +353,7 @@
 	color: var(--muted-foreground);
 	background: transparent;
 	border: 1px solid transparent;
-	border-radius: 3px;
+	border-radius: var(--radius);
 }
 .gallery-filters button[aria-pressed="true"] {
 	background: var(--landing-soft);
@@ -400,26 +373,21 @@
 	min-height: 335px;
 }
 .direction-art {
-	height: 280px;
+	aspect-ratio: 4 / 5;
 	display: grid;
 	place-items: center;
 	background: var(--landing-soft);
 	position: relative;
-	overflow: hidden;
-	border-radius: 4px;
+	border-radius: var(--radius);
 }
-.direction-art img {
-	height: 78%;
-	width: auto;
-	max-width: 78%;
-	object-fit: contain;
+.direction-material {
+	position: absolute;
+	inset: 12px 5px;
 	transform: rotate(var(--rest-angle));
-	border-radius: 7px;
-	box-shadow: 7px 15px 20px #10131529;
 	transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.direction-tile:hover .direction-art img {
-	transform: rotate(0) translateY(-6px);
+.direction-tile:hover .direction-material {
+	transform: rotate(0) translateY(-3px);
 }
 .direction-index {
 	position: absolute;
@@ -428,6 +396,8 @@
 	font-family: var(--font-geist-mono), monospace;
 	color: var(--muted-foreground);
 	font-size: 9px;
+	z-index: 1;
+	pointer-events: none;
 }
 .direction-open {
 	position: absolute;
@@ -439,6 +409,8 @@
 	height: 24px;
 	border: 1px solid var(--landing-line);
 	border-radius: 50%;
+	z-index: 1;
+	pointer-events: none;
 }
 .direction-open svg {
 	width: 11px;
@@ -506,7 +478,7 @@
 }
 .terminal-example {
 	border: 1px solid var(--landing-line);
-	border-radius: 5px;
+	border-radius: var(--radius);
 	position: relative;
 	min-width: 0;
 }
@@ -570,7 +542,7 @@
 	border: 1px solid var(--landing-line);
 	background: transparent;
 	color: var(--muted-foreground);
-	border-radius: 3px;
+	border-radius: var(--radius);
 	font-size: 10px;
 }
 .terminal-copy svg {
@@ -688,16 +660,9 @@
 		top: 48%;
 	}
 	.object-badge {
-		width: 126px;
-		height: 189px;
-		margin: -94.5px 0 0 -63px;
-		border-radius: 10px;
-	}
-	.object-badge::after {
-		width: 24px;
-		height: 4px;
-		top: 9px;
-		left: calc(50% - 12px);
+		width: 175px;
+		height: 232px;
+		margin: -116px 0 0 -87.5px;
 	}
 	.orbit-watermark {
 		top: 12px;
@@ -780,8 +745,8 @@
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 26px 12px;
 	}
-	.direction-art {
-		height: 218px;
+	.direction-material {
+		inset: 10px 0;
 	}
 	.direction-caption h3 {
 		font-size: 11px;
@@ -822,7 +787,7 @@
 	}
 }
 @media (prefers-reduced-motion: reduce) {
-	.direction-art img,
+	.direction-material,
 	.primary-action {
 		transition: none;
 	}

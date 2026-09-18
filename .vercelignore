@@ -1,0 +1,14 @@
+.env*
+**/.env*
+**/.next*
+**/node_modules
+**/.prism-designs
+**/.prism-data
+**/dist
+**/*.tsbuildinfo
+.gitignor
+package.jso
+apps/web/src/app/story
+apps/web/public/story
+apps/web/src/app/design/proof
+apps/web/src/app/design/compare

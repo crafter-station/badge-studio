@@ -1,6 +1,7 @@
 "use client";
 
 export { PrismBadge } from "./prism-badge";
+export { PrismPreview } from "./prism-preview";
 export { cropRectangle, defaultPrismAppearance, normalizeAppearance } from "./types";
 export { materialSignature } from "./signature";
 export type {

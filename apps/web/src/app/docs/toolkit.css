@@ -1,12 +1,12 @@
 .toolkit-content {
 	max-width: 720px;
-	padding: 70px 24px 110px;
+	padding: 48px 24px 80px;
 	margin: auto;
 }
 .toolkit-content h1 {
-	font-size: clamp(48px, 7vw, 76px);
+	font-size: clamp(32px, 4vw, 44px);
 	font-weight: 500;
-	letter-spacing: -3px;
+	letter-spacing: -1.5px;
 	line-height: 1.05;
 	margin: 0 0 24px;
 }
@@ -34,9 +34,10 @@
 	letter-spacing: -0.3px;
 }
 .toolkit-content pre {
-	background: var(--landing-soft);
+	background: var(--syntax-background);
+	color: var(--syntax-text);
 	border: 1px solid var(--landing-line);
-	border-radius: 4px;
+	border-radius: var(--radius);
 	padding: 22px;
 	overflow-x: auto;
 	font-size: 12px;
@@ -53,7 +54,7 @@
 .toolkit-note {
 	padding: 22px;
 	background: var(--landing-soft);
-	border-radius: 4px;
+	border-radius: var(--radius);
 }
 .toolkit-note p {
 	font-size: 12px;

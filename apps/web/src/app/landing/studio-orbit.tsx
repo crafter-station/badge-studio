@@ -2,8 +2,9 @@
 
 import { ArrowLeft, ArrowRight, SpeakerHigh, SpeakerSlash } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
-import { orbitObjects, previewUrl } from "./directions";
-import { orbitPosition, settleVelocity, tickIndex } from "./orbit-math";
+import { orbitObjects } from "./directions";
+import { LiveBadge } from "./live-badge";
+import { orbitLiveIndices, orbitPosition, settleVelocity, tickIndex } from "./orbit-math";
 import { createOrbitSound } from "./orbit-sound";
 
 export function StudioOrbit() {
@@ -11,11 +12,13 @@ export function StudioOrbit() {
 	const objects = useRef<(HTMLButtonElement | null)[]>([]);
 	const control = useRef({ nudge: (_direction: number) => {}, mute: (_muted: boolean) => {} });
 	const [sound, setSound] = useState(true);
+	const [liveIndices, setLiveIndices] = useState<number[]>([]);
 
 	useEffect(() => {
 		const element = stage.current;
 		if (!element) return;
 		const media = matchMedia("(prefers-reduced-motion: reduce)");
+		const compact = matchMedia("(max-width: 639px), (max-height: 639px), (pointer: coarse)");
 		let phase = -0.2;
 		let velocity = 0;
 		let target: number | undefined;
@@ -32,6 +35,8 @@ export function StudioOrbit() {
 		let travel = 0;
 		let visible = true;
 		let previousTick = tickIndex(phase);
+		let liveKey = "";
+		let liveCompact: boolean | undefined;
 		const soundEngine = createOrbitSound();
 		function paint() {
 			const degrees = ((phase * 180) / Math.PI + 36000) % 360;
@@ -45,6 +50,18 @@ export function StudioOrbit() {
 				object.style.zIndex = String(position.z);
 				object.style.setProperty("--light-x", `${50 - position.yaw * 1.2}%`);
 			});
+			if (
+				compact.matches !== liveCompact ||
+				(compact.matches && !dragging && Math.abs(velocity) < 0.5)
+			) {
+				liveCompact = compact.matches;
+				const next = orbitLiveIndices(phase, orbitObjects.length, compact.matches);
+				const key = next.join(",");
+				if (key !== liveKey) {
+					liveKey = key;
+					setLiveIndices(next);
+				}
+			}
 			const tick = tickIndex(phase);
 			if (tick !== previousTick && !muted && !auto) soundEngine.tick(Math.abs(velocity));
 			previousTick = tick;
@@ -172,6 +189,7 @@ export function StudioOrbit() {
 		element.addEventListener("keydown", key);
 		document.addEventListener("visibilitychange", visibility);
 		media.addEventListener("change", reducedMotion);
+		compact.addEventListener("change", paint);
 		control.current = {
 			nudge,
 			mute: (value) => {
@@ -194,6 +212,7 @@ export function StudioOrbit() {
 			element.removeEventListener("keydown", key);
 			document.removeEventListener("visibilitychange", visibility);
 			media.removeEventListener("change", reducedMotion);
+			compact.removeEventListener("change", paint);
 		};
 	}, []);
 
@@ -220,15 +239,7 @@ export function StudioOrbit() {
 								location.href = `/design?style=${object.id}`;
 							}}
 						>
-							<img
-								src={previewUrl(object.id)}
-								width={512}
-								height={768}
-								alt=""
-								draggable={false}
-								fetchPriority={index === 0 ? "high" : "auto"}
-							/>
-							<span className="object-sheen" />
+							<LiveBadge source={object.id} enabled={liveIndices.includes(index)} />
 						</button>
 					))}
 				</div>

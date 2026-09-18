@@ -1,10 +1,10 @@
 "use client";
 
 import { designPresets } from "@/lib/design-presets";
+import { demoBadgeForDesign } from "@/lib/studio-participant";
 import type { BadgeDesign } from "@crafter-station/badge-studio-design/badge-design";
 import { designAppearance, drawBadgeFace } from "@crafter-station/badge-studio-renderer";
 import { useEffect, useRef, useState } from "react";
-import { designAssetUrl } from "../design-client";
 
 const fonts = [
 	'700 100px "Andes Brand"',
@@ -22,26 +22,14 @@ function Faces({ design, second }: { design: BadgeDesign; second: boolean }) {
 	useEffect(() => {
 		const abort = new AbortController();
 		setReady(false);
-		const data = {
-			name: second ? "Alejandra Montenegro" : "Railly Hugo",
-			role: second ? "speaker" : "attendee",
-			organization: second ? "Estudio independiente" : "Vercel",
-			number: second ? 257 : 1,
-			eventName: design.event,
-			portraitUrl: "/api/demo-portrait",
-			publicUrl: `https://example.com/events/${design.source}`,
-			signature: { version: 1 as const, seed: design.material.recipe?.seed ?? 42091 },
-			metadata: {
-				roleLabel: second ? "Speaker" : "Builder",
-				eventName: design.event,
-				eventDate: "Edición 2026",
-				location: "Encuentro creativo",
-				website: "",
-				bio: "",
-			},
-			document: design,
-			artworkUrl: design.artwork ? designAssetUrl(design.artwork.assetId) : undefined,
-		};
+		const data = demoBadgeForDesign(design);
+		if (second) {
+			data.name = "Alejandra Montenegro";
+			data.role = "speaker";
+			data.organization = "Estudio independiente";
+			data.number = 257;
+			if (data.metadata) data.metadata = { ...data.metadata, roleLabel: "Speaker" };
+		}
 		void Promise.all(fonts.map((font) => document.fonts.load(font)))
 			.then(() =>
 				Promise.all(

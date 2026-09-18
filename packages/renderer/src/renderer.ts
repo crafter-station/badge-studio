@@ -34,6 +34,9 @@ export type StudioOptions = {
 	motion: boolean;
 	fluid: boolean;
 	side?: PrismSide;
+	active?: boolean;
+	flat?: boolean;
+	dpr?: number;
 };
 
 export type StudioController = {
@@ -138,7 +141,17 @@ export function startPrism(
 	};
 
 	const resume = () => {
-		if (!gpu || !material || !screen || disposed || fixedSize || document.hidden || loop) return;
+		if (
+			!gpu ||
+			!material ||
+			!screen ||
+			disposed ||
+			fixedSize ||
+			document.hidden ||
+			options.active === false ||
+			loop
+		)
+			return;
 		lastTime = performance.now();
 		loop = frameLoop(gpu, (frame) => {
 			if (!material || !screen) return;
@@ -199,8 +212,8 @@ export function startPrism(
 					(reduced.matches ? 0 : (smoothX * 0.21 - 0.075 + driftY) * frontWeight * amplitude);
 				material.set({
 					params: {
-						angles: [tiltX, tiltY],
-						roll: reduced.matches ? 0 : arc * -0.14,
+						angles: options.flat ? [0, turn] : [tiltX, tiltY],
+						roll: reduced.matches || options.flat ? 0 : arc * -0.14,
 						heat0: heat[0],
 						heat1: heat[1],
 						heat2: heat[2],
@@ -210,7 +223,10 @@ export function startPrism(
 						time: reduced.matches ? 0 : phase,
 						activity: reduced.matches ? 0 : activity,
 						fluidity,
-						lift: reduced.matches ? 0 : Math.sin(phase * 0.34) * 0.009 * amplitude + arc * 0.045,
+						lift:
+							reduced.matches || options.flat
+								? 0
+								: Math.sin(phase * 0.34) * 0.009 * amplitude + arc * 0.045,
 					},
 				});
 				fieldMaterial?.set({
@@ -527,7 +543,7 @@ export function startPrism(
 			screen = surface(gpu, canvas, {
 				...(fixedSize
 					? { size: [1080, 1440] as const, autoResize: false, dpr: 1 }
-					: { dpr: [1.5, 2] as const }),
+					: { dpr: initial.dpr ?? ([1.5, 2] as const) }),
 				alphaMode: "premultiplied",
 			});
 			fieldMap = target(gpu, {
@@ -570,7 +586,7 @@ export function startPrism(
 						designMode: designMaterialData(content.document).mode,
 						resolution: screen.size,
 						coating: fieldCoating(layout.recipe?.field),
-						angles: [0, initial.side === "back" ? Math.PI : fixedSize ? 0 : -0.075],
+						angles: [0, initial.side === "back" ? Math.PI : fixedSize || initial.flat ? 0 : -0.075],
 						roll: 0,
 						heat0: [0, 0, 0, 0],
 						heat1: [0, 0, 0, 0],
@@ -693,6 +709,12 @@ export function startPrism(
 		setOptions(next) {
 			if (disposed) return;
 			options = next;
+			if (next.active === false) {
+				loop?.stop();
+				loop = undefined;
+			} else {
+				resume();
+			}
 			material?.set({
 				params: {
 					finish: next.finish,

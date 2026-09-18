@@ -1,8 +1,13 @@
 "use client";
 
 import { preparePhoto } from "@/app/badge/prepare-photo";
-import { badgeEditions } from "@/app/collection/editions";
 import { designPresets as badgeDesignExamples } from "@/lib/design-presets";
+import { type PortraitMode, demoPortraitUrl, resolveStudioPortrait } from "@/lib/portrait-studies";
+import {
+	demoParticipant,
+	demoParticipantForDesign,
+	participantForDesign,
+} from "@/lib/studio-participant";
 import {
 	type BadgeDesign,
 	type BadgeLayer,
@@ -30,63 +35,6 @@ import {
 const defaultDesign =
 	badgeDesignExamples.find((design) => design.source === "gtm") ?? badgeDesignExamples[0];
 
-const demoParticipant: PrismBadgeData = {
-	name: "Railly Hugo",
-	role: "Builder",
-	organization: "Vercel",
-	number: 1,
-	eventName: "The GTM Hackathon",
-	portraitUrl: "/api/demo-portrait",
-	publicUrl: "https://crafters.chat/",
-	signature: { seed: 42091, version: 1 },
-};
-
-function participantForDesign(person: PrismBadgeData, design: BadgeDesign): PrismBadgeData {
-	const edition = badgeEditions.find((item) => item.id === design.source);
-	return {
-		...person,
-		design: undefined,
-		edition: undefined,
-		document: undefined,
-		eventName: design.event,
-		signature: {
-			seed:
-				design.material.recipe?.seed ??
-				edition?.data.signature?.seed ??
-				person.signature?.seed ??
-				1,
-			version: 1,
-		},
-		...(edition
-			? {
-					publicUrl: edition.data.publicUrl,
-					metadata: {
-						...(edition.data.metadata ?? {
-							roleLabel: "",
-							eventName: edition.name,
-							eventDate: "",
-							location: "",
-							website: "",
-							bio: "",
-						}),
-						roleLabel: person.metadata?.roleLabel || person.role,
-						eventName: design.event,
-					},
-				}
-			: {
-					publicUrl: `https://example.com/events/${design.source || "your-event"}`,
-					metadata: {
-						roleLabel: person.metadata?.roleLabel || person.role,
-						eventName: design.event,
-						eventDate: "Edición 2026",
-						location: "Encuentro creativo",
-						website: "",
-						bio: "",
-					},
-				}),
-	};
-}
-
 export function useDesignStudio() {
 	const [editor, setEditor] = useState<DesignEditorState>(() => ({
 		design: defaultDesign,
@@ -94,6 +42,7 @@ export function useDesignStudio() {
 		past: [],
 	}));
 	const [participant, setParticipant] = useState<PrismBadgeData>(demoParticipant);
+	const [portraitMode, setPortraitMode] = useState<PortraitMode>("event");
 	const [reference, setReference] = useState<DesignReference>();
 	const [proposals, setProposals] = useState<BadgeDesign[]>([]);
 	const [library, setLibrary] = useState<DesignLibrary>();
@@ -117,9 +66,8 @@ export function useDesignStudio() {
 		mounted.current = true;
 		const source = new URLSearchParams(window.location.search).get("style");
 		const base = badgeDesignExamples.find((design) => design.source === source) ?? defaultDesign;
-		const edition = badgeEditions.find((item) => item.id === base.source);
 		setEditor({ design: base, locks: { front: [], back: [], material: false }, past: [] });
-		setParticipant(participantForDesign(edition?.data ?? demoParticipant, base));
+		setParticipant(demoParticipantForDesign(base));
 		void designRequest<DesignLibrary>("", { signal: controller.signal })
 			.then((result) => {
 				if (controller.signal.aborted) return;
@@ -416,6 +364,22 @@ export function useDesignStudio() {
 		}
 	}
 
+	function changePortraitMode(mode: PortraitMode) {
+		if (active.current) return;
+		photoRevision.current++;
+		setPortraitMode(mode);
+	}
+
+	function restoreDemoPortrait() {
+		if (active.current) return;
+		photoRevision.current++;
+		if (photoUrl.current) URL.revokeObjectURL(photoUrl.current);
+		photoUrl.current = undefined;
+		setParticipant((person) => ({ ...person, portraitUrl: demoPortraitUrl }));
+		setPortraitMode("event");
+		setError("");
+	}
+
 	function toggleLock(side: DesignSide, id: string) {
 		if (active.current) return;
 		setEditor((state) => ({
@@ -593,7 +557,18 @@ export function useDesignStudio() {
 
 	return {
 		...editor,
-		participant,
+		participant: {
+			...participant,
+			portraitUrl: resolveStudioPortrait(
+				participant.portraitUrl,
+				editor.design.source,
+				portraitMode,
+			),
+		},
+		demoPortrait: participant.portraitUrl === demoPortraitUrl,
+		portraitMode,
+		changePortraitMode,
+		restoreDemoPortrait,
 		setParticipant,
 		reference,
 		proposals,

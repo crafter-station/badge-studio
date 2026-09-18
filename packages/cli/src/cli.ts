@@ -19,7 +19,7 @@ const commands = [
 	"design validate --file <file>",
 	"schema",
 ];
-const nextSteps = ["badge-studio styles list", "badge-studio schema"];
+const nextSteps = ["badg styles list", "badg schema"];
 
 class InputError extends Error {}
 
@@ -69,7 +69,7 @@ async function run() {
 				exitCodes: { success: 0, invalidInput: 2, systemFailure: 1 },
 			},
 			nextSteps,
-			`${style("Commands", "1", !json)}\n${commands.map((command) => `  badge-studio ${command}`).join("\n")}\n\nJSON is automatic when piped. --out creates new files only.\nFrom a checkout: bun run studio <command>`,
+			`${style("Commands", "1", !json)}\n${commands.map((command) => `  badg ${command}`).join("\n")}\n\nJSON is automatic when piped. --out creates new files only.\nFrom a checkout: bun run studio <command>`,
 			json,
 		);
 		return;
@@ -95,7 +95,7 @@ async function run() {
 		}));
 		emit(
 			{ styles },
-			["badge-studio design create --style opalo-lunar --out badge.json"],
+			["badg design create --style opalo-lunar --out badge.json"],
 			`${style(`${styles.length} starting points`, "1", !json)}\n\n${styles
 				.map((entry) => `${column(entry.id ?? "", 25)}${entry.name}`)
 				.join("\n")}`,
@@ -120,15 +120,14 @@ async function run() {
 					"Run design validate for full semantic validation. Artwork IDs require matching local assets.",
 				],
 			},
-			["badge-studio design validate --file badge.json"],
+			["badg design validate --file badge.json"],
 			"Use --json to inspect the complete versioned design schema.",
 			json,
 		);
 		return;
 	}
 	if (command === "design create") {
-		if (!values.style)
-			throw new InputError("Supply --style. Run badge-studio styles list for IDs.");
+		if (!values.style) throw new InputError("Supply --style. Run badg styles list for IDs.");
 		const preset = findDesign(values.style);
 		if (!preset) throw new InputError(`Unknown style: ${values.style}`);
 		const design = badgeDesignSchema.parse(structuredClone(preset));
@@ -147,7 +146,7 @@ async function run() {
 			{ design, path, written: Boolean(path && !dryRun), dryRun },
 			path
 				? [
-						`badge-studio design validate --file ${JSON.stringify(path)}`,
+						`badg design validate --file ${JSON.stringify(path)}`,
 						"Import the JSON in the Badge Studio editor.",
 					]
 				: ["Run again with --out badge.json to create an importable document."],

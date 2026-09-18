@@ -5,13 +5,13 @@ description: Create or customize editable Badge Studio designs from the local ca
 
 # Badge Studio
 
-Run from the repository root with `bun run studio`, or use the linked `badge-studio` binary. The package is not published yet.
+Run with `bunx badg`, install `badg` globally, or use `bun run studio` from the repository root. The package is `badg`; the app is Badge Studio. The `badge-studio` command remains an alias.
 
-1. Inspect `badge-studio schema --json` and `badge-studio styles list`.
-2. Create a starting document: `badge-studio design create --style gtm --out badge.json`.
+1. Inspect `badg schema --json` and `badg styles list`.
+2. Create a starting document: `badg design create --style gtm --out badge.json`.
 3. Edit that document according to the user's art direction. Preserve schema version, both faces and participant bindings.
-4. Run `badge-studio design validate --file badge.json`. Correct errors until validation passes.
-5. Hand the file to the user and open the local editor. Use **Importar JSON**, then inspect front and back before declaring visual success.
+4. Run `badg design validate --file badge.json`. Correct errors until validation passes.
+5. Hand the file to the user and open `https://badge-studio.crafter.run/design` or the local editor. Use **Importar JSON**, then inspect front and back before declaring visual success.
 
 Use `--dry-run` on `design create` to preview. Output JSON is automatic when piped. `--out` refuses existing files; choose a new path rather than deleting or replacing user work. Without `--out`, the complete design is returned in `data.design`.
 

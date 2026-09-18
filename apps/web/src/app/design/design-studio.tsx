@@ -2,7 +2,7 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,6 @@ import {
 } from "@crafter-station/badge-studio-renderer";
 import {
 	ArrowClockwise,
-	ArrowLeft,
 	ArrowUpRight,
 	Check,
 	DownloadSimple,
@@ -29,10 +28,10 @@ import {
 	MagicWand,
 	Pause,
 	Play,
-	Stack,
 	X,
 } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
+import { browserStorageEnabled } from "./browser-design-store";
 import { designAssetUrl, downloadFile } from "./design-client";
 import { DesignInspector } from "./design-inspector";
 import { DesignPreview } from "./design-preview";
@@ -101,21 +100,8 @@ export function DesignStudio() {
 
 	return (
 		<main className="design-studio" lang="es" data-mobile-panel={mobilePanel}>
-			<header className="design-header">
-				<a href="/" className="design-brand">
-					<Stack weight="duotone" aria-hidden="true" /> Badge <span>/ studio</span>
-				</a>
-				<nav aria-label="Navegación del estudio" className="design-top-nav">
-					<a href="/design/showcase" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-						Exploraciones
-					</a>
-					<a href="/" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-						<ArrowLeft data-icon="inline-start" /> Colección
-					</a>
-					<a href="/docs" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-						Toolkit
-					</a>
-				</nav>
+			<div className="design-actions" aria-label="Acciones del diseño">
+				<span className="design-workspace-label">Tu espacio de diseño</span>
 				<div className="design-header-actions">
 					<input
 						ref={documentInput}
@@ -131,10 +117,11 @@ export function DesignStudio() {
 					<Button
 						size="sm"
 						variant="ghost"
+						aria-label="Importar JSON"
 						disabled={pending}
 						onClick={() => documentInput.current?.click()}
 					>
-						Importar JSON
+						Importar<span className="design-import-format"> JSON</span>
 					</Button>
 					<span className="design-save-state">
 						{studio.saved && !studio.dirty ? (
@@ -155,7 +142,7 @@ export function DesignStudio() {
 						<FloppyDisk data-icon="inline-start" /> Guardar
 					</Button>
 				</div>
-			</header>
+			</div>
 			<div className="design-mobile-tabs">
 				<ToggleGroup
 					value={[mobilePanel]}
@@ -175,10 +162,14 @@ export function DesignStudio() {
 			<div className="design-workspace">
 				<aside className="design-director" aria-label="Crear una dirección">
 					<div className="design-section-heading">
-						<h2>Tu dirección, en palabras.</h2>
+						<h2>{browserStorageEnabled ? "Hazlo tuyo." : "Tu dirección, en palabras."}</h2>
 						<Badge variant="outline">Beta</Badge>
 					</div>
-					<p className="design-intro">Una referencia. Una idea. Un badge que se sienta tuyo.</p>
+					<p className="design-intro">
+						{browserStorageEnabled
+							? "Elige una dirección. Sube tu foto. Cambia cada detalle."
+							: "Una referencia. Una idea. Un badge que se sienta tuyo."}
+					</p>
 					<FieldGroup>
 						<Field>
 							<FieldLabel htmlFor="design-event">Evento</FieldLabel>
@@ -190,99 +181,107 @@ export function DesignStudio() {
 								onChange={(event) => studio.setEvent(event.target.value)}
 							/>
 						</Field>
-						<Field>
-							<FieldLabel htmlFor="design-brief">¿Cómo debería sentirse?</FieldLabel>
-							<Textarea
-								id="design-brief"
-								rows={4}
-								maxLength={1500}
-								value={prompt}
-								disabled={pending}
-								placeholder="Una credencial de papel con pétalos, fotografía editorial y un toque de metal…"
-								onChange={(event) => setPrompt(event.target.value)}
-							/>
-						</Field>
-						<Field>
-							<FieldLabel htmlFor="design-reference">
-								Referencia visual <span className="design-help">opcional</span>
-							</FieldLabel>
-							<Input
-								ref={referenceInput}
-								id="design-reference"
-								type="file"
-								className="sr-only"
-								accept="image/png,image/jpeg,image/webp"
-								disabled={pending}
-								onChange={(event) => {
-									const file = event.target.files?.[0];
-									if (file) void studio.uploadReference(file);
-									event.target.value = "";
-								}}
-							/>
-							{studio.reference ? (
-								<div className="design-reference">
-									<img
-										src={studio.reference.url}
-										alt="Referencia para la dirección de arte"
-										width={60}
-										height={60}
-									/>
-									<span>{studio.reference.name}</span>
+						{!browserStorageEnabled ? (
+							<Field>
+								<FieldLabel htmlFor="design-brief">¿Cómo debería sentirse?</FieldLabel>
+								<Textarea
+									id="design-brief"
+									rows={4}
+									maxLength={1500}
+									value={prompt}
+									disabled={pending}
+									placeholder="Una credencial de papel con pétalos, fotografía editorial y un toque de metal…"
+									onChange={(event) => setPrompt(event.target.value)}
+								/>
+							</Field>
+						) : null}
+						{!browserStorageEnabled ? (
+							<Field>
+								<FieldLabel htmlFor="design-reference">
+									Referencia visual <span className="design-help">opcional</span>
+								</FieldLabel>
+								<Input
+									ref={referenceInput}
+									id="design-reference"
+									type="file"
+									className="sr-only"
+									accept="image/png,image/jpeg,image/webp"
+									disabled={pending}
+									onChange={(event) => {
+										const file = event.target.files?.[0];
+										if (file) void studio.uploadReference(file);
+										event.target.value = "";
+									}}
+								/>
+								{studio.reference ? (
+									<div className="design-reference">
+										<img
+											src={studio.reference.url}
+											alt="Referencia para la dirección de arte"
+											width={60}
+											height={60}
+										/>
+										<span>{studio.reference.name}</span>
+										<Button
+											size="icon-xs"
+											variant="ghost"
+											aria-label="Quitar referencia"
+											disabled={pending}
+											onClick={studio.clearReference}
+										>
+											<X />
+										</Button>
+									</div>
+								) : (
 									<Button
-										size="icon-xs"
-										variant="ghost"
-										aria-label="Quitar referencia"
-										disabled={pending}
-										onClick={studio.clearReference}
+										variant="outline"
+										disabled={pending || !studio.library}
+										onClick={() => referenceInput.current?.click()}
 									>
-										<X />
+										<Image data-icon="inline-start" /> Añadir póster o imagen
 									</Button>
-								</div>
-							) : (
-								<Button
-									variant="outline"
-									disabled={pending || !studio.library}
-									onClick={() => referenceInput.current?.click()}
-								>
-									<Image data-icon="inline-start" /> Añadir póster o imagen
-								</Button>
-							)}
-						</Field>
+								)}
+							</Field>
+						) : null}
 					</FieldGroup>
-					<label className="design-help design-lock-note" htmlFor="use-current-design">
-						<Checkbox
-							id="use-current-design"
-							checked={studio.useBase}
-							onCheckedChange={(value) => studio.setUseBase(Boolean(value))}
-							disabled={pending}
-						/>
-						Partir de {studio.design.name}
-					</label>
-					<label className="design-help design-lock-note" htmlFor="auto-artwork">
-						<Checkbox
-							id="auto-artwork"
-							checked={studio.autoArtwork}
-							onCheckedChange={(value) => studio.setAutoArtwork(Boolean(value))}
-							disabled={pending}
-						/>
-						Generar ilustración si la dirección la necesita
-					</label>
-					<Button
-						disabled={pending || !prompt.trim() || !studio.library?.generationAvailable}
-						onClick={() => void studio.generate(prompt, false)}
-						aria-busy={pending}
-					>
-						{pending ? (
-							<Spinner data-icon="inline-start" />
-						) : (
-							<MagicWand data-icon="inline-start" />
-						)}
-						Crear 3 direcciones
-					</Button>
-					{pending ? (
-						<Button size="sm" variant="ghost" onClick={studio.cancel}>
-							Cancelar
-						</Button>
+					{!browserStorageEnabled ? (
+						<>
+							<label className="design-help design-lock-note" htmlFor="use-current-design">
+								<Checkbox
+									id="use-current-design"
+									checked={studio.useBase}
+									onCheckedChange={(value) => studio.setUseBase(Boolean(value))}
+									disabled={pending}
+								/>
+								Partir de {studio.design.name}
+							</label>
+							<label className="design-help design-lock-note" htmlFor="auto-artwork">
+								<Checkbox
+									id="auto-artwork"
+									checked={studio.autoArtwork}
+									onCheckedChange={(value) => studio.setAutoArtwork(Boolean(value))}
+									disabled={pending}
+								/>
+								Generar ilustración si la dirección la necesita
+							</label>
+							<Button
+								disabled={pending || !prompt.trim() || !studio.library?.generationAvailable}
+								onClick={() => void studio.generate(prompt, false)}
+								aria-busy={pending}
+							>
+								{pending ? (
+									<Spinner data-icon="inline-start" />
+								) : (
+									<MagicWand data-icon="inline-start" />
+								)}
+								Crear 3 direcciones
+							</Button>
+							{pending ? (
+								<Button size="sm" variant="ghost" onClick={studio.cancel}>
+									Cancelar
+								</Button>
+							) : null}
+						</>
 					) : null}
 					<div className="design-director-feedback" aria-live="polite">
 						{studio.error ? (
@@ -293,70 +292,79 @@ export function DesignStudio() {
 							<p className="design-help">{studio.phase || studio.notice}</p>
 						)}
 					</div>
-					{!studio.library?.generationAvailable && studio.library ? (
+					{browserStorageEnabled ? (
+						<p className="design-help">
+							Tus diseños e ilustraciones se guardan solo en este navegador. Exporta una copia para
+							conservarlos. La generación con IA llegará después.
+						</p>
+					) : !studio.library?.generationAvailable && studio.library ? (
 						<p className="design-help">
 							La generación todavía no está configurada. Puedes explorar y editar los diseños base.
 						</p>
 					) : null}
-					<details className="design-disclosure">
-						<summary>Ideas para empezar</summary>
-						<div className="design-prompt-examples">
-							{examples.map((example) => (
-								<button
-									type="button"
-									key={example}
-									disabled={pending}
-									onClick={() => setPrompt(example)}
+					{!browserStorageEnabled ? (
+						<>
+							<details className="design-disclosure">
+								<summary>Ideas para empezar</summary>
+								<div className="design-prompt-examples">
+									{examples.map((example) => (
+										<button
+											type="button"
+											key={example}
+											disabled={pending}
+											onClick={() => setPrompt(example)}
+										>
+											{example}
+											<ArrowUpRight aria-hidden="true" />
+										</button>
+									))}
+								</div>
+							</details>
+							<section className="design-refinement" aria-label="Refinar la dirección">
+								<div className="design-section-heading">
+									<h2>Quédate con lo bueno.</h2>
+								</div>
+								<p className="design-help">
+									Pide un cambio. Conservaremos los elementos que bloqueaste.
+								</p>
+								<FieldGroup>
+									<Field>
+										<FieldLabel htmlFor="design-refinement" className="sr-only">
+											Cambio que quieres hacer
+										</FieldLabel>
+										<Textarea
+											id="design-refinement"
+											rows={2}
+											value={refinement}
+											maxLength={1500}
+											disabled={pending}
+											placeholder="El fondo más suave. Nombre más grande. Conserva mi retrato."
+											onChange={(event) => setRefinement(event.target.value)}
+										/>
+									</Field>
+								</FieldGroup>
+								<Button
+									variant="outline"
+									disabled={pending || !refinement.trim() || !studio.library?.generationAvailable}
+									onClick={() => void studio.generate(refinement, true)}
 								>
-									{example}
-									<ArrowUpRight aria-hidden="true" />
-								</button>
-							))}
-						</div>
-					</details>
-					<section className="design-refinement" aria-label="Refinar la dirección">
-						<div className="design-section-heading">
-							<h2>Quédate con lo bueno.</h2>
-						</div>
-						<p className="design-help">
-							Pide un cambio. Conservaremos los elementos que bloqueaste.
-						</p>
-						<FieldGroup>
-							<Field>
-								<FieldLabel htmlFor="design-refinement" className="sr-only">
-									Cambio que quieres hacer
-								</FieldLabel>
-								<Textarea
-									id="design-refinement"
-									rows={2}
-									value={refinement}
-									maxLength={1500}
-									disabled={pending}
-									placeholder="El fondo más suave. Nombre más grande. Conserva mi retrato."
-									onChange={(event) => setRefinement(event.target.value)}
-								/>
-							</Field>
-						</FieldGroup>
-						<Button
-							variant="outline"
-							disabled={pending || !refinement.trim() || !studio.library?.generationAvailable}
-							onClick={() => void studio.generate(refinement, true)}
-						>
-							<MagicWand data-icon="inline-start" /> Crear variante
-						</Button>
-						<Button
-							variant="ghost"
-							size="sm"
-							disabled={pending || artworkLocked || !studio.library?.artworkAvailable}
-							onClick={() => void studio.generateArtwork()}
-						>
-							<Image data-icon="inline-start" />{" "}
-							{studio.design.artwork?.assetId ? "Regenerar ilustración" : "Generar ilustración"}
-						</Button>
-						<p className="design-help">
-							Añade arte a la dirección seleccionada. La foto y los textos siguen separados.
-						</p>
-					</section>
+									<MagicWand data-icon="inline-start" /> Crear variante
+								</Button>
+								<Button
+									variant="ghost"
+									size="sm"
+									disabled={pending || artworkLocked || !studio.library?.artworkAvailable}
+									onClick={() => void studio.generateArtwork()}
+								>
+									<Image data-icon="inline-start" />{" "}
+									{studio.design.artwork?.assetId ? "Regenerar ilustración" : "Generar ilustración"}
+								</Button>
+								<p className="design-help">
+									Añade arte a la dirección seleccionada. La foto y los textos siguen separados.
+								</p>
+							</section>
+						</>
+					) : null}
 					<details className="design-disclosure" open={!studio.proposals.length}>
 						<summary>La colección · {badgeDesignExamples.length} direcciones editables</summary>
 						<div className="design-seeds">

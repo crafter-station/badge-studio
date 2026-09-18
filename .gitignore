@@ -9,4 +9,6 @@ dist/
 .prism-designs/
 .prism-data/
 .DS_Store
-apps/web/public/prism/demo/
+.vercel
+apps/web/src/app/story/
+apps/web/public/story/

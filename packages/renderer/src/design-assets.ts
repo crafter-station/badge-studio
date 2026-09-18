@@ -10,7 +10,7 @@ export function safeArtworkUrl(value: string, origin: string) {
 		return value;
 	}
 	const url = new URL(value, origin);
-	if (url.origin !== origin || !["http:", "https:"].includes(url.protocol))
+	if (url.origin !== origin || !["http:", "https:", "blob:"].includes(url.protocol))
 		throw new Error("El recurso visual debe pertenecer a este estudio.");
 	return url.href;
 }

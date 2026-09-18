@@ -10,7 +10,7 @@ import type { PrismSide } from "@crafter-station/badge-studio-renderer";
 import { ArrowCounterClockwise, LockSimple, Stack } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import { DesignLayerActions } from "./design-layer-actions";
-import { DesignPhotoPicker } from "./design-photo-picker";
+import { DesignPortraitPicker } from "./design-portrait-picker";
 import { DesignSelectedLayer } from "./design-selected-layer";
 import type { useDesignStudio } from "./use-design-studio";
 
@@ -122,11 +122,7 @@ export function DesignInspector({
 					<p className="design-help">
 						Selecciona una capa para editarla. El ojo muestra u oculta; el candado protege.
 					</p>
-					<DesignPhotoPicker
-						src={studio.participant.portraitUrl}
-						disabled={pending}
-						onChange={studio.changePhoto}
-					/>
+					<DesignPortraitPicker studio={studio} />
 					<select
 						className="design-select"
 						aria-label="Añadir elemento"
@@ -262,6 +258,7 @@ export function DesignInspector({
 						<h2>La misma dirección, otra persona</h2>
 					</div>
 					<p className="design-help">Cambia los datos sin volver a generar el arte.</p>
+					<DesignPortraitPicker studio={studio} />
 					<FieldGroup>
 						{(
 							[
@@ -341,21 +338,6 @@ export function DesignInspector({
 							<p id="participant-url-feedback" className="design-help">
 								{urlError}
 							</p>
-						</Field>
-						<Field>
-							<FieldLabel htmlFor="participant-photo">Foto</FieldLabel>
-							<Input
-								id="participant-photo"
-								type="file"
-								accept="image/png,image/jpeg,image/webp"
-								disabled={pending}
-								onChange={(event) => {
-									const file = event.target.files?.[0];
-									if (file) void studio.changePhoto(file);
-									event.target.value = "";
-								}}
-							/>
-							<p className="design-help">La foto se compone en tu navegador.</p>
 						</Field>
 					</FieldGroup>
 				</>

@@ -14,6 +14,8 @@ const copies: unknown[] = [];
 const uniforms: { params?: Record<string, unknown>; field?: Record<string, unknown> }[] = [];
 const disposed = mock(() => {});
 const surfaceDisposed = mock(() => {});
+const loopStarted = mock(() => {});
+const loopStopped = mock(() => {});
 let compiled = false;
 let atlas = deferred<Response>();
 let initialize: () => Promise<typeof gpu>;
@@ -60,8 +62,9 @@ mock.module("vgpu", () => ({
 		_gpu: unknown,
 		render: (frame: { pass: (_target: unknown, effect: { shader: string }) => void }) => void,
 	) => {
+		loopStarted();
 		advanceFrame = () => render({ pass: (_target, effect) => passes.push(effect.shader) });
-		return { stop: () => {} };
+		return { stop: loopStopped };
 	},
 	sampler: () => ({}),
 	surface: () => ({
@@ -121,6 +124,8 @@ beforeEach(() => {
 	labRead = async () => new Float32Array([-0.5, 1, -1, 1, 0.5, 0.5, -0.5, 1]);
 	disposed.mockClear();
 	surfaceDisposed.mockClear();
+	loopStarted.mockClear();
+	loopStopped.mockClear();
 	compiled = false;
 	atlas = deferred<Response>();
 	Object.assign(globalThis, {
@@ -413,6 +418,57 @@ test.each([false, true])(
 		}
 	},
 );
+
+test("a preview pauses offscreen, resumes once and stays stopped after disposal", async () => {
+	const { controller } = await loaded(defaultPrismAppearance, false);
+	const options = { finish: 0, spectral: 0.66, motion: true, fluid: false };
+	expect(loopStarted).toHaveBeenCalledTimes(1);
+	controller.setOptions({ ...options, active: false });
+	expect(loopStopped).toHaveBeenCalledTimes(1);
+	controller.setOptions({ ...options, active: false });
+	expect(loopStopped).toHaveBeenCalledTimes(1);
+	controller.setOptions({ ...options, active: true });
+	controller.setOptions({ ...options, active: true });
+	expect(loopStarted).toHaveBeenCalledTimes(2);
+	controller.dispose();
+	expect(loopStopped).toHaveBeenCalledTimes(2);
+	controller.setOptions({ ...options, active: true });
+	expect(loopStarted).toHaveBeenCalledTimes(2);
+});
+
+test("a preview hidden while loading paints once without starting an animation loop", async () => {
+	photos.set("original", deferred());
+	const { controller, ready } = start(defaultPrismAppearance, false);
+	const options = { finish: 0, spectral: 0.66, motion: true, fluid: false };
+	controller.setOptions({ ...options, active: false });
+	photos.get("original")?.resolve(image());
+	atlas.resolve(new Response(gzipSync(new Uint8Array(1024 * 1536 * 4))));
+	await until(() => ready.mock.calls.length > 0);
+	expect(passes.length).toBeGreaterThan(0);
+	expect(loopStarted).not.toHaveBeenCalled();
+	controller.setOptions({ ...options, active: true });
+	expect(loopStarted).toHaveBeenCalledTimes(1);
+});
+
+test("flat previews keep their silhouette fixed while the material responds to time and pointer", async () => {
+	const { controller, listeners } = await loaded(
+		{ ...defaultPrismAppearance, recipe: laboratoryRecipe },
+		false,
+	);
+	controller.setOptions({ finish: 0, spectral: 0.66, motion: true, fluid: false, flat: true });
+	listeners.get("pointermove")?.({ clientX: 2000, clientY: -100 });
+	await new Promise((resolve) => setTimeout(resolve, 10));
+	advanceFrame?.();
+	const params = uniforms.findLast((values) => values.params)?.params;
+	expect(params?.angles).toEqual([0, 0]);
+	expect(params?.roll).toBe(0);
+	expect(params?.lift).toBe(0);
+	expect(params?.time).toBeGreaterThan(0);
+	const field = uniforms.findLast((values) => values.field)?.field;
+	expect((field?.pointer as number[])[0]).toBeGreaterThan(0);
+	expect((field?.pointer as number[])[1]).toBeLessThan(0);
+	expect(field?.time).toBeGreaterThan(0);
+});
 
 test("GPU admission probes four states, uses the submitted formula and releases its context", async () => {
 	const result = await validateShader(laboratoryRecipe);
