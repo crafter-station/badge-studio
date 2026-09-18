@@ -10,7 +10,8 @@
 		"typecheck": "tsc --noEmit -p apps/web/tsconfig.json && bun run --cwd packages/cli typecheck",
 		"test": "bun run --cwd packages/cli build && bun test packages apps/web/src/lib apps/web/src/app/design",
 		"studio": "node packages/cli/dist/cli.js",
-		"test:npm": "node scripts/verify-cli-package.mjs"
+		"test:npm": "node scripts/verify-cli-package.mjs",
+		"test:portraits": "bun scripts/check-portrait-alpha.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

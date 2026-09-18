@@ -59,11 +59,21 @@ export function paintDesignPhoto(
 		layer.tint ??
 		(layer.filter === "rose" ? "#c58bae" : layer.filter === "blue" ? "#73bac8" : undefined);
 	if (tint) {
+		const pixels = surface.getImageData(0, 0, photo.width, photo.height);
+		const alpha = new Uint8ClampedArray(photo.width * photo.height);
+		for (let i = 0; i < alpha.length; i++) {
+			alpha[i] = pixels.data[i * 4 + 3];
+			pixels.data[i * 4 + 3] = 255;
+		}
+		surface.putImageData(pixels, 0, 0);
 		surface.globalCompositeOperation = layer.tintMode ?? "multiply";
 		surface.globalAlpha = layer.tintOpacity ?? 1;
 		surface.fillStyle = tint;
 		surface.fillRect(0, 0, layer.w, layer.h);
 		surface.globalAlpha = 1;
+		const tinted = surface.getImageData(0, 0, photo.width, photo.height);
+		for (let i = 0; i < alpha.length; i++) tinted.data[i * 4 + 3] = alpha[i];
+		surface.putImageData(tinted, 0, 0);
 	}
 	if (layer.fade) {
 		surface.globalCompositeOperation = "destination-in";

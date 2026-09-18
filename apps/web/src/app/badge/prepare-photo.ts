@@ -17,11 +17,9 @@ export async function preparePhoto(file: File): Promise<Blob> {
 		canvas.height = Math.round(bitmap.height * scale);
 		const context = canvas.getContext("2d");
 		if (!context) throw new Error("No pudimos preparar la foto.");
-		context.fillStyle = "#161e26";
-		context.fillRect(0, 0, canvas.width, canvas.height);
 		context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
 		const image = await new Promise<Blob | null>((resolve) =>
-			canvas.toBlob(resolve, "image/jpeg", 0.92),
+			canvas.toBlob(resolve, file.type === "image/jpeg" ? "image/jpeg" : "image/webp", 0.92),
 		);
 		if (!image || image.size > 3.5 * 1024 * 1024)
 			throw new Error("No pudimos reducir la foto. Prueba con una versión más pequeña.");

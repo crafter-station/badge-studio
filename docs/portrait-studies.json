@@ -1,5 +1,5 @@
 {
-	"version": 3,
+	"version": 4,
 	"generatedAt": "2026-09-18",
 	"tool": "ai-cli@0.4.4 via Vercel AI Gateway",
 	"model": "openai/gpt-image-2",
@@ -7,7 +7,13 @@
 	"policy": "Every bundled sample uses the fictional portrait. Visitor uploads retain their own identity and stay in their browser. Generated studies preserve the head-and-shoulders crop, pose and anatomy; no invented bodies. Photographic directions retain the base portrait and editable native filters.",
 	"base": {
 		"output": "apps/web/public/prism/demo/alex.webp",
-		"prompt": "Use case: photorealistic-natural.\nAsset type: fictional sample portrait for a public badge design playground.\nCreate a single premium editorial studio photograph of a fictional adult woman, around 28, with warm medium skin, a short softly textured dark curly bob, brown eyes, an easy confident closed-mouth smile, and a plain charcoal crew-neck t-shirt. The identity must be completely fictional, with no resemblance to a celebrity or known person. Head and shoulders only, fully visible hairstyle with generous margin above, centered face, near-frontal view, both shoulders within frame. Natural skin texture, gentle directional studio lighting from upper left, believable eyes and hair, subtle dimensional rim light. Neutral medium-gray seamless background. Clean color photograph, tasteful and approachable, excellent detail at badge size. Square composition. No text, no logos, no lanyard, no badge, no hat, no jewelry, no invented full body, no hands, no visual effects or illustration. This is the base photo; badge-specific filters are applied separately."
+		"prompt": "Use case: photorealistic-natural.\nAsset type: fictional sample portrait for a public badge design playground.\nCreate a single premium editorial studio photograph of a fictional adult woman, around 28, with warm medium skin, a short softly textured dark curly bob, brown eyes, an easy confident closed-mouth smile, and a plain charcoal crew-neck t-shirt. The identity must be completely fictional, with no resemblance to a celebrity or known person. Head and shoulders only, fully visible hairstyle with generous margin above, centered face, near-frontal view, both shoulders within frame. Natural skin texture, gentle directional studio lighting from upper left, believable eyes and hair, subtle dimensional rim light. Neutral medium-gray seamless background. Clean color photograph, tasteful and approachable, excellent detail at badge size. Square composition. No text, no logos, no lanyard, no badge, no hat, no jewelry, no invented full body, no hands, no visual effects or illustration. This is the base photo; badge-specific filters are applied separately.",
+		"cutout": {
+			"output": "apps/web/public/prism/demo/alex-cutout.webp",
+			"tool": "rembg 2.0.84 / birefnet-portrait",
+			"processing": "Foreground segmentation with edge decontamination; keeps the original face, crop and pose. WebP quality 96, alpha quality 100. Prepared offline; no segmentation model is shipped to the browser.",
+			"reference": "https://github.com/danielgatis/rembg"
+		}
 	},
 	"studies": [
 		{

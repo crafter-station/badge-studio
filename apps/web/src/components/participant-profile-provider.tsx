@@ -3,7 +3,7 @@
 import { preparePhoto } from "@/app/badge/prepare-photo";
 import { type ParticipantIdentity, emptyIdentity, validIdentity } from "@/lib/participant-profile";
 import { ParticipantProfileStore } from "@/lib/participant-profile-store";
-import { sampleParticipant } from "@/lib/sample-participant";
+import { currentExamplePhoto, sampleParticipant } from "@/lib/sample-participant";
 import {
 	createContext,
 	useCallback,
@@ -60,17 +60,27 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 			typeof indexedDB === "undefined" ? null : new ParticipantProfileStore(indexedDB);
 		store.current = database;
 		void (database ? database.read(controller.signal) : Promise.reject())
-			.then((saved) => {
+			.then(async (saved) => {
+				const restoredPhoto = await currentExamplePhoto(saved.photo, controller.signal);
+				let warning = "";
+				if (restoredPhoto !== saved.photo && !controller.signal.aborted) {
+					try {
+						await database?.save(saved.identity, restoredPhoto, controller.signal);
+					} catch {
+						warning = "La nueva foto de ejemplo estará disponible solo durante esta sesión.";
+					}
+				}
 				if (controller.signal.aborted) return;
-				identity.current = saved.photo ? { ...saved.identity, started: true } : saved.identity;
-				photo.current = saved.photo;
-				const portraitUrl = saved.photo ? URL.createObjectURL(saved.photo) : "";
+				identity.current = restoredPhoto ? { ...saved.identity, started: true } : saved.identity;
+				photo.current = restoredPhoto;
+				const portraitUrl = restoredPhoto ? URL.createObjectURL(restoredPhoto) : "";
 				ready.current = true;
 				setState((current) => ({
 					...current,
 					identity: identity.current,
 					portraitUrl,
 					ready: true,
+					warning,
 				}));
 			})
 			.catch(() => {

@@ -42,6 +42,8 @@ Browsing, editing, JSON import/export and PNG export do not need credentials. Pr
 
 Upload a photo once in the editor, or choose **Probar con foto de ejemplo** to try the fictional sample portrait. Your photo and name carry across all 17 styles, the gallery and the landing page. The profile is saved in this browser and restored on your next visit. Replace or remove the photo from the profile bar at any time.
 
+The sample portrait has a transparent background so each badge supplies its own setting. Transparent PNG/WebP uploads retain their alpha through resizing, portrait filters and export. Background removal for arbitrary uploaded photos is not included. Run `bun run test:portraits` with agent-browser installed to verify real Canvas2D compositing and image resizing.
+
 ## Structure
 
 - `apps/web`: Next.js landing, editor, local design API and assets.
