@@ -11,7 +11,10 @@
 	"dependencies": {
 		"@base-ui/react": "^1.8.0",
 		"@clerk/nextjs": "^7.9.2",
+		"@crafter-station/badge-studio-design": "workspace:*",
+		"@crafter-station/badge-studio-renderer": "workspace:*",
 		"@phosphor-icons/react": "^2.1.10",
+		"ai": "^7.0.0",
 		"class-variance-authority": "^0.7.1",
 		"cn": "^0.2.6",
 		"geist": "^1.7.0",
@@ -21,10 +24,8 @@
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"sharp": "0.35.4",
-		"ai": "^7.0.0",
 		"zod": "^3.24.0",
-		"@crafter-station/badge-studio-design": "workspace:*",
-		"@crafter-station/badge-studio-renderer": "workspace:*"
+		"zod-to-json-schema": "^3.25.0"
 	},
 	"devDependencies": {
 		"@types/react": "^19",

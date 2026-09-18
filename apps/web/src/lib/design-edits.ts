@@ -17,6 +17,7 @@ const faceEdits = z.object({
 });
 export const designEditsSchema = z.object({
 	name: badgeDesignObjectSchema.shape.name.optional(),
+	event: badgeDesignObjectSchema.shape.event.optional(),
 	description: badgeDesignObjectSchema.shape.description.optional(),
 	artPrompt: badgeDesignObjectSchema.shape.artPrompt.optional(),
 	material: badgeDesignObjectSchema.shape.material.partial().optional(),
@@ -50,6 +51,7 @@ export function applyDesignEdits(
 	const edits = designEditsSchema.parse(input);
 	const next = structuredClone(base);
 	if (edits.name !== undefined) next.name = edits.name;
+	if (edits.event !== undefined) next.event = edits.event;
 	if (edits.description !== undefined) next.description = edits.description;
 	if (edits.artPrompt !== undefined) next.artPrompt = edits.artPrompt;
 	if (edits.material) next.material = { ...next.material, ...edits.material };

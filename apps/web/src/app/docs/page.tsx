@@ -15,9 +15,67 @@ export default function ToolkitPage() {
 					<em>Another way in.</em>
 				</h1>
 				<p className="toolkit-lead">
-					Start with a badge. Let your agent edit its layers. Bring it back to the studio to see it
-					move.
+					Design by hand, or bring your coding agent into the same editor. You share the canvas.
+					Your agent brings the ideas.
 				</p>
+				<section id="agents">
+					<h2>Your agent. Your canvas.</h2>
+					<p>
+						The web editor stays fully editable. WebMCP lets a connected agent read and change the
+						same layers, typography, materials, photos and metadata you control by hand. It can flip
+						the badge, save locally, undo a layout change and export either face.
+					</p>
+					<pre>
+						<code>
+							{
+								'npx skills add crafter-station/badge-studio --skill badge-studio\n\nagent-browser --session badges --webgpu open https://badge-studio.crafter.run/design\nagent-browser --session badges webmcp list badge_inspect --json\nagent-browser --session badges webmcp invoke badge_inspect --params \'{"section":"state"}\' --json'
+							}
+						</code>
+					</pre>
+					<p>
+						Your coding agent reasons about the design using its own subscription. Badge Studio
+						applies and validates the changes in your browser. It does not call a language model to
+						plan your layout. Each change checks the current revision so it cannot silently
+						overwrite a newer edit.
+					</p>
+					<blockquote>
+						“Open my badge in Badge Studio. Give it a warmer editorial direction, with oversized
+						serif type and a quiet reverse. Keep my photo, preserve the QR and show me both sides.”
+					</blockquote>
+					<p>
+						Use a browser and agent with native WebMCP support. Agent-browser exposes these tools
+						directly; other clients need a compatible browser connection. If unavailable, the manual
+						editor and JSON workflow below still work.
+					</p>
+				</section>
+				<section>
+					<h2>Image magic, outside the browser.</h2>
+					<p>
+						Use the editor's filters when they fit. For a new illustration, pixel art or background
+						removal, your agent can export the photo, run{" "}
+						<a
+							href="https://github.com/vercel-labs/ai-cli"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							ai-cli
+						</a>{" "}
+						with your AI Gateway credentials, inspect the result and import it through WebMCP.
+					</p>
+					<pre>
+						<code>
+							{
+								'npm install --global ai-cli\nai models --type image --json\nai image -m "$BADGE_IMAGE_MODEL" -i portrait.webp \\\n  --output transformed.png "Restyle this portrait. Preserve the person, pose and crop."'
+							}
+						</code>
+					</pre>
+					<p>
+						Choose a model that supports reference images. Image generation uses your Gateway
+						credits, separately from your coding agent subscription. Keys stay in your local
+						environment. Badge Studio does not run paid generation or send your photo to a model.
+						The companion skill includes image transfer helpers and the complete workflow.
+					</p>
+				</section>
 				<section>
 					<h2>01 / Meet badgio</h2>
 					<p>Badge Studio from your terminal. Run the CLI without installing it globally.</p>
@@ -87,7 +145,8 @@ export default function ToolkitPage() {
 					<p>
 						The public studio saves your profile, photo, designs and illustrations in this browser.
 						Your photo is not uploaded to a server. Export your work to keep a separate copy. Cloud
-						sync, public AI generation and additional physical formats are future work.
+						sync and additional physical formats are future work. Image generation is handled by
+						your own agent and tools outside the browser.
 					</p>
 				</aside>
 			</article>

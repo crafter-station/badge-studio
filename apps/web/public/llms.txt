@@ -1,0 +1,34 @@
+# Badge Studio
+
+> An editable browser studio for badges with personality. Humans and coding agents share the same canvas.
+
+## Start
+
+- Live editor: https://badge-studio.crafter.run/design
+- Human and agent guide: https://badge-studio.crafter.run/docs#agents
+- Source: https://github.com/crafter-station/badge-studio
+- Companion skill: https://raw.githubusercontent.com/crafter-station/badge-studio/main/skills/badge-studio/SKILL.md
+- Install skill: npx skills add crafter-station/badge-studio --skill badge-studio
+- Offline CLI: npx badgio styles list
+
+## Browser tools
+
+The /design page registers native WebMCP tools when document.modelContext is available:
+badge_inspect, badge_edit, badge_set_participant, badge_set_image, badge_get_image, badge_view, badge_library, badge_export, badge_cancel.
+
+Discover the actual tool metadata before invocation. Start with badge_inspect section state. Each edit requires the expectedRevision from current state or the last receipt. Invalid or stale changes are rejected. Edits share the UI's validation, locks and undo. To cancel, inspect operation.id and invoke badge_cancel with operationId. Completed writes and downloads are not rolled back.
+
+With agent-browser:
+agent-browser --session badges --webgpu open https://badge-studio.crafter.run/design
+agent-browser --session badges webmcp list badge_inspect --json
+agent-browser --session badges webmcp invoke badge_inspect --params '{"section":"state"}' --json
+
+## Generation boundary
+
+The coding agent reasons about layouts. The web does not call an LLM or accept API keys.
+Optional image generation/transformation runs externally with ai-cli and the user's AI Gateway credentials.
+The agent can explicitly export an image, transform it, inspect it, and import its bytes.
+Model reference support and transparent output vary. Gateway credits are separate from the coding agent subscription.
+
+Shared profile/photo data and saved designs stay in this browser. Exported JSON has no embedded photos.
+If WebMCP is unavailable, use manual controls or create/edit/validate JSON with badgio and import it.

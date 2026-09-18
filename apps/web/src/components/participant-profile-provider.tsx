@@ -26,8 +26,8 @@ type ProfileState = {
 
 type Profile = ProfileState & {
 	updateIdentity: (patch: Partial<ParticipantIdentity>) => void;
-	changePhoto: (file: File) => Promise<boolean>;
-	useExamplePhoto: () => Promise<void>;
+	changePhoto: (file: File, signal?: AbortSignal) => Promise<boolean>;
+	useExamplePhoto: (signal?: AbortSignal) => Promise<boolean>;
 	removePhoto: () => void;
 };
 
@@ -147,13 +147,17 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 	);
 
 	const changePhoto = useCallback(
-		async (file: File) => {
-			if (!ready.current) return false;
+		async (file: File, signal?: AbortSignal) => {
+			if (!ready.current || signal?.aborted) return false;
 			const revision = ++photoRevision.current;
 			setState((current) => ({ ...current, uploading: true, error: "" }));
 			try {
 				const image = await preparePhoto(file);
 				if (!mounted.current || revision !== photoRevision.current) return false;
+				if (signal?.aborted) {
+					setState((current) => ({ ...current, uploading: false }));
+					return false;
+				}
 				const next = { ...identity.current, started: true };
 				identity.current = next;
 				photo.current = image;
@@ -192,32 +196,45 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 		persist(identity.current);
 	}, [persist]);
 
-	const useExamplePhoto = useCallback(async () => {
-		if (!ready.current) return;
-		const revision = ++photoRevision.current;
-		setState((current) => ({ ...current, uploading: true, error: "" }));
-		try {
-			const response = await fetch(sampleParticipant.portraitUrl, {
-				signal: AbortSignal.timeout(10000),
-			});
-			if (!response.ok) throw new Error("Example unavailable");
-			const image = await response.blob();
-			if (!mounted.current || revision !== photoRevision.current) return;
-			const applied = await changePhoto(new File([image], "example.webp", { type: "image/webp" }));
-			if (applied)
-				updateIdentity({
-					name: identity.current.name.trim() || sampleParticipant.name,
-					role: identity.current.role.trim() || sampleParticipant.role,
+	const useExamplePhoto = useCallback(
+		async (signal?: AbortSignal) => {
+			if (!ready.current || signal?.aborted) return false;
+			const revision = ++photoRevision.current;
+			setState((current) => ({ ...current, uploading: true, error: "" }));
+			try {
+				const response = await fetch(sampleParticipant.portraitUrl, {
+					signal: signal
+						? AbortSignal.any([signal, AbortSignal.timeout(10000)])
+						: AbortSignal.timeout(10000),
 				});
-		} catch {
-			if (mounted.current && revision === photoRevision.current)
-				setState((current) => ({
-					...current,
-					uploading: false,
-					error: "No pudimos cargar la foto de ejemplo. Inténtalo otra vez o sube la tuya.",
-				}));
-		}
-	}, [changePhoto, updateIdentity]);
+				if (!response.ok) throw new Error("Example unavailable");
+				const image = await response.blob();
+				signal?.throwIfAborted();
+				if (!mounted.current || revision !== photoRevision.current) return false;
+				const applied = await changePhoto(
+					new File([image], "example.webp", { type: "image/webp" }),
+					signal,
+				);
+				if (applied)
+					updateIdentity({
+						name: identity.current.name.trim() || sampleParticipant.name,
+						role: identity.current.role.trim() || sampleParticipant.role,
+					});
+				return applied;
+			} catch {
+				if (mounted.current && revision === photoRevision.current)
+					setState((current) => ({
+						...current,
+						uploading: false,
+						error: signal?.aborted
+							? ""
+							: "No pudimos cargar la foto de ejemplo. Inténtalo otra vez o sube la tuya.",
+					}));
+				return false;
+			}
+		},
+		[changePhoto, updateIdentity],
+	);
 
 	const value = useMemo(
 		() => ({ ...state, updateIdentity, changePhoto, useExamplePhoto, removePhoto }),

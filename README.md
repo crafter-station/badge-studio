@@ -25,6 +25,23 @@ The CLI creates and validates editable JSON. The web studio renders and exports 
 
 See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
 
+## Use your coding agent in the browser
+
+The public web editor remains fully editable. Nine native WebMCP tools expose the current document, catalog and schema; atomic layer/material edits; participant data and image transfer; view controls; local save/load; PNG/JSON downloads; and explicit cancellation. Your coding agent supplies the layout reasoning through its own subscription. The page does not run a paid model.
+
+```sh
+npx skills add crafter-station/badge-studio --skill badge-studio
+agent-browser --session badges --webgpu open https://badge-studio.crafter.run/design
+agent-browser --session badges webmcp list badge_inspect --json
+agent-browser --session badges webmcp invoke badge_inspect --params '{"section":"state"}' --json
+```
+
+Use a native WebMCP-capable browser. Other clients need their own compatible browser connection; the manual editor and offline JSON workflow remain available without it. Edits require the current revision, preserve locks and use the same semantic validator as the editor. Invalid batches change nothing. Layout edits have undo; shared profile/photo changes are separate.
+
+For image transformations, the agent can export the portrait, run [ai-cli](https://github.com/vercel-labs/ai-cli) locally through AI Gateway, inspect the result, then import it as a portrait or artwork. Credentials stay outside the page. Reference support and transparent output depend on the image model; Gateway generation credits are separate from the agent subscription.
+
+The [skill](skills/badge-studio/SKILL.md) includes the workflow and Node image-transfer helper. See [the browser contract](docs/webmcp-contract.md) for tools, concurrency and validation.
+
 ## Develop the studio
 
 The monorepo uses Bun 1.3+ for workspace installation and its test runner. Published CLI users only need Node.js and npm.
@@ -38,7 +55,7 @@ bun run dev
 
 Open `http://127.0.0.1:3004`. The editor is at `/design` and the local CLI guide at `/docs`. After building, run the local CLI on Node with `npm run studio -- styles list`.
 
-Browsing, editing, JSON import/export and PNG export do not need credentials. Prompt-based generation and artwork generation use an optional Vercel AI Gateway key. Copy `apps/web/.env.example` to `apps/web/.env.local` and add your own key to enable those operations.
+Browsing, editing, JSON import/export, PNG export and WebMCP do not need credentials. Browser storage is the default. Image generation belongs to the external coding agent and its own ai-cli environment.
 
 Upload a photo once in the editor, or choose **Probar con foto de ejemplo** to try the fictional sample portrait. Your photo and name carry across all 17 styles, the gallery and the landing page. The profile is saved in this browser and restored on your next visit. Replace or remove the photo from the profile bar at any time.
 
@@ -71,9 +88,9 @@ npm run test:npm -- badgio@0.1.1
 
 ## Service boundary
 
-The public studio uses `NEXT_PUBLIC_BADGE_STORAGE=browser` to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a server. Export JSON and images to keep a separate copy. Public AI generation and cloud sync are not enabled.
+The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos are not uploaded to a server. Export JSON and images to keep a separate copy. Public server-side AI generation and cloud sync are not enabled.
 
-Local development can use the file-backed design API and an optional AI Gateway key. Hosted file storage is disabled. Multi-user generation needs account-scoped storage and consumption controls before it can be enabled.
+The legacy file-backed experiment is available only with `NEXT_PUBLIC_BADGE_STORAGE=server` in local development. Hosted file storage is disabled. WebMCP exposes deterministic editor controls, never legacy generation endpoints or credentials.
 
 Event SDK remains a separate initiative. See [provenance](docs/provenance.md).
 

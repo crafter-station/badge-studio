@@ -1,5 +1,8 @@
 # Implementation decisions
 
+- September 18: browser-agent control has a mixed contract. Badge state and validation are defined here; native WebMCP and ai-cli are discovered from their upstream sources. The user clarified that public editing stays enabled. Generation belongs to the external coding agent, with ai-cli optional for images. No new CLI framework, paid browser endpoint or read-only website mode is needed.
+- WebMCP reuses the existing schema, editor undo and browser storage. Registration is native and scoped to the editor lifecycle. Generic document edits cover layout controls without exporting one tool per button.
+
 - Contract origin: defined. Badge Studio owns the version 1 design schema and shares it between CLI and editor.
 - Extraction preserves the original AGPL-3.0-only license and source provenance. Event SDK remains independent.
 - cligentic `detect`: hybrid. Use TTY detection and explicit JSON output, omit unused OS detection. Do not accept `NO_JSON` because it would weaken the automatic machine-output contract.

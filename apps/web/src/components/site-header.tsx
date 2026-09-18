@@ -35,6 +35,13 @@ export function SiteHeader() {
 						{item.label}
 					</Link>
 				))}
+				<a
+					href="https://github.com/crafter-station/badge-studio"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					GitHub<span className="sr-only"> (opens in a new tab)</span>
+				</a>
 			</nav>
 			<ToggleGroup
 				className="app-theme"

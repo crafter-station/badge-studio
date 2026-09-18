@@ -39,6 +39,7 @@ import { DesignInspector } from "./design-inspector";
 import { DesignPreview } from "./design-preview";
 import { DesignProfile } from "./design-profile";
 import { useDesignStudio } from "./use-design-studio";
+import { useStudioWebMcp } from "./use-studio-webmcp";
 
 export function DesignStudio() {
 	const studio = useDesignStudio();
@@ -52,6 +53,17 @@ export function DesignStudio() {
 	const badge = useRef<PrismBadgeHandle>(null);
 	const referenceInput = useRef<HTMLInputElement>(null);
 	const documentInput = useRef<HTMLInputElement>(null);
+	const agentConnection = useStudioWebMcp({
+		studio,
+		side,
+		moving,
+		status,
+		mobilePanel,
+		setSide,
+		setMoving,
+		setMobilePanel,
+		badge,
+	});
 	const pending = Boolean(studio.phase);
 	const appearance = {
 		...designAppearance(studio.design),
@@ -103,7 +115,7 @@ export function DesignStudio() {
 
 	if (!studio.profile.ready || !studio.profile.identity.started) {
 		return (
-			<main className="design-studio design-studio-welcome" lang="es">
+			<main className="design-studio design-studio-welcome" lang="es" data-webmcp={agentConnection}>
 				{studio.profile.ready && studio.fontsReady ? (
 					<DesignProfile welcome />
 				) : (
@@ -116,10 +128,19 @@ export function DesignStudio() {
 	}
 
 	return (
-		<main className="design-studio" lang="es" data-mobile-panel={mobilePanel}>
+		<main
+			className="design-studio"
+			lang="es"
+			data-mobile-panel={mobilePanel}
+			data-webmcp={agentConnection}
+		>
 			<DesignProfile />
 			<div className="design-actions" aria-label="Acciones del diseño">
-				<span className="design-workspace-label">Tu espacio de diseño</span>
+				<a className="design-workspace-label" href="/docs#agents">
+					{agentConnection === "ready"
+						? "WebMCP listo · Usar mi agente ↗"
+						: "Usar mi coding agent ↗"}
+				</a>
 				<div className="design-header-actions">
 					<input
 						ref={documentInput}
@@ -315,7 +336,8 @@ export function DesignStudio() {
 					{browserStorageEnabled ? (
 						<p className="design-help">
 							Tus diseños e ilustraciones se guardan solo en este navegador. Exporta una copia para
-							conservarlos. La generación con IA llegará después.
+							conservarlos. Tu coding agent puede editar el diseño mediante WebMCP y traer imágenes
+							externas.
 						</p>
 					) : !studio.library?.generationAvailable && studio.library ? (
 						<p className="design-help">

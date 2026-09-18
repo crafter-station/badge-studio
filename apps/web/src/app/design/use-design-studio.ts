@@ -17,6 +17,7 @@ import {
 } from "@crafter-station/badge-studio-design/badge-design";
 import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
 import { type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { agentEditSchema, editFromAgent } from "./design-agent";
 import {
 	type DesignLibrary,
 	type DesignReference,
@@ -107,16 +108,25 @@ export function useDesignStudio() {
 		};
 	}, []);
 
-	async function perform(label: string, operation: (signal: AbortSignal) => Promise<() => void>) {
-		if (active.current) return;
+	async function perform(
+		label: string,
+		operation: (signal: AbortSignal) => Promise<() => void>,
+		externalSignal?: AbortSignal,
+	) {
+		if (active.current || externalSignal?.aborted) return false;
 		const controller = new AbortController();
+		const abort = () => controller.abort(externalSignal?.reason);
+		externalSignal?.addEventListener("abort", abort, { once: true });
 		active.current = controller;
 		setError("");
 		setNotice("");
 		setPhase(label);
 		try {
 			const commit = await operation(controller.signal);
-			if (!controller.signal.aborted && mounted.current && active.current === controller) commit();
+			if (controller.signal.aborted || !mounted.current || active.current !== controller)
+				return false;
+			commit();
+			return true;
 		} catch (reason) {
 			if (!controller.signal.aborted && mounted.current)
 				setError(
@@ -124,7 +134,9 @@ export function useDesignStudio() {
 						? "La operación tardó demasiado. Tu diseño está intacto; puedes reintentarlo."
 						: (reason as Error).message,
 				);
+			return false;
 		} finally {
+			externalSignal?.removeEventListener("abort", abort);
 			if (active.current === controller) {
 				active.current = null;
 				if (mounted.current) setPhase("");
@@ -270,7 +282,7 @@ export function useDesignStudio() {
 		});
 	}
 
-	async function changeArtwork(file: File) {
+	async function changeArtwork(file: File, signal?: AbortSignal) {
 		if (
 			(["front", "back"] as const).some((side) =>
 				editor.design[side].layers.some(
@@ -279,72 +291,117 @@ export function useDesignStudio() {
 			)
 		) {
 			setError("Desbloquea las capas de ilustración para cambiar su imagen.");
-			return;
+			return false;
 		}
 		const current = editor.design;
-		await perform("Cambiando la ilustración…", async (signal) => {
-			const image = await preparePhoto(file);
-			signal.throwIfAborted();
-			const form = new FormData();
-			form.set("reference", image, file.name);
-			const result = await designRequest<{ id: string }>("/reference", {
-				method: "POST",
-				body: form,
-				signal,
-			});
-			const next = badgeDesignSchema.parse({ ...current, artwork: { assetId: result.id } });
-			return () => {
-				setEditor((state) => replaceDesign(state, next));
-				setNotice("Ilustración actualizada en las capas que la usan.");
-			};
-		});
-	}
-
-	async function save() {
-		const design = editor.design;
-		await perform("Guardando la dirección…", async (signal) => {
-			const result = await designRequest<SavedDesign>(
-				"",
-				requestJson(
-					{
-						design,
-						...(saved ? { designId: saved.id, expectedVersion: saved.version } : {}),
-					},
+		return perform(
+			"Cambiando la ilustración…",
+			async (signal) => {
+				const image = await preparePhoto(file);
+				signal.throwIfAborted();
+				const form = new FormData();
+				form.set("reference", image, file.name);
+				const result = await designRequest<{ id: string }>("/reference", {
+					method: "POST",
+					body: form,
 					signal,
-				),
-			);
-			badgeDesignSchema.parse(result.design);
-			return () => {
-				setSaved(result);
-				history.replaceState(history.state, "", `/design?design=${encodeURIComponent(result.id)}`);
-				setSavedFingerprint(JSON.stringify(design));
-				setLibrary((state) =>
-					state
-						? {
-								...state,
-								designs: [result, ...state.designs.filter((entry) => entry.id !== result.id)],
-							}
-						: state,
-				);
-				setNotice(`Dirección guardada · versión ${result.version}. Ya puedes reutilizarla.`);
-			};
-		});
+				});
+				const next = badgeDesignSchema.parse({ ...current, artwork: { assetId: result.id } });
+				return () => {
+					setEditor((state) => replaceDesign(state, next));
+					setNotice("Ilustración actualizada en las capas que la usan.");
+				};
+			},
+			signal,
+		);
 	}
 
-	async function load(id: string) {
-		await perform("Abriendo la dirección…", async (signal) => {
-			const result = await designRequest<SavedDesign>(`/${encodeURIComponent(id)}`, { signal });
-			const design = badgeDesignSchema.parse(result.design);
-			return () => {
-				setEditor((state) => replaceDesign(state, design, false));
-				setBaseParticipant((person) => participantForDesign(person, design));
-				setSaved(result);
-				history.replaceState(history.state, "", `/design?design=${encodeURIComponent(result.id)}`);
-				setSavedFingerprint(JSON.stringify(design));
-				setProposals([]);
-				setNotice(`Versión ${result.version} cargada.`);
-			};
-		});
+	async function save(signal?: AbortSignal) {
+		const design = editor.design;
+		return perform(
+			"Guardando la dirección…",
+			async (signal) => {
+				const result = await designRequest<SavedDesign>(
+					"",
+					requestJson(
+						{
+							design,
+							...(saved ? { designId: saved.id, expectedVersion: saved.version } : {}),
+						},
+						signal,
+					),
+				);
+				badgeDesignSchema.parse(result.design);
+				return () => {
+					setSaved(result);
+					history.replaceState(
+						history.state,
+						"",
+						`/design?design=${encodeURIComponent(result.id)}`,
+					);
+					setSavedFingerprint(JSON.stringify(design));
+					setLibrary((state) =>
+						state
+							? {
+									...state,
+									designs: [result, ...state.designs.filter((entry) => entry.id !== result.id)],
+								}
+							: state,
+					);
+					setNotice(`Dirección guardada · versión ${result.version}. Ya puedes reutilizarla.`);
+				};
+			},
+			signal,
+		);
+	}
+
+	async function load(id: string, signal?: AbortSignal) {
+		return perform(
+			"Abriendo la dirección…",
+			async (signal) => {
+				const result = await designRequest<SavedDesign>(`/${encodeURIComponent(id)}`, { signal });
+				const design = badgeDesignSchema.parse(result.design);
+				return () => {
+					setEditor((state) => replaceDesign(state, design, false));
+					setBaseParticipant((person) => participantForDesign(person, design));
+					setSaved(result);
+					history.replaceState(
+						history.state,
+						"",
+						`/design?design=${encodeURIComponent(result.id)}`,
+					);
+					setSavedFingerprint(JSON.stringify(design));
+					setProposals([]);
+					setNotice(`Versión ${result.version} cargada.`);
+				};
+			},
+			signal,
+		);
+	}
+
+	function agentEdit(input: unknown) {
+		if (active.current) throw new Error("An editor operation is already running.");
+		const edit = agentEditSchema.parse(input);
+		const next = editFromAgent(editor, edit);
+		setEditor(next);
+		setBaseParticipant((person) =>
+			edit.action === "select"
+				? participantForDesign(person, next.design)
+				: {
+						...person,
+						eventName: next.design.event,
+						...(person.metadata
+							? { metadata: { ...person.metadata, eventName: next.design.event } }
+							: {}),
+					},
+		);
+		if (edit.action === "select") {
+			setSaved(undefined);
+			setSavedFingerprint("");
+			history.replaceState(history.state, "", `/design?style=${encodeURIComponent(edit.source)}`);
+		}
+		setError("");
+		setNotice("Cambios de tu agente aplicados. Puedes seguir editando o deshacerlos.");
 	}
 
 	function setParticipant(update: SetStateAction<PrismBadgeData>) {
@@ -535,6 +592,7 @@ export function useDesignStudio() {
 
 	return {
 		...editor,
+		agentEdit,
 		participant,
 		profile,
 		setParticipant,

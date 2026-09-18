@@ -3,7 +3,7 @@ import { z } from "zod";
 import { showcaseAssets } from "../../lib/design-showcase";
 import type { SavedDesign } from "./design-client";
 
-export const browserStorageEnabled = process.env.NEXT_PUBLIC_BADGE_STORAGE === "browser";
+export const browserStorageEnabled = process.env.NEXT_PUBLIC_BADGE_STORAGE !== "server";
 const assetUrls = new Map<string, string>();
 const saveSchema = z.object({
 	design: badgeDesignSchema,

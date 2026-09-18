@@ -28,6 +28,14 @@
 	border-top: 1px solid var(--landing-line);
 	padding: 27px 0;
 }
+.toolkit-content section[id] {
+	scroll-margin-top: 24px;
+}
+.toolkit-content p a {
+	color: var(--foreground);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
 .toolkit-content h2 {
 	font-size: 16px;
 	font-weight: 550;

@@ -12,7 +12,7 @@ export function DesignPhotoPicker({
 }: {
 	src?: string;
 	disabled: boolean;
-	onChange: (file: File) => Promise<void>;
+	onChange: (file: File) => Promise<unknown>;
 	artwork?: boolean;
 }) {
 	const input = useRef<HTMLInputElement>(null);
