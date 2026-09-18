@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "bun run --cwd apps/web dev --hostname 127.0.0.1 --port 3004",
 		"build": "bun run build:packages && bun run --cwd apps/web build",
-		"build:packages": "bun run --filter @crafter-station/badge-studio-design build && bun run --filter @crafter-station/badge-studio-renderer build && bun run --filter badg build",
+		"build:packages": "bun run --filter @crafter-station/badge-studio-design build && bun run --filter @crafter-station/badge-studio-renderer build && bun run --filter badgio build",
 		"check": "biome check .",
 		"typecheck": "tsc --noEmit -p apps/web/tsconfig.json && bun run --cwd packages/cli typecheck",
 		"test": "bun run --cwd packages/cli build && bun test packages apps/web/src/lib apps/web/src/app/design",

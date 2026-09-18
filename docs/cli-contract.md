@@ -18,4 +18,4 @@ Success output is `{ok:true, version, data, nextSteps}`. Failure output is `{ok:
 
 The JSON Schema covers structure; `design validate` additionally checks bounds, bindings, QR placement and contrast. Artwork UUIDs reference assets served by the app and are not embedded in JSON. The shipped catalog's artwork assets are included in the web app. Custom generated assets must be transferred separately.
 
-Distribution: the `badg` npm package contains a Node 22-compatible binary and bundles the shared catalog and validator. Run `bunx badg`, install `badg` globally, or use `bun run studio` from a source checkout. The `badge-studio` binary remains an alias.
+Distribution: the `badgio` npm package contains a Node 22-compatible binary and bundles the shared catalog and validator. Run `bunx badgio`, install `badgio` globally, or use `bun run studio` from a source checkout. The `badge-studio` binary remains an alias.

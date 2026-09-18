@@ -2,7 +2,7 @@
 
 A design studio for badges with personality. Explore nine event art directions, three physical originals and five custom studies. Edit every layer, flip the badge, change its material and export it.
 
-Try [Badge Studio](https://badge-studio.crafter.run), or create a document from your terminal with `bunx badg styles list`.
+Try [Badge Studio](https://badge-studio.crafter.run), or create a document from your terminal with `bunx badgio styles list`.
 
 The landing is a draggable orbit of nine event badges plus Térmico, Prisma and Cromo, with depth, inertia and optional synthesized mechanical ticks. It supports keyboard rotation, reduced motion and light/dark themes.
 
@@ -26,15 +26,15 @@ The bundled demo portrait and prepared event studies show the sample participant
 ## Use the CLI
 
 ```sh
-bunx badg styles list
-bunx badg design create --style gtm --out badge.json
-bunx badg schema --json
-bunx badg design validate --file badge.json
+bunx badgio styles list
+bunx badgio design create --style gtm --out badge.json
+bunx badgio schema --json
+bunx badgio design validate --file badge.json
 ```
 
 An agent can edit the JSON using the versioned schema and semantic validator. Choose **Importar JSON** in the editor to continue visually.
 
-The npm package is `badg`, with `badg` and `badge-studio` commands. It requires Node.js 22 or newer and bundles the same catalog and validator as the editor. The CLI works locally and does not generate images, call an LLM or render PNGs. From a source checkout, use `bun run studio`.
+The npm package is `badgio`, with `badgio` and `badge-studio` commands. It requires Node.js 22 or newer and bundles the same catalog and validator as the editor. The CLI works locally and does not generate images, call an LLM or render PNGs. From a source checkout, use `bun run studio`.
 
 See [the CLI contract](docs/cli-contract.md) and [the companion skill](skills/badge-studio/SKILL.md).
 

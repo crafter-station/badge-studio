@@ -3,22 +3,22 @@
 Create editable badges with personality from your terminal or coding agent.
 
 ```sh
-bunx badg styles list
-bunx badg design create --style gtm --out badge.json
-bunx badg schema --json
-bunx badg design validate --file badge.json
+bunx badgio styles list
+bunx badgio design create --style gtm --out badge.json
+bunx badgio schema --json
+bunx badgio design validate --file badge.json
 ```
 
 Or install the command:
 
 ```sh
-bun add --global badg
-badg --help
+bun add --global badgio
+badgio --help
 ```
 
 Requires Node.js 22 or newer. Open [Badge Studio](https://badge-studio.crafter.run/design), choose **Importar JSON**, upload your photo and export your badge.
 
-The package is `badg`; the app is Badge Studio. The `badge-studio` command remains available as an alias.
+The package is `badgio`; the app is Badge Studio. The `badge-studio` command remains available as an alias.
 
 The package contains 17 starting designs, the document schema and its validator. Your agent can change typography, placement, portrait filters, graphics and material effects. Both faces remain editable in the web studio.
 

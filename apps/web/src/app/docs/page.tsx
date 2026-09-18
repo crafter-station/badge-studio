@@ -19,21 +19,22 @@ export default function ToolkitPage() {
 					move.
 				</p>
 				<section>
-					<h2>01 / Meet badg</h2>
+					<h2>01 / Meet badgio</h2>
 					<p>Badge Studio from your terminal. Run the CLI without installing it globally.</p>
 					<pre>
-						<code>{"bunx badg --help\nbunx badg styles list"}</code>
+						<code>{"bunx badgio --help\nbunx badgio styles list"}</code>
 					</pre>
 					<p>
-						The package is called badg. It runs on Node.js 22 or newer and works without an account
-						or AI key. Install it globally with <code>bun add --global badg</code> if you prefer.
+						The package is called badgio. It runs on Node.js 22 or newer and works without an
+						account or AI key. Install it globally with <code>bun add --global badgio</code> if you
+						prefer.
 					</p>
 				</section>
 				<section>
 					<h2>02 / Pick your starting point</h2>
 					<pre>
 						<code>
-							{"bunx badg styles list\nbunx badg design create --style gtm --out badge.json"}
+							{"bunx badgio styles list\nbunx badgio design create --style gtm --out badge.json"}
 						</code>
 					</pre>
 					<p>
@@ -45,7 +46,9 @@ export default function ToolkitPage() {
 				<section>
 					<h2>03 / Make it yours with your agent</h2>
 					<pre>
-						<code>{"bunx badg schema --json\nbunx badg design validate --file badge.json"}</code>
+						<code>
+							{"bunx badgio schema --json\nbunx badgio design validate --file badge.json"}
+						</code>
 					</pre>
 					<p>
 						Ask your agent to edit badge.json using the schema: typography, positions, shapes,

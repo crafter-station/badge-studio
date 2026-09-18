@@ -9,7 +9,7 @@ import { StudioOrbit } from "./studio-orbit";
 export function StudioLanding() {
 	const [category, setCategory] = useState("All styles");
 	const [copied, setCopied] = useState(false);
-	const command = "bunx badg design create --style gtm --out badge.json";
+	const command = "bunx badgio design create --style gtm --out badge.json";
 	const filtered = directions.filter(
 		(direction) => category === "All styles" || direction.category === category,
 	);
@@ -146,7 +146,7 @@ export function StudioLanding() {
 						{copied ? "Copied" : "Copy command"}
 					</button>
 					<p className="terminal-caption">
-						Run badg from your terminal. Bring the same editable document into the studio.
+						Run badgio from your terminal. Bring the same editable document into the studio.
 					</p>
 				</div>
 			</section>
