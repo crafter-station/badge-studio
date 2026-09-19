@@ -499,9 +499,22 @@
 .agent-workflow {
 	min-width: 0;
 }
-.landing-workflow .agent-first-prompt {
-	max-width: none;
-	margin-top: 24px;
+.agent-prompt {
+	min-width: 0;
+	max-width: 100%;
+}
+.agent-first-prompt {
+	margin: 0 0 20px;
+	font-size: 16px;
+	line-height: 1.8;
+	color: var(--foreground);
+}
+.agent-prompt-hint {
+	max-width: 390px;
+	margin: 16px auto 0;
+	color: var(--muted-foreground);
+	font-size: 12px;
+	line-height: 1.7;
 }
 .landing-footer {
 	max-width: 1400px;

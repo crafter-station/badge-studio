@@ -18,7 +18,7 @@ These are prompts for invention, not recipes to repeat. Explain the direction br
 - Position, size, rotate, hide, duplicate, remove and reorder layers on either face.
 - Set typography, scale, weight, alignment, color and name/role bindings.
 - Compose vector shapes, SVG paths, graphic patterns, text, portraits, images, QR and effects using the layer kinds exposed by the schema.
-- Use portrait crop, filters, masks and treatments already available before requesting a generated image.
+- Honor the agreed portrait treatment. Use supported crop, masks and editable filters where that choice calls for them; load the images guide for requested generation.
 - Change face backgrounds, material surface and every material/effect parameter the schema supports.
 - Build an independent reverse with useful event information and a clear QR, instead of merely copying the front.
 - Use `badge_edit` action `replace` for a comprehensive new composition. Use `patch` for iteration; an `upsert` is a complete layer, and `order` must include every layer ID once.

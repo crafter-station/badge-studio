@@ -47,7 +47,7 @@
     },
     "packages/cli": {
       "name": "badgio",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "bin": {
         "badgio": "./dist/cli.js",
         "badge-studio": "./dist/cli.js",

@@ -4,7 +4,21 @@ Create a distinctive, fully editable badge from the user's photo. Use the live e
 
 ## Start with the person
 
-Use an image already attached or identified in the conversation. Otherwise ask for a photo or its local path before designing. Ask for a name and an event or mood only when the conversation does not provide them. Never silently substitute the example portrait. Preserve the person's face, framing, pose and proportions.
+Before composing, distinguish the user's portrait from a style reference or decorative artwork. An attached mood board, poster or illustration supplies art direction, not the person's photo. If its role is unclear, ask. Reuse a portrait already supplied for this badge; otherwise ask for the photo or its local path. Search a folder when the user asks, and clarify which image to use if several candidates fit. Do not infer the person's identity from a filename.
+
+Resolve the exact display name and image treatment alongside the photo in one short conversational intake. Ask only for missing decisions. A machine username, account name or nickname in agent instructions is not the badge's requested name. Take the mood from the reference when available; ask about the event only if needed.
+
+Offer three plain-language treatments, with a recommendation suited to the reference:
+
+- **Original photo:** keep its appearance, using only placement and framing. Do not silently add filters or remove its background.
+- **Editable filters:** use the real photo with supported color, monochrome, tint or other native treatments. This needs no image generation.
+- **Generated image:** transform the supplied portrait into an illustration or pixel art, or create separate artwork if that is what the user wants. Clarify the target when ambiguous. Use the images guide for dependencies, external processing and costs.
+
+For a style reference alone, a first reply could be: “Tomo el verde, amarillo y los contornos de stickers como referencia. Pásame tu foto o su ruta y el nombre exacto del badge. ¿La quieres tal cual, con filtros editables o convertida en ilustración? Para este estilo recomiendo conservar tu foto y rodearla de gráficos tipo sticker.” Adapt this to the user's language and omit anything already answered.
+
+Wait for the required photo, exact name and treatment choice or explicit delegation before building the personalized composition. You can inspect tools and prepare authorized dependencies while waiting. Do not replace the person with a mascot, example portrait or provisional name just to produce a first draft. A photo-free badge or fictional participant is fine when the user explicitly requests it. If they delegate the treatment, keep the original photo for the first preview and explain that choice; artistic freedom alone does not authorize paid generation.
+
+Once the inputs are clear, state the direction briefly and design without asking the user to place every layer. Preserve the person's face, framing, pose and proportions. Creating, editing, saving locally and exporting require no account; authentication belongs only to optional public submission.
 
 ## Set up only what is missing
 

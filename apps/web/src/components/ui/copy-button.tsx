@@ -1,17 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Check, Copy } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { cn } from "cn";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
 
 export function CopyButton({
 	value,
 	label = "Copy",
 	copiedLabel = "Copied",
+	variant = "outline",
+	size,
 }: {
 	value: string;
 	label?: string;
 	copiedLabel?: string;
+	variant?: ComponentProps<typeof Button>["variant"];
+	size?: ComponentProps<typeof Button>["size"];
 }) {
 	const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -32,14 +38,27 @@ export function CopyButton({
 		}
 	}
 	return (
-		<div className="inline-flex flex-col items-start gap-1">
-			<Button type="button" variant="outline" onClick={copy}>
+		<div className="inline-flex max-w-full flex-col items-start gap-2">
+			<Button type="button" variant={variant} size={size} onClick={copy}>
 				{status === "copied" ? (
 					<Check data-icon="inline-start" />
 				) : (
 					<Copy data-icon="inline-start" />
 				)}
-				{status === "copied" ? copiedLabel : label}
+				<span className="grid">
+					<span
+						className={cn("col-start-1 row-start-1", status === "copied" && "invisible")}
+						aria-hidden={status === "copied"}
+					>
+						{label}
+					</span>
+					<span
+						className={cn("col-start-1 row-start-1", status !== "copied" && "invisible")}
+						aria-hidden={status !== "copied"}
+					>
+						{copiedLabel}
+					</span>
+				</span>
 			</Button>
 			<output className={status === "error" ? "text-xs text-destructive" : "sr-only"}>
 				{status === "error"
@@ -48,6 +67,15 @@ export function CopyButton({
 						? copiedLabel
 						: ""}
 			</output>
+			{status === "error" ? (
+				<Textarea
+					aria-label="Text to copy manually"
+					readOnly
+					value={value}
+					rows={4}
+					onFocus={(event) => event.currentTarget.select()}
+				/>
+			) : null}
 		</div>
 	);
 }

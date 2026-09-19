@@ -3,9 +3,8 @@
 import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState } from "react";
-import { AgentSetup } from "../../components/agent-setup";
+import { AgentPrompt } from "../../components/agent-prompt";
 import { Button } from "../../components/ui/button";
-import { agentFirstPrompt } from "../../lib/agent-setup";
 import { directions } from "./directions";
 import { LiveBadge } from "./live-badge";
 import { StudioOrbit } from "./studio-orbit";
@@ -37,9 +36,7 @@ export function StudioLanding() {
 						Find your direction. Make it yours. Let it move.
 					</p>
 					<div className="intro-actions">
-						<Button variant="default" nativeButton={false} render={<Link href="#workflow" />}>
-							Create with your agent <ArrowDown data-icon="inline-end" />
-						</Button>
+						<AgentPrompt compact />
 						<Button variant="outline" nativeButton={false} render={<Link href="/design" />}>
 							Open the editor <ArrowUpRight data-icon="inline-end" />
 						</Button>
@@ -47,6 +44,10 @@ export function StudioLanding() {
 							Find a little inspiration <ArrowDown data-icon="inline-end" />
 						</Button>
 					</div>
+					<p className="agent-prompt-hint">
+						Paste it into your coding agent and attach a reference image. Your agent takes it from
+						there.
+					</p>
 					<div className="hero-footnote">
 						<span>Made for people.</span>
 						<span>Open to possibilities.</span>
@@ -115,16 +116,16 @@ export function StudioLanding() {
 						<em>Your workflow.</em>
 					</h2>
 					<p>
-						Install the CLI and skill. Give your agent a photo and an idea. Keep refining your badge
-						in the same conversation, with a live canvas right beside you.
+						Copy the prompt, attach a reference and let your agent handle setup. It asks for your
+						photo, name and preferred image treatment, then opens a live canvas you can refine
+						together. No account needed to create.
 					</p>
 					<a href="/docs" className="text-link">
 						Meet the design toolkit <ArrowUpRight />
 					</a>
 				</div>
 				<div className="agent-workflow">
-					<AgentSetup />
-					<p className="agent-first-prompt">{agentFirstPrompt}</p>
+					<AgentPrompt />
 				</div>
 			</section>
 			<footer className="landing-footer">

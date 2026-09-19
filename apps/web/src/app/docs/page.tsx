@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { AgentPrompt } from "../../components/agent-prompt";
 import { AgentSetup } from "../../components/agent-setup";
 import { CommandCode } from "../../components/command-code";
 import { Button } from "../../components/ui/button";
-import { agentFirstPrompt } from "../../lib/agent-setup";
 import "../landing/landing.css";
 import "./toolkit.css";
 
@@ -23,19 +23,26 @@ export default function ToolkitPage() {
 					refining it with you.
 				</p>
 				<section id="agents">
-					<h2>Install two things. Then just ask.</h2>
-					<AgentSetup />
+					<h2>One prompt. Your agent takes it from there.</h2>
+					<AgentPrompt />
 					<p>
-						The first command installs badgio, the Badge Studio CLI. The second adds the
-						badge-studio skill to your coding agent. Choose your agent in the installer, then start
-						a session with the skill available.
+						Paste this into your coding agent and attach a style reference. Your agent installs the
+						skill and CLI, then asks for your photo, the exact name to display and how you want to
+						treat the image: original, editable filters or a generated illustration.
 					</p>
-					<blockquote>“{agentFirstPrompt}”</blockquote>
 					<p>
-						Attach your image or give its path. If you forget, your agent will ask. It will also ask
-						before installing agent-browser for browser inspection. You do not need an image model
-						or an API key to compose a badge.
+						A style reference is inspiration for the design. Supply your portrait separately or give
+						its path. Your agent asks only for what is missing and checks with you before installing
+						agent-browser. Creating, editing, saving and exporting need no account.
 					</p>
+					<details>
+						<summary>Prefer to install manually?</summary>
+						<AgentSetup />
+						<p>
+							The first command installs badgio. The second adds the skill to your coding agent.
+							Choose your agent in the installer, then start a session with the skill available.
+						</p>
+					</details>
 				</section>
 				<section>
 					<h2>The preview stays with you.</h2>

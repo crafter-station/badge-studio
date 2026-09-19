@@ -1,6 +1,8 @@
 # Optional image transformations
 
-Use this only when the requested result needs changed image content. Editable monochrome, tint, thermal, crop and other native treatments do not require ai-cli.
+Use this after the user chooses generation or requests a change that needs new image content. A style reference alone does not authorize transforming the portrait. Honor an original-photo or filters-only choice; editable monochrome, tint, thermal, crop and other native treatments do not require ai-cli.
+
+Distinguish transforming the person's photo from generating separate decorative artwork. A portrait transformation needs the actual portrait, not just the style reference. Keep the person's identity, framing, pose and proportions. For separate artwork, leave the portrait unchanged unless the user also requested its transformation.
 
 Check `badgio doctor --json`. If ai-cli is missing, ask whether to install it for the requested transformation, then run:
 
@@ -10,7 +12,7 @@ ai image --help
 ai models --type image --json
 ```
 
-Use the installed CLI's setup instructions for the user's AI Gateway credentials. Never put keys in chat, files, prompts, page storage, WebMCP arguments or the session URL. Image generation uses Gateway credits separately from the coding agent's subscription. Confirm the paid generation if it has not already been authorized. If declined, continue with the original photo and editable treatments.
+Use the installed CLI's setup instructions for the user's AI Gateway credentials. Never put keys in chat, files, prompts, page storage, WebMCP arguments or the session URL. Explain that generation sends the selected source images to an external provider and uses Gateway credits separately from the coding agent's subscription. Confirm that processing and spending if not already authorized. If declined, offer the original photo or editable filters and continue with the user's choice.
 
 Use the original local photo where available. To transform the current editor photo instead:
 

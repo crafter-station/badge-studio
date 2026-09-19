@@ -95,8 +95,8 @@ bun run build
 Verify a packed or published CLI with npm and npx in an isolated consumer:
 
 ```sh
-npm run test:npm -- /absolute/path/to/badgio-0.2.1.tgz
-npm run test:npm -- badgio@0.2.1
+npm run test:npm -- /absolute/path/to/badgio-0.2.2.tgz
+npm run test:npm -- badgio@0.2.2
 ```
 
 ## Service boundary
