@@ -35,7 +35,7 @@ function Faces({ design, second }: { design: BadgeDesign; second: boolean }) {
 				Promise.all(
 					(["front", "back"] as const).map((side, index) => {
 						const canvas = canvases.current[index];
-						if (!canvas) throw new Error("Falta el canvas");
+						if (!canvas) throw new Error("Canvas is missing");
 						return drawBadgeFace(canvas, data, designAppearance(design), side, abort.signal);
 					}),
 				),

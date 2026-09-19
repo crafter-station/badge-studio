@@ -18,7 +18,7 @@ export function DesignExtraControls({
 		<>
 			{!["portrait", "image", "effect"].includes(layer.kind) ? (
 				<Field>
-					<FieldLabel htmlFor="layer-channel">Acabado de capa</FieldLabel>
+					<FieldLabel htmlFor="layer-channel">Layer finish</FieldLabel>
 					<select
 						id="layer-channel"
 						className="design-select"
@@ -26,8 +26,8 @@ export function DesignExtraControls({
 						value={layer.channel ?? (["text", "qr"].includes(layer.kind) ? "ink" : "print")}
 						onChange={(event) => update({ channel: event.target.value as "print" | "ink" })}
 					>
-						<option value="print">Bajo el material</option>
-						<option value="ink">Sobre el material</option>
+						<option value="print">Under the material</option>
+						<option value="ink">On top of the material</option>
 					</select>
 				</Field>
 			) : null}
@@ -36,7 +36,7 @@ export function DesignExtraControls({
 					{(["prefix", "suffix"] as const).map((key) => (
 						<Field key={key}>
 							<FieldLabel htmlFor={`layer-${key}`}>
-								{key === "prefix" ? "Prefijo" : "Sufijo"}
+								{key === "prefix" ? "Prefix" : "Suffix"}
 							</FieldLabel>
 							<Input
 								id={`layer-${key}`}
@@ -49,7 +49,7 @@ export function DesignExtraControls({
 					))}
 					{layer.baseline === "alphabetic" ? (
 						<Field>
-							<FieldLabel htmlFor="layer-baseline-offset">Posición de la línea de base</FieldLabel>
+							<FieldLabel htmlFor="layer-baseline-offset">Baseline position</FieldLabel>
 							<Input
 								id="layer-baseline-offset"
 								type="number"
@@ -70,13 +70,13 @@ export function DesignExtraControls({
 					disabled={disabled}
 					onClick={() => update({ tint: undefined, tintMode: undefined, tintOpacity: undefined })}
 				>
-					Quitar tinte adicional
+					Remove extra tint
 				</Button>
 			) : null}
 			{layer.kind === "graphic" && layer.pattern === "paper" ? (
 				<>
 					<Field>
-						<FieldLabel htmlFor="paper-variant">Patrón del papel</FieldLabel>
+						<FieldLabel htmlFor="paper-variant">Paper pattern</FieldLabel>
 						<select
 							id="paper-variant"
 							className="design-select"
@@ -94,7 +94,7 @@ export function DesignExtraControls({
 						</select>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="paper-ink">Tinta del papel</FieldLabel>
+						<FieldLabel htmlFor="paper-ink">Paper ink</FieldLabel>
 						<Input
 							id="paper-ink"
 							type="color"
@@ -109,7 +109,7 @@ export function DesignExtraControls({
 				? (["foreground", "background"] as const).map((key) => (
 						<Field key={key}>
 							<FieldLabel htmlFor={`qr-${key}`}>
-								{key === "foreground" ? "Tinta del QR" : "Papel del QR"}
+								{key === "foreground" ? "QR ink" : "QR paper"}
 							</FieldLabel>
 							<Input
 								id={`qr-${key}`}

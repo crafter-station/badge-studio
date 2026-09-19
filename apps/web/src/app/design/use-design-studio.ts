@@ -131,7 +131,7 @@ export function useDesignStudio() {
 			if (!controller.signal.aborted && mounted.current)
 				setError(
 					(reason as Error).name === "TimeoutError"
-						? "La operación tardó demasiado. Tu diseño está intacto; puedes reintentarlo."
+						? "The operation took too long. Your design is intact; you can try again."
 						: (reason as Error).message,
 				);
 			return false;
@@ -178,7 +178,7 @@ export function useDesignStudio() {
 		};
 		if (!input.prompt) return;
 		await perform(
-			refine ? "Refinando tu dirección…" : "Diseñando tres propuestas…",
+			refine ? "Refining your direction…" : "Designing three proposals…",
 			async (signal) => {
 				const result = await designRequest<{ designs: unknown }>(
 					"/generate",
@@ -198,7 +198,7 @@ export function useDesignStudio() {
 					next[0].artPrompt &&
 					[...next[0].front.layers, ...next[0].back.layers].some((layer) => layer.kind === "image")
 				) {
-					setPhase("Composición lista. Generando el arte de la primera propuesta…");
+					setPhase("Composition ready. Generating the artwork for the first proposal…");
 					try {
 						const illustrated = await designRequest<{ design: unknown }>(
 							"/artwork",
@@ -215,7 +215,7 @@ export function useDesignStudio() {
 						next[0] = badgeDesignSchema.parse(illustrated.design);
 					} catch (reason) {
 						signal.throwIfAborted();
-						artworkError = `La composición está lista; la ilustración necesita otro intento. ${(reason as Error).message}`;
+						artworkError = `The composition is ready; the artwork needs another attempt. ${(reason as Error).message}`;
 					}
 				}
 				return () => {
@@ -229,8 +229,8 @@ export function useDesignStudio() {
 					if (artworkError) setError(artworkError);
 					setNotice(
 						refine
-							? "Variante lista. Los elementos bloqueados se conservaron."
-							: "Tres direcciones listas. Explora ambas caras y elige una.",
+							? "Variant ready. Locked elements were kept."
+							: "Three directions ready. Explore both faces and pick one.",
 					);
 				};
 			},
@@ -238,7 +238,7 @@ export function useDesignStudio() {
 	}
 
 	async function uploadReference(file: File) {
-		await perform("Preparando la referencia…", async (signal) => {
+		await perform("Preparing the reference…", async (signal) => {
 			const image = await preparePhoto(file);
 			signal.throwIfAborted();
 			const form = new FormData();
@@ -250,7 +250,7 @@ export function useDesignStudio() {
 			});
 			return () => {
 				setReference({ id: result.id, url: designAssetUrl(result.id), name: file.name });
-				setNotice("Referencia lista. La próxima exploración partirá de su dirección visual.");
+				setNotice("Reference ready. The next exploration will start from its visual direction.");
 			};
 		});
 	}
@@ -261,7 +261,7 @@ export function useDesignStudio() {
 			locks: editor.locks,
 			...(reference ? { referenceId: reference.id } : {}),
 		};
-		await perform("Generando la ilustración…", async (signal) => {
+		await perform("Generating the artwork…", async (signal) => {
 			const result = await designRequest<{ design: unknown }>(
 				"/artwork",
 				requestJson(
@@ -277,7 +277,7 @@ export function useDesignStudio() {
 				setEditor((state) => replaceDesign(state, next));
 				setProposals([]);
 				retry.current = undefined;
-				setNotice("Ilustración lista. Tu retrato y los datos siguen siendo editables.");
+				setNotice("Artwork ready. Your portrait and details are still editable.");
 			};
 		});
 	}
@@ -290,12 +290,12 @@ export function useDesignStudio() {
 				),
 			)
 		) {
-			setError("Desbloquea las capas de ilustración para cambiar su imagen.");
+			setError("Unlock the artwork layers to change their image.");
 			return false;
 		}
 		const current = editor.design;
 		return perform(
-			"Cambiando la ilustración…",
+			"Changing the artwork…",
 			async (signal) => {
 				const image = await preparePhoto(file);
 				signal.throwIfAborted();
@@ -309,7 +309,7 @@ export function useDesignStudio() {
 				const next = badgeDesignSchema.parse({ ...current, artwork: { assetId: result.id } });
 				return () => {
 					setEditor((state) => replaceDesign(state, next));
-					setNotice("Ilustración actualizada en las capas que la usan.");
+					setNotice("Artwork updated in the layers that use it.");
 				};
 			},
 			signal,
@@ -319,7 +319,7 @@ export function useDesignStudio() {
 	async function save(signal?: AbortSignal) {
 		const design = editor.design;
 		return perform(
-			"Guardando la dirección…",
+			"Saving the direction…",
 			async (signal) => {
 				const result = await designRequest<SavedDesign>(
 					"",
@@ -348,7 +348,7 @@ export function useDesignStudio() {
 								}
 							: state,
 					);
-					setNotice(`Dirección guardada · versión ${result.version}. Ya puedes reutilizarla.`);
+					setNotice(`Direction saved · version ${result.version}. You can reuse it now.`);
 				};
 			},
 			signal,
@@ -357,7 +357,7 @@ export function useDesignStudio() {
 
 	async function load(id: string, signal?: AbortSignal) {
 		return perform(
-			"Abriendo la dirección…",
+			"Opening the direction…",
 			async (signal) => {
 				const result = await designRequest<SavedDesign>(`/${encodeURIComponent(id)}`, { signal });
 				const design = badgeDesignSchema.parse(result.design);
@@ -372,7 +372,7 @@ export function useDesignStudio() {
 					);
 					setSavedFingerprint(JSON.stringify(design));
 					setProposals([]);
-					setNotice(`Versión ${result.version} cargada.`);
+					setNotice(`Version ${result.version} loaded.`);
 				};
 			},
 			signal,
@@ -401,7 +401,7 @@ export function useDesignStudio() {
 			history.replaceState(history.state, "", `/design?style=${encodeURIComponent(edit.source)}`);
 		}
 		setError("");
-		setNotice("Cambios de tu agente aplicados. Puedes seguir editando o deshacerlos.");
+		setNotice("Your agent's changes were applied. You can keep editing or undo them.");
 	}
 
 	function setParticipant(update: SetStateAction<PrismBadgeData>) {
@@ -432,7 +432,9 @@ export function useDesignStudio() {
 		if (active.current) return;
 		const next = updateDesignLayer(editor, side, id, patch);
 		setEditor(next);
-		setError(next === editor ? "Ese cambio no cabe en el badge o invade el espacio del QR." : "");
+		setError(
+			next === editor ? "That change does not fit on the badge or overlaps the QR area." : "",
+		);
 	}
 
 	function toggleVisibility(side: DesignSide, id: string) {
@@ -456,7 +458,7 @@ export function useDesignStudio() {
 				layer = {
 					...base,
 					kind: "text",
-					text: "Tu texto",
+					text: "Your text",
 					binding: "none",
 					font: "sans",
 					color: "#888888",
@@ -542,9 +544,7 @@ export function useDesignStudio() {
 			setEditor((state) => replaceDesign(state, checked.data));
 			setError("");
 		} else
-			setError(
-				"Ese cambio quitaría datos necesarios o taparía el QR. Mueve los elementos primero.",
-			);
+			setError("That change would remove required data or cover the QR. Move the elements first.");
 	}
 
 	function setEvent(event: string) {
@@ -636,7 +636,7 @@ export function useDesignStudio() {
 			active.current?.abort();
 			active.current = null;
 			setPhase("");
-			setNotice("Operación cancelada. Conservamos tu último diseño.");
+			setNotice("Operation cancelled. Your latest design was kept.");
 		},
 	};
 }

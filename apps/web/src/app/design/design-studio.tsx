@@ -86,9 +86,9 @@ export function DesignStudio() {
 		),
 	);
 	const examples = [
-		"Editorial magenta y cyan, cintas fluidas, retrato monocromo y reverso numerado.",
-		"Pétalos de rosa, papel marfil, tipografía elegante y bordes orgánicos.",
-		"Credencial de exploración polar: azul tinta, topografía y números grandes.",
+		"Editorial magenta and cyan, fluid ribbons, monochrome portrait and a numbered back.",
+		"Rose petals, ivory paper, elegant typography and organic edges.",
+		"Polar expedition credential: ink blue, topography and large numbers.",
 	];
 
 	async function exportPng() {
@@ -108,9 +108,9 @@ export function DesignStudio() {
 	async function importDesign(file: File) {
 		studio.setError("");
 		try {
-			if (file.size > 2 * 1024 * 1024) throw new Error("El JSON debe pesar menos de 2 MB.");
+			if (file.size > 2 * 1024 * 1024) throw new Error("The JSON must be smaller than 2 MB.");
 			const parsed = badgeDesignSchema.safeParse(JSON.parse(await file.text()));
-			if (!parsed.success) throw new Error(`Diseño inválido: ${parsed.error.issues[0]?.message}`);
+			if (!parsed.success) throw new Error(`Invalid design: ${parsed.error.issues[0]?.message}`);
 			studio.select(parsed.data);
 		} catch (error) {
 			studio.setError((error as Error).message);
@@ -119,12 +119,12 @@ export function DesignStudio() {
 
 	if (!studio.profile.ready || !studio.profile.identity.started) {
 		return (
-			<main className="design-studio design-studio-welcome" lang="es" data-webmcp={agentConnection}>
+			<main className="design-studio design-studio-welcome" data-webmcp={agentConnection}>
 				{studio.profile.ready && studio.fontsReady ? (
 					<DesignProfile welcome />
 				) : (
 					<output className="design-loading">
-						<Spinner /> Preparando tu espacio…
+						<Spinner /> Setting up your space…
 					</output>
 				)}
 			</main>
@@ -132,19 +132,14 @@ export function DesignStudio() {
 	}
 
 	return (
-		<main
-			className="design-studio"
-			lang="es"
-			data-mobile-panel={mobilePanel}
-			data-webmcp={agentConnection}
-		>
+		<main className="design-studio" data-mobile-panel={mobilePanel} data-webmcp={agentConnection}>
 			<DesignProfile />
 			<CommunityPublishPanel publishing={publishing} />
-			<div className="design-actions" aria-label="Acciones del diseño">
+			<div className="design-actions" aria-label="Design actions">
 				<a className="design-workspace-label" href="/docs#agents">
 					{agentConnection === "ready"
-						? "Agente conectado · Cómo usarlo ↗"
-						: "Usar mi coding agent ↗"}
+						? "Agent connected · How to use it ↗"
+						: "Use my coding agent ↗"}
 				</a>
 				<div className="design-header-actions">
 					<input
@@ -161,21 +156,21 @@ export function DesignStudio() {
 					<Button
 						size="sm"
 						variant="ghost"
-						aria-label="Importar JSON"
+						aria-label="Import JSON"
 						disabled={pending}
 						onClick={() => documentInput.current?.click()}
 					>
-						Importar<span className="design-import-format"> JSON</span>
+						Import<span className="design-import-format"> JSON</span>
 					</Button>
 					<span className="design-save-state">
 						{studio.saved && !studio.dirty ? (
 							<>
-								<Check aria-hidden="true" /> v{studio.saved.version} guardada
+								<Check aria-hidden="true" /> v{studio.saved.version} saved
 							</>
 						) : studio.saved ? (
-							"Cambios sin guardar"
+							"Unsaved changes"
 						) : (
-							"Nueva dirección"
+							"New direction"
 						)}
 					</span>
 					<Button
@@ -183,7 +178,7 @@ export function DesignStudio() {
 						disabled={pending || !studio.library || (!studio.dirty && Boolean(studio.saved))}
 						onClick={() => void studio.save()}
 					>
-						<FloppyDisk data-icon="inline-start" /> Guardar
+						<FloppyDisk data-icon="inline-start" /> Save
 					</Button>
 				</div>
 			</div>
@@ -196,29 +191,29 @@ export function DesignStudio() {
 					size="sm"
 					variant="outline"
 					spacing={0}
-					aria-label="Vista del estudio"
+					aria-label="Studio view"
 				>
 					<ToggleGroupItem value="create">
-						{browserStorageEnabled ? "Estilos" : "Crear"}
+						{browserStorageEnabled ? "Styles" : "Create"}
 					</ToggleGroupItem>
 					<ToggleGroupItem value="preview">Badge</ToggleGroupItem>
-					<ToggleGroupItem value="edit">Editar</ToggleGroupItem>
+					<ToggleGroupItem value="edit">Edit</ToggleGroupItem>
 				</ToggleGroup>
 			</div>
 			<div className="design-workspace">
-				<aside className="design-director" aria-label="Crear una dirección">
+				<aside className="design-director" aria-label="Create a direction">
 					<div className="design-section-heading">
-						<h2>{browserStorageEnabled ? "Hazlo tuyo." : "Tu dirección, en palabras."}</h2>
+						<h2>{browserStorageEnabled ? "Make it yours." : "Your direction, in words."}</h2>
 						<Badge variant="outline">Beta</Badge>
 					</div>
 					<p className="design-intro">
 						{browserStorageEnabled
-							? "Tu foto ya está en toda la colección. Elige un estilo y cambia cada detalle."
-							: "Una referencia. Una idea. Un badge que se sienta tuyo."}
+							? "Your photo is already across the whole collection. Pick a style and change every detail."
+							: "A reference. An idea. A badge that feels like yours."}
 					</p>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor="design-event">Evento</FieldLabel>
+							<FieldLabel htmlFor="design-event">Event</FieldLabel>
 							<Input
 								id="design-event"
 								value={studio.participant.eventName}
@@ -229,14 +224,14 @@ export function DesignStudio() {
 						</Field>
 						{!browserStorageEnabled ? (
 							<Field>
-								<FieldLabel htmlFor="design-brief">¿Cómo debería sentirse?</FieldLabel>
+								<FieldLabel htmlFor="design-brief">How should it feel?</FieldLabel>
 								<Textarea
 									id="design-brief"
 									rows={4}
 									maxLength={1500}
 									value={prompt}
 									disabled={pending}
-									placeholder="Una credencial de papel con pétalos, fotografía editorial y un toque de metal…"
+									placeholder="A paper credential with petals, editorial photography and a touch of metal…"
 									onChange={(event) => setPrompt(event.target.value)}
 								/>
 							</Field>
@@ -244,7 +239,7 @@ export function DesignStudio() {
 						{!browserStorageEnabled ? (
 							<Field>
 								<FieldLabel htmlFor="design-reference">
-									Referencia visual <span className="design-help">opcional</span>
+									Visual reference <span className="design-help">optional</span>
 								</FieldLabel>
 								<Input
 									ref={referenceInput}
@@ -263,7 +258,7 @@ export function DesignStudio() {
 									<div className="design-reference">
 										<img
 											src={studio.reference.url}
-											alt="Referencia para la dirección de arte"
+											alt="Reference for the art direction"
 											width={60}
 											height={60}
 										/>
@@ -271,7 +266,7 @@ export function DesignStudio() {
 										<Button
 											size="icon-xs"
 											variant="ghost"
-											aria-label="Quitar referencia"
+											aria-label="Remove reference"
 											disabled={pending}
 											onClick={studio.clearReference}
 										>
@@ -284,7 +279,7 @@ export function DesignStudio() {
 										disabled={pending || !studio.library}
 										onClick={() => referenceInput.current?.click()}
 									>
-										<Image data-icon="inline-start" /> Añadir póster o imagen
+										<Image data-icon="inline-start" /> Add a poster or image
 									</Button>
 								)}
 							</Field>
@@ -299,7 +294,7 @@ export function DesignStudio() {
 									onCheckedChange={(value) => studio.setUseBase(Boolean(value))}
 									disabled={pending}
 								/>
-								Partir de {studio.design.name}
+								Start from {studio.design.name}
 							</label>
 							<label className="design-help design-lock-note" htmlFor="auto-artwork">
 								<Checkbox
@@ -308,7 +303,7 @@ export function DesignStudio() {
 									onCheckedChange={(value) => studio.setAutoArtwork(Boolean(value))}
 									disabled={pending}
 								/>
-								Generar ilustración si la dirección la necesita
+								Generate artwork if the direction needs it
 							</label>
 							<Button
 								disabled={pending || !prompt.trim() || !studio.library?.generationAvailable}
@@ -320,11 +315,11 @@ export function DesignStudio() {
 								) : (
 									<MagicWand data-icon="inline-start" />
 								)}
-								Crear 3 direcciones
+								Create 3 directions
 							</Button>
 							{pending ? (
 								<Button size="sm" variant="ghost" onClick={studio.cancel}>
-									Cancelar
+									Cancel
 								</Button>
 							) : null}
 						</>
@@ -340,19 +335,18 @@ export function DesignStudio() {
 					</div>
 					{browserStorageEnabled ? (
 						<p className="design-help">
-							Tus diseños e ilustraciones se guardan solo en este navegador. Exporta una copia para
-							conservarlos. Tu coding agent puede editar el diseño mediante WebMCP y traer imágenes
-							externas.
+							Your designs and artwork are stored only in this browser. Export a copy to keep them.
+							Your coding agent can edit the design through WebMCP and bring in external images.
 						</p>
 					) : !studio.library?.generationAvailable && studio.library ? (
 						<p className="design-help">
-							La generación todavía no está configurada. Puedes explorar y editar los diseños base.
+							Generation is not configured yet. You can explore and edit the base designs.
 						</p>
 					) : null}
 					{!browserStorageEnabled ? (
 						<>
 							<details className="design-disclosure">
-								<summary>Ideas para empezar</summary>
+								<summary>Ideas to get started</summary>
 								<div className="design-prompt-examples">
 									{examples.map((example) => (
 										<button
@@ -367,17 +361,17 @@ export function DesignStudio() {
 									))}
 								</div>
 							</details>
-							<section className="design-refinement" aria-label="Refinar la dirección">
+							<section className="design-refinement" aria-label="Refine the direction">
 								<div className="design-section-heading">
-									<h2>Quédate con lo bueno.</h2>
+									<h2>Keep what works.</h2>
 								</div>
 								<p className="design-help">
-									Pide un cambio. Conservaremos los elementos que bloqueaste.
+									Ask for a change. The elements you locked will be kept.
 								</p>
 								<FieldGroup>
 									<Field>
 										<FieldLabel htmlFor="design-refinement" className="sr-only">
-											Cambio que quieres hacer
+											Change you want to make
 										</FieldLabel>
 										<Textarea
 											id="design-refinement"
@@ -385,7 +379,7 @@ export function DesignStudio() {
 											value={refinement}
 											maxLength={1500}
 											disabled={pending}
-											placeholder="El fondo más suave. Nombre más grande. Conserva mi retrato."
+											placeholder="Softer background. Bigger name. Keep my portrait."
 											onChange={(event) => setRefinement(event.target.value)}
 										/>
 									</Field>
@@ -395,7 +389,7 @@ export function DesignStudio() {
 									disabled={pending || !refinement.trim() || !studio.library?.generationAvailable}
 									onClick={() => void studio.generate(refinement, true)}
 								>
-									<MagicWand data-icon="inline-start" /> Crear variante
+									<MagicWand data-icon="inline-start" /> Create variant
 								</Button>
 								<Button
 									variant="ghost"
@@ -404,16 +398,16 @@ export function DesignStudio() {
 									onClick={() => void studio.generateArtwork()}
 								>
 									<Image data-icon="inline-start" />{" "}
-									{studio.design.artwork?.assetId ? "Regenerar ilustración" : "Generar ilustración"}
+									{studio.design.artwork?.assetId ? "Regenerate artwork" : "Generate artwork"}
 								</Button>
 								<p className="design-help">
-									Añade arte a la dirección seleccionada. La foto y los textos siguen separados.
+									Adds art to the selected direction. The photo and text stay separate.
 								</p>
 							</section>
 						</>
 					) : null}
 					<details className="design-disclosure" open={!studio.proposals.length}>
-						<summary>La colección · {badgeDesignExamples.length} direcciones editables</summary>
+						<summary>The collection · {badgeDesignExamples.length} editable directions</summary>
 						<div className="design-seeds">
 							{badgeDesignExamples.map((design) => (
 								<Button
@@ -446,7 +440,7 @@ export function DesignStudio() {
 					{studio.library?.designs.length ? (
 						<details className="design-disclosure">
 							<summary>
-								Direcciones guardadas <span>{studio.library.designs.length}</span>
+								Saved directions <span>{studio.library.designs.length}</span>
 							</summary>
 							<div className="design-saved-list">
 								{studio.library.designs.map((entry) => (
@@ -465,16 +459,16 @@ export function DesignStudio() {
 						</details>
 					) : null}
 				</aside>
-				<section className="design-viewer" aria-label="Vista previa del badge">
+				<section className="design-viewer" aria-label="Badge preview">
 					<div className="design-viewer-title">
 						<div>
 							<span className="design-overline">
-								{studio.proposals.length ? "Tu exploración" : "Diseño por capas"}
+								{studio.proposals.length ? "Your exploration" : "Layered design"}
 							</span>
 							<h1>{studio.design.name}</h1>
 						</div>
 						<Badge variant="outline">
-							{studio.design.front.layers.length + studio.design.back.layers.length} capas
+							{studio.design.front.layers.length + studio.design.back.layers.length} layers
 						</Badge>
 					</div>
 					<div className="design-stage" data-status={status} data-design-id={studio.design.name}>
@@ -488,7 +482,7 @@ export function DesignStudio() {
 								onStatus={setStatus}
 							/>
 						) : (
-							<span className="design-loading">Preparando el lienzo…</span>
+							<span className="design-loading">Preparing the canvas…</span>
 						)}
 					</div>
 					<p className="design-caption">{studio.design.description}</p>
@@ -502,15 +496,15 @@ export function DesignStudio() {
 							size="sm"
 							variant="outline"
 							spacing={0}
-							aria-label="Cara del badge"
+							aria-label="Badge side"
 						>
-							<ToggleGroupItem value="front">Frente</ToggleGroupItem>
-							<ToggleGroupItem value="back">Reverso</ToggleGroupItem>
+							<ToggleGroupItem value="front">Front</ToggleGroupItem>
+							<ToggleGroupItem value="back">Back</ToggleGroupItem>
 						</ToggleGroup>
 						<Button
 							variant="ghost"
 							size="icon-sm"
-							aria-label="Girar badge"
+							aria-label="Flip badge"
 							onClick={() => setSide(side === "front" ? "back" : "front")}
 						>
 							<ArrowClockwise />
@@ -518,7 +512,7 @@ export function DesignStudio() {
 						<Button
 							variant="ghost"
 							size="icon-sm"
-							aria-label={moving ? "Pausar movimiento" : "Activar movimiento"}
+							aria-label={moving ? "Pause motion" : "Enable motion"}
 							aria-pressed={!moving}
 							onClick={() => setMoving(!moving)}
 						>
@@ -555,7 +549,7 @@ export function DesignStudio() {
 									),
 								),
 							]}
-							aria-label="Direcciones generadas"
+							aria-label="Generated directions"
 							disabled={pending}
 							onValueChange={(values) => {
 								const proposal = studio.proposals[Number(values[0])];
@@ -589,8 +583,8 @@ export function DesignStudio() {
 						) : (
 							<p>
 								{status === "fallback"
-									? "Vista estática en este dispositivo."
-									: "Mueve la luz. Toca el badge para girarlo."}
+									? "Static view on this device."
+									: "Move the light. Tap the badge to flip it."}
 							</p>
 						)}
 					</div>

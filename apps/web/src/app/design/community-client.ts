@@ -39,7 +39,7 @@ export class CommunityRequestError extends Error {
 export function requirePendingPublication(value?: PreparedPublication) {
 	if (value?.receipt)
 		throw new Error(
-			"ALREADY_COMPLETED: La operación ya terminó. Conservamos su comprobante; puedes retirar la publicación si lo deseas.",
+			"ALREADY_COMPLETED: The operation already finished. Its receipt was kept; you can withdraw the publication if you wish.",
 		);
 }
 
@@ -70,7 +70,8 @@ export async function communityRequest<T>(
 		throw new CommunityRequestError(
 			typeof result.error === "string"
 				? result.error
-				: (result.error?.message ?? "No pudimos completar la publicación. Tu diseño sigue aquí."),
+				: (result.error?.message ??
+						"Could not complete the publication. Your design is still here."),
 			response.status,
 		);
 	return result as T;
@@ -122,7 +123,7 @@ export async function publicationCheckpoint(
 				reject(
 					signal?.reason ??
 						transaction.error ??
-						new Error("No pudimos guardar la versión para publicar."),
+						new Error("Could not save the version to publish."),
 				);
 			};
 		});
@@ -132,34 +133,34 @@ export async function publicationCheckpoint(
 }
 
 async function sourceImage(url: string, signal?: AbortSignal, preserveOriginal = false) {
-	if (!url) throw new Error("Añade una foto antes de publicar.");
+	if (!url) throw new Error("Add a photo before publishing.");
 	const resolved = new URL(url, window.location.origin);
 	if (resolved.protocol !== "blob:" && resolved.origin !== window.location.origin)
-		throw new Error("Importa la imagen en el editor antes de publicarla.");
+		throw new Error("Import the image into the editor before publishing it.");
 	const response = await fetch(resolved, { signal });
-	if (!response.ok) throw new Error("No pudimos leer una imagen del badge.");
+	if (!response.ok) throw new Error("Could not read one of the badge images.");
 	let image = await response.blob();
 	if (!["image/png", "image/jpeg", "image/webp"].includes(image.type))
-		throw new Error("Usa imágenes PNG, JPEG o WebP.");
+		throw new Error("Use PNG, JPEG or WebP images.");
 	if (image.size > COMMUNITY_IMAGE_LIMIT) {
 		if (preserveOriginal)
 			throw new Error(
-				"Para guardar el paquete completo, importa una versión de la imagen de menos de 3 MB y revisa la vista previa.",
+				"To save the full bundle, import a version of the image under 3 MB and check the preview.",
 			);
 		const bitmap = await createImageBitmap(image);
 		try {
 			if (bitmap.width * bitmap.height > 24_000_000)
-				throw new Error("La imagen supera 24 megapíxeles.");
+				throw new Error("The image exceeds 24 megapixels.");
 			const scale = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height));
 			const canvas = document.createElement("canvas");
 			canvas.width = Math.round(bitmap.width * scale);
 			canvas.height = Math.round(bitmap.height * scale);
 			const context = canvas.getContext("2d");
-			if (!context) throw new Error("No pudimos preparar la imagen.");
+			if (!context) throw new Error("Could not prepare the image.");
 			context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
 			image = await new Promise<Blob>((resolve, reject) =>
 				canvas.toBlob(
-					(blob) => (blob ? resolve(blob) : reject(new Error("No pudimos preparar la imagen."))),
+					(blob) => (blob ? resolve(blob) : reject(new Error("Could not prepare the image."))),
 					"image/webp",
 					0.9,
 				),
@@ -169,7 +170,7 @@ async function sourceImage(url: string, signal?: AbortSignal, preserveOriginal =
 		}
 	}
 	if (!image.size || image.size > COMMUNITY_IMAGE_LIMIT)
-		throw new Error("Reduce la imagen a menos de 3 MB antes de publicar.");
+		throw new Error("Reduce the image to under 3 MB before publishing.");
 	return image;
 }
 
@@ -197,7 +198,7 @@ export async function preparePublication(
 	});
 	const serialized = canonicalJson(snapshot);
 	if (new TextEncoder().encode(serialized).length > COMMUNITY_JSON_LIMIT)
-		throw new Error("El diseño supera el límite de publicación de 256 KB.");
+		throw new Error("The design exceeds the 256 KB publication limit.");
 	signal?.throwIfAborted();
 	return {
 		intent: {

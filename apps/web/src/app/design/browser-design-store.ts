@@ -59,7 +59,7 @@ export class BrowserDesignStore {
 				};
 				transaction.onabort = () => {
 					cleanup();
-					reject(failure ?? transaction.error ?? new Error("No se pudo guardar el diseño."));
+					reject(failure ?? transaction.error ?? new Error("Could not save the design."));
 				};
 				work(transaction).then(
 					(value) => {
@@ -100,7 +100,7 @@ export class BrowserDesignStore {
 				const design = await read<SavedDesign | undefined>(
 					transaction.objectStore("designs").get(id),
 				);
-				if (!design) throw new Error("No encontramos ese diseño en este navegador.");
+				if (!design) throw new Error("Could not find that design in this browser.");
 				return design;
 			},
 			signal,
@@ -118,13 +118,13 @@ export class BrowserDesignStore {
 					? await read<SavedDesign | undefined>(designs.get(value.designId))
 					: undefined;
 				if (value.designId && !latest)
-					throw new Error("No encontramos ese diseño en este navegador.");
+					throw new Error("Could not find that design in this browser.");
 				if (latest && latest.version !== value.expectedVersion)
-					throw new Error("Existe una versión más reciente. Vuelve a abrirla antes de guardar.");
+					throw new Error("A newer version exists. Reopen it before saving.");
 				const assetId = value.design.artwork?.assetId;
 				if (assetId && !showcaseAssets.has(assetId)) {
 					const asset = await read(transaction.objectStore("assets").get(assetId));
-					if (!asset) throw new Error("Falta la ilustración. Vuelve a subirla antes de guardar.");
+					if (!asset) throw new Error("The artwork is missing. Upload it again before saving.");
 				}
 				const entry: SavedDesign = {
 					id: latest?.id ?? crypto.randomUUID(),
@@ -141,9 +141,9 @@ export class BrowserDesignStore {
 
 	async putAsset(image: Blob, signal?: AbortSignal | null) {
 		if (!["image/png", "image/jpeg", "image/webp"].includes(image.type))
-			throw new Error("Elige una imagen PNG, JPG o WebP.");
+			throw new Error("Choose a PNG, JPG or WebP image.");
 		if (!image.size || image.size > 6_000_000)
-			throw new Error("La ilustración debe pesar menos de 6 MB.");
+			throw new Error("The artwork must be smaller than 6 MB.");
 		const id = crypto.randomUUID();
 		await this.transaction(
 			["assets"],
@@ -162,7 +162,7 @@ export class BrowserDesignStore {
 			"readonly",
 			async (transaction) => {
 				const image = await read<Blob | undefined>(transaction.objectStore("assets").get(id));
-				if (!image) throw new Error("No encontramos esa ilustración en este navegador.");
+				if (!image) throw new Error("Could not find that artwork in this browser.");
 				return image;
 			},
 			signal,
@@ -176,7 +176,7 @@ export function browserAssetUrl(id: string) {
 
 export async function browserDesignRequest<T>(path: string, init?: RequestInit): Promise<T> {
 	if (typeof indexedDB === "undefined")
-		throw new Error("Habilita el almacenamiento del navegador para guardar tus diseños.");
+		throw new Error("Enable browser storage to save your designs.");
 	const store = new BrowserDesignStore(indexedDB);
 	const signal = init?.signal;
 	const cacheAsset = async (id?: string) => {
@@ -203,15 +203,15 @@ export async function browserDesignRequest<T>(path: string, init?: RequestInit):
 			return (await store.save(JSON.parse(String(init.body)), signal)) as T;
 		if (init.method === "POST" && path === "/reference") {
 			const image = init.body instanceof FormData ? init.body.get("reference") : undefined;
-			if (!(image instanceof Blob)) throw new Error("Elige una imagen PNG, JPG o WebP.");
+			if (!(image instanceof Blob)) throw new Error("Choose a PNG, JPG or WebP image.");
 			const id = await store.putAsset(image, signal);
 			await cacheAsset(id);
 			return { id } as T;
 		}
-		throw new Error("La generación con IA estará disponible en una próxima versión.");
+		throw new Error("AI generation will be available in an upcoming version.");
 	} catch (error) {
 		if (error instanceof Error && error.name === "QuotaExceededError")
-			throw new Error("Este navegador se quedó sin espacio. Exporta tu diseño como JSON.");
+			throw new Error("This browser ran out of storage. Export your design as JSON.");
 		throw error;
 	}
 }

@@ -37,7 +37,7 @@ export function DesignPreview({ design, data }: { design: BadgeDesign; data: Pri
 	return (
 		<span className="design-preview-art">
 			<canvas ref={canvas} width={300} height={280} tabIndex={-1} aria-hidden="true" />
-			{failed ? <small>Vista previa no disponible</small> : null}
+			{failed ? <small>Preview unavailable</small> : null}
 		</span>
 	);
 }

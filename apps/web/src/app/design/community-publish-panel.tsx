@@ -30,11 +30,11 @@ export function CommunityPublishPanel({
 	const prepared = publishing.prepared;
 	const receipt = prepared?.receipt;
 	return (
-		<section className="community-publish" aria-label="Publicar en la colección">
+		<section className="community-publish" aria-label="Publish to the collection">
 			<div className="community-publish-heading">
 				<div>
-					<strong>Un badge para compartir.</strong>
-					<p>Tu agente también puede publicarlo. Tú decides cuándo.</p>
+					<strong>A badge worth sharing.</strong>
+					<p>Your agent can publish it too. You decide when.</p>
 				</div>
 				<Button
 					size="sm"
@@ -42,7 +42,7 @@ export function CommunityPublishPanel({
 					disabled={pending}
 					onClick={() => (prepared ? setOpen(!open) : void act(() => publishing.prepare()))}
 				>
-					{pending ? "Preparando…" : receipt ? "Ver publicación" : "Publicar badge"}
+					{pending ? "Preparing…" : receipt ? "View publication" : "Publish badge"}
 				</Button>
 			</div>
 			{open || prepared?.consented ? (
@@ -51,8 +51,8 @@ export function CommunityPublishPanel({
 						<>
 							<output>
 								{receipt.state === "published"
-									? `Publicado · versión ${receipt.version}`
-									: "La publicación fue retirada."}
+									? `Published · version ${receipt.version}`
+									: "The publication was withdrawn."}
 							</output>
 							<div className="community-actions">
 								{receipt.state === "published" ? (
@@ -63,7 +63,7 @@ export function CommunityPublishPanel({
 											rel="noreferrer"
 											className={buttonVariants({ size: "sm" })}
 										>
-											Ver en la galería
+											View in the gallery
 										</a>
 										<Button
 											size="sm"
@@ -78,7 +78,7 @@ export function CommunityPublishPanel({
 												)
 											}
 										>
-											Publicar cambios
+											Publish changes
 										</Button>
 										<Button
 											size="sm"
@@ -88,7 +88,7 @@ export function CommunityPublishPanel({
 												void act(() => publishing.prepareWithdrawal(receipt.id, receipt.version))
 											}
 										>
-											Retirar publicación
+											Withdraw publication
 										</Button>
 									</>
 								) : null}
@@ -98,7 +98,7 @@ export function CommunityPublishPanel({
 									disabled={pending}
 									onClick={() => void act(() => publishing.prepare())}
 								>
-									Preparar otra publicación
+									Prepare another publication
 								</Button>
 							</div>
 						</>
@@ -108,9 +108,9 @@ export function CommunityPublishPanel({
 								<strong>{prepared.intent.title}</strong> · {prepared.intent.participantName}
 							</p>
 							<p>
-								Se compartirán tu foto, nombre, datos y ambas caras con sus capas editables.
-								Cualquier persona podrá verlos y usar el diseño. Los cambios posteriores seguirán
-								siendo locales hasta que publiques una actualización.
+								Your photo, name, details and both faces with their editable layers will be shared.
+								Anyone will be able to see them and use the design. Later changes stay local until
+								you publish an update.
 							</p>
 							{!prepared.consented ? (
 								<>
@@ -121,8 +121,8 @@ export function CommunityPublishPanel({
 											onCheckedChange={(value) => setConsent(Boolean(value))}
 										/>
 										{prepared.intent.action === "withdraw"
-											? "Quiero retirar este badge de la galería."
-											: "Quiero compartir este badge públicamente."}
+											? "I want to withdraw this badge from the gallery."
+											: "I want to share this badge publicly."}
 									</label>
 									<Button
 										size="sm"
@@ -131,7 +131,7 @@ export function CommunityPublishPanel({
 											void act(() => publishing.submit(prepared.intent.snapshotHash, true))
 										}
 									>
-										Continuar
+										Continue
 									</Button>
 								</>
 							) : (
@@ -143,8 +143,8 @@ export function CommunityPublishPanel({
 										className={buttonVariants({ size: "sm" })}
 									>
 										{publishing.phase === "review"
-											? "Confirmar vista previa"
-											: "Verificar cuenta y publicar"}
+											? "Confirm preview"
+											: "Verify account and publish"}
 									</a>
 									<Button
 										size="sm"
@@ -152,16 +152,16 @@ export function CommunityPublishPanel({
 										disabled={pending}
 										onClick={() => void act(() => publishing.advance())}
 									>
-										Comprobar estado
+										Check status
 									</Button>
 								</div>
 							)}
 							<output className="community-caption">
 								{publishing.phase === "uploading"
-									? "Preparando tus imágenes…"
+									? "Preparing your images…"
 									: publishing.phase === "review"
-										? "Vista previa lista. Confírmala en la pestaña de publicación."
-										: "Tu diseño permanece abierto aquí durante el inicio de sesión."}
+										? "Preview ready. Confirm it in the publication tab."
+										: "Your design stays open here while you sign in."}
 							</output>
 							<Button
 								size="sm"
@@ -169,7 +169,7 @@ export function CommunityPublishPanel({
 								disabled={pending}
 								onClick={() => void act(() => publishing.clear())}
 							>
-								Cancelar publicación
+								Cancel publication
 							</Button>
 						</>
 					) : null}

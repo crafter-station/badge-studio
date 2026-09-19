@@ -17,10 +17,10 @@ export function DesignPhotoPicker({
 }) {
 	const input = useRef<HTMLInputElement>(null);
 	const id = useId();
-	const label = artwork ? "Cambiar ilustración" : "Cambiar foto";
+	const label = artwork ? "Change artwork" : "Change photo";
 	return (
 		<div className="design-photo-picker">
-			{src ? <img src={src} alt={artwork ? "Ilustración actual" : "Foto actual"} /> : null}
+			{src ? <img src={src} alt={artwork ? "Current artwork" : "Current photo"} /> : null}
 			<div>
 				<Button
 					variant="outline"
@@ -31,9 +31,7 @@ export function DesignPhotoPicker({
 					<Image data-icon="inline-start" /> {label}
 				</Button>
 				<p className="design-help">
-					{artwork
-						? "Se reemplaza en las capas de ilustración."
-						: "Se actualiza en todos los retratos."}
+					{artwork ? "Replaces it in the artwork layers." : "Updates every portrait."}
 				</p>
 			</div>
 			<input

@@ -67,7 +67,7 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 					try {
 						await database?.save(saved.identity, restoredPhoto, controller.signal);
 					} catch {
-						warning = "La nueva foto de ejemplo estará disponible solo durante esta sesión.";
+						warning = "The new sample photo will only be available during this session.";
 					}
 				}
 				if (controller.signal.aborted) return;
@@ -89,7 +89,7 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 					setState((current) => ({
 						...current,
 						ready: true,
-						warning: "Tu perfil estará disponible solo durante esta sesión.",
+						warning: "Your profile will only be available during this session.",
 					}));
 				}
 			});
@@ -126,7 +126,7 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 					warning = "";
 				} catch {
 					warning =
-						"Tu perfil está aplicado. No pudimos guardarlo para la próxima visita; exporta tu badge.";
+						"Your profile is applied. It could not be saved for your next visit; export your badge.";
 				}
 			}
 			writing.current = false;
@@ -177,10 +177,10 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 						uploading: false,
 						error:
 							error instanceof DOMException
-								? "No pudimos leer esa foto. Prueba con otra imagen JPG, PNG o WebP."
+								? "Could not read that photo. Try another JPG, PNG or WebP image."
 								: error instanceof Error
 									? error.message
-									: "No pudimos preparar esa foto. Prueba con otra imagen.",
+									: "Could not prepare that photo. Try another image.",
 					}));
 				return false;
 			}
@@ -228,7 +228,7 @@ export function ParticipantProfileProvider({ children }: { children: React.React
 						uploading: false,
 						error: signal?.aborted
 							? ""
-							: "No pudimos cargar la foto de ejemplo. Inténtalo otra vez o sube la tuya.",
+							: "Could not load the sample photo. Try again or upload your own.",
 					}));
 				return false;
 			}

@@ -4,9 +4,9 @@ import { parseDesigns } from "./design-client";
 
 describe("design responses", () => {
 	it("rejects incomplete batches and malformed compositions", () => {
-		expect(() => parseDesigns([badgeDesignExamples[0]], 3)).toThrow("todas");
+		expect(() => parseDesigns([badgeDesignExamples[0]], 3)).toThrow("every proposal");
 		expect(() => parseDesigns([{ ...badgeDesignExamples[0], front: { layers: [] } }], 1)).toThrow(
-			"corregirse",
+			"needs fixing",
 		);
 		expect(parseDesigns(badgeDesignExamples.slice(0, 3), 3)).toHaveLength(3);
 	});
