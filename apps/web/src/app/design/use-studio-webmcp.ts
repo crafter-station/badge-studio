@@ -315,6 +315,7 @@ export function useStudioWebMcp(options: Options) {
 					if (!value.publicationId) throw new Error("INVALID_INPUT: publicationId is required.");
 					if (value.action === "remix") {
 						const result = await publishing.remix(value.publicationId, signal);
+						flushSync(() => refresh((value) => value + 1));
 						return { ...result, ...receipt() };
 					}
 					if (!value.expectedVersion)

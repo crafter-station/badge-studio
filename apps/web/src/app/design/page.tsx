@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { DesignStudio } from "./design-studio";
 import "./design.css";
 import "../community/community.css";
@@ -9,5 +10,15 @@ export const metadata = {
 };
 
 export default function DesignPage() {
-	return <DesignStudio />;
+	return (
+		<Suspense
+			fallback={
+				<main className="design-studio">
+					<output className="design-loading">Preparing your space…</output>
+				</main>
+			}
+		>
+			<DesignStudio />
+		</Suspense>
+	);
 }

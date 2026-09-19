@@ -1,19 +1,11 @@
 "use client";
 
+import { loadBadgeFonts } from "@/lib/badge-fonts";
 import type { CommunityPublication } from "@/lib/community-contract";
 import { publicationData } from "@/lib/community-contract";
 import { useEffect, useState } from "react";
 import { BadgeSnapshot } from "./badge-snapshot";
 import { Button } from "./ui/button";
-
-const fonts = [
-	'700 100px "Andes Brand"',
-	'700 100px "Andes Display"',
-	'400 24px "Andes Mono"',
-	'400 60px "Next Craft Script"',
-	'700 72px "Next Craft Mono"',
-	'400 30px "Next Craft Pixel"',
-];
 
 export function CommunityBadge({
 	publication,
@@ -30,7 +22,7 @@ export function CommunityBadge({
 	useEffect(() => {
 		let mounted = true;
 		if (attempt) setReady(false);
-		void Promise.all(fonts.map((font) => document.fonts.load(font)))
+		void loadBadgeFonts()
 			.then(() => {
 				if (mounted) setReady(true);
 			})

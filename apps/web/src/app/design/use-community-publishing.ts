@@ -9,8 +9,6 @@ import {
 	createPublicationSecret,
 } from "@/lib/community-contract";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
-import { browserDesignRequest } from "./browser-design-store";
 import {
 	type PreparedPublication,
 	authorizationUrl,
@@ -315,73 +313,6 @@ export function useCommunityPublishing(studio: Studio) {
 		}
 	}
 
-	async function remix(publicationId: string, inputSignal?: AbortSignal) {
-		const signal = workSignal(inputSignal);
-		if (busy.current) throw new Error("BUSY: Wait for the current operation.");
-		busy.current = true;
-		const fingerprint = () =>
-			JSON.stringify([latest.current.design, latest.current.locks, latest.current.participant]);
-		const before = fingerprint();
-		try {
-			const publication = await communityRequest<CommunityPublication>(
-				`/${publicationId}`,
-				undefined,
-				undefined,
-				signal,
-			);
-			const design = structuredClone(publication.snapshot.design);
-			if (publication.images.artwork) {
-				const response = await fetch(publication.images.artwork, { signal });
-				if (!response.ok) throw new Error("Could not copy the artwork.");
-				const image = await response.blob();
-				const form = new FormData();
-				form.set("reference", image, "community.webp");
-				const saved = await browserDesignRequest<{ id: string }>("/reference", {
-					method: "POST",
-					body: form,
-					signal,
-				});
-				design.artwork = { assetId: saved.id };
-			}
-			signal.throwIfAborted();
-			if (fingerprint() !== before)
-				throw new Error(
-					"STALE_REVISION: The badge changed while the design was loading. Your changes were kept.",
-				);
-			flushSync(() => {
-				latest.current.select(design);
-				latest.current.setParticipant((person) => ({
-					...person,
-					eventName: publication.snapshot.participant.eventName,
-					publicUrl: publication.snapshot.participant.publicUrl,
-					signature: publication.snapshot.participant.signature,
-					metadata: {
-						...publication.snapshot.participant.metadata,
-						roleLabel: person.role,
-					},
-				}));
-			});
-			return {
-				sourceId: publicationId,
-				sourceVersion: publication.version,
-				identityPreserved: true,
-			};
-		} finally {
-			busy.current = false;
-		}
-	}
-
-	const remixStarted = useRef(false);
-	const remixRef = useRef(remix);
-	remixRef.current = remix;
-	useEffect(() => {
-		if (!studio.profile.ready || !studio.library || remixStarted.current) return;
-		const id = new URLSearchParams(window.location.search).get("remix");
-		if (!id) return;
-		remixStarted.current = true;
-		void remixRef.current(id).catch((reason) => updateError((reason as Error).message));
-	}, [studio.profile.ready, studio.library, updateError]);
-
 	return {
 		prepared,
 		phase,
@@ -392,7 +323,7 @@ export function useCommunityPublishing(studio: Studio) {
 		advance,
 		inspect: describe,
 		prepareWithdrawal,
-		remix,
+		remix: studio.remix,
 		clear: async (inputSignal?: AbortSignal) => {
 			if (busy.current) throw new Error("The publication is still in progress.");
 			const signal = workSignal(inputSignal);

@@ -2,13 +2,11 @@
 
 import { preparePhoto } from "@/app/badge/prepare-photo";
 import { useParticipantProfile } from "@/components/participant-profile-provider";
+import { loadBadgeFonts } from "@/lib/badge-fonts";
+import type { CommunityPublication } from "@/lib/community-contract";
 import { designPresets as badgeDesignExamples } from "@/lib/design-presets";
 import { applyParticipantIdentity } from "@/lib/participant-profile";
-import {
-	demoParticipant,
-	demoParticipantForDesign,
-	participantForDesign,
-} from "@/lib/studio-participant";
+import { demoParticipant, participantForDesign } from "@/lib/studio-participant";
 import {
 	type BadgeDesign,
 	type BadgeLayer,
@@ -16,7 +14,10 @@ import {
 	badgeDesignSchema,
 } from "@crafter-station/badge-studio-design/badge-design";
 import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
+import { useSearchParams } from "next/navigation";
 import { type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { communityRequest } from "./community-client";
+import { copyCommunityDesign, loadCommunityCollection } from "./community-collection";
 import { agentEditSchema, editFromAgent } from "./design-agent";
 import {
 	type DesignLibrary,
@@ -28,6 +29,12 @@ import {
 	requestJson,
 } from "./design-client";
 import {
+	type DesignLocation,
+	designHref,
+	designLocationKey,
+	readDesignLocation,
+} from "./design-location";
+import {
 	type DesignEditorState,
 	replaceDesign,
 	undoDesign,
@@ -38,6 +45,14 @@ const defaultDesign =
 	badgeDesignExamples.find((design) => design.source === "gtm") ?? badgeDesignExamples[0];
 
 export function useDesignStudio() {
+	const searchParams = useSearchParams();
+	const routeKey = designLocationKey(readDesignLocation(searchParams));
+	const appliedRoute = useRef<string | undefined>(undefined);
+	const [selection, setSelection] = useState<DesignLocation | null>(null);
+	const [community, setCommunity] = useState<CommunityPublication[]>([]);
+	const [communityLoading, setCommunityLoading] = useState(true);
+	const [communityError, setCommunityError] = useState("");
+	const [communityAttempt, setCommunityAttempt] = useState(0);
 	const [editor, setEditor] = useState<DesignEditorState>(() => ({
 		design: defaultDesign,
 		locks: { front: [], back: [], material: false },
@@ -68,35 +83,15 @@ export function useDesignStudio() {
 	useEffect(() => {
 		const controller = new AbortController();
 		mounted.current = true;
-		const source = new URLSearchParams(window.location.search).get("style");
-		const base = badgeDesignExamples.find((design) => design.source === source) ?? defaultDesign;
-		setEditor({ design: base, locks: { front: [], back: [], material: false }, past: [] });
-		setBaseParticipant(demoParticipantForDesign(base));
 		void designRequest<DesignLibrary>("", { signal: controller.signal })
 			.then((result) => {
 				if (controller.signal.aborted) return;
 				setLibrary(result);
-				const selectedId = new URLSearchParams(window.location.search).get("design");
-				const entry = result.designs.find((design) => design.id === selectedId);
-				if (entry) {
-					const design = badgeDesignSchema.parse(entry.design);
-					setEditor({ design, locks: { front: [], back: [], material: false }, past: [] });
-					setSaved(entry);
-					setSavedFingerprint(JSON.stringify(design));
-					setBaseParticipant((person) => participantForDesign(person, design));
-				}
 			})
 			.catch((reason) => {
 				if (!controller.signal.aborted) setError((reason as Error).message);
 			});
-		void Promise.all([
-			document.fonts.load('700 100px "Andes Brand"'),
-			document.fonts.load('700 100px "Andes Display"'),
-			document.fonts.load('400 24px "Andes Mono"'),
-			document.fonts.load('400 60px "Next Craft Script"'),
-			document.fonts.load('700 72px "Next Craft Mono"'),
-			document.fonts.load('400 30px "Next Craft Pixel"'),
-		])
+		void loadBadgeFonts()
 			.catch(() => {})
 			.finally(() => {
 				if (!controller.signal.aborted) setFontsReady(true);
@@ -107,6 +102,31 @@ export function useDesignStudio() {
 			active.current?.abort();
 		};
 	}, []);
+
+	useEffect(() => {
+		const controller = new AbortController();
+		setCommunityLoading(true);
+		setCommunityError("");
+		if (!communityAttempt) setCommunity([]);
+		void loadCommunityCollection(controller.signal, setCommunity)
+			.catch((reason) => {
+				if (!controller.signal.aborted) setCommunityError((reason as Error).message);
+			})
+			.finally(() => {
+				if (!controller.signal.aborted) setCommunityLoading(false);
+			});
+		return () => controller.abort();
+	}, [communityAttempt]);
+
+	function markLocation(location: DesignLocation | null, navigate = true, replace = false) {
+		appliedRoute.current = designLocationKey(location);
+		setSelection(location);
+		if (navigate) {
+			const href = designHref(location, window.location.href);
+			if (href !== `${window.location.pathname}${window.location.search}${window.location.hash}`)
+				history[replace ? "replaceState" : "pushState"](null, "", href);
+		}
+	}
 
 	async function perform(
 		label: string,
@@ -151,18 +171,22 @@ export function useDesignStudio() {
 		return retry.current.requestId;
 	}
 
-	function select(design: BadgeDesign, sameDirection = false) {
+	function select(
+		design: BadgeDesign,
+		sameDirection = false,
+		location: DesignLocation | null = badgeDesignExamples.includes(design) && design.source
+			? { kind: "style", id: design.source }
+			: null,
+		navigate = true,
+	) {
 		if (active.current) return;
 		setEditor((state) => replaceDesign(state, design, sameDirection));
 		setBaseParticipant((person) => participantForDesign(person, design));
 		if (!sameDirection) {
 			setSaved(undefined);
 			setSavedFingerprint("");
-			history.replaceState(
-				history.state,
-				"",
-				design.source ? `/design?style=${encodeURIComponent(design.source)}` : "/design",
-			);
+			setProposals([]);
+			markLocation(location, navigate);
 		}
 		setError("");
 		setNotice("");
@@ -224,6 +248,7 @@ export function useDesignStudio() {
 					if (!refine) {
 						setSaved(undefined);
 						setSavedFingerprint("");
+						markLocation(null);
 					}
 					retry.current = undefined;
 					if (artworkError) setError(artworkError);
@@ -334,11 +359,7 @@ export function useDesignStudio() {
 				badgeDesignSchema.parse(result.design);
 				return () => {
 					setSaved(result);
-					history.replaceState(
-						history.state,
-						"",
-						`/design?design=${encodeURIComponent(result.id)}`,
-					);
+					markLocation({ kind: "design", id: result.id }, true, true);
 					setSavedFingerprint(JSON.stringify(design));
 					setLibrary((state) =>
 						state
@@ -355,7 +376,7 @@ export function useDesignStudio() {
 		);
 	}
 
-	async function load(id: string, signal?: AbortSignal) {
+	async function load(id: string, signal?: AbortSignal, navigate = true) {
 		return perform(
 			"Opening the direction…",
 			async (signal) => {
@@ -365,11 +386,7 @@ export function useDesignStudio() {
 					setEditor((state) => replaceDesign(state, design, false));
 					setBaseParticipant((person) => participantForDesign(person, design));
 					setSaved(result);
-					history.replaceState(
-						history.state,
-						"",
-						`/design?design=${encodeURIComponent(result.id)}`,
-					);
+					markLocation({ kind: "design", id: result.id }, navigate);
 					setSavedFingerprint(JSON.stringify(design));
 					setProposals([]);
 					setNotice(`Version ${result.version} loaded.`);
@@ -378,6 +395,75 @@ export function useDesignStudio() {
 			signal,
 		);
 	}
+
+	async function remix(id: string, signal?: AbortSignal, navigate = true) {
+		let result: { sourceId: string; sourceVersion: number; identityPreserved: true } | undefined;
+		await perform(
+			"Opening the Community design…",
+			async (signal) => {
+				const publication = await communityRequest<CommunityPublication>(
+					`/${encodeURIComponent(id)}`,
+					undefined,
+					undefined,
+					signal,
+				);
+				const design = await copyCommunityDesign(publication, signal);
+				return () => {
+					setEditor((state) => replaceDesign(state, design, false));
+					setBaseParticipant((person) => ({
+						...participantForDesign(person, design),
+						eventName: publication.snapshot.participant.eventName,
+						publicUrl: publication.snapshot.participant.publicUrl,
+						signature: publication.snapshot.participant.signature,
+						metadata: {
+							...publication.snapshot.participant.metadata,
+							roleLabel: person.metadata?.roleLabel || person.role,
+						},
+					}));
+					setSaved(undefined);
+					setSavedFingerprint("");
+					setProposals([]);
+					markLocation({ kind: "remix", id }, navigate);
+					setNotice("Community design ready. Your photo and details are preserved.");
+					result = { sourceId: id, sourceVersion: publication.version, identityPreserved: true };
+				};
+			},
+			signal,
+		);
+		if (!result) {
+			signal?.throwIfAborted();
+			throw new Error("Could not open the Community design. Your badge is unchanged.");
+		}
+		return result;
+	}
+
+	const openLocation = useRef(
+		(_location: DesignLocation | null, _signal: AbortSignal): Promise<unknown> | undefined =>
+			undefined,
+	);
+	openLocation.current = (location, signal) => {
+		if (location?.kind === "remix") return remix(location.id, signal, false);
+		if (location?.kind === "design") return load(location.id, signal, false);
+		const design = location
+			? badgeDesignExamples.find((value) => value.source === location.id)
+			: defaultDesign;
+		if (design) {
+			select(design, false, location, false);
+			if (!location && design.source)
+				markLocation({ kind: "style", id: design.source }, true, true);
+		} else setError("We could not find that style. Choose a direction from the collection.");
+	};
+	useEffect(() => {
+		if (appliedRoute.current === routeKey) return;
+		const controller = new AbortController();
+		active.current?.abort();
+		active.current = null;
+		setPhase("");
+		void openLocation
+			.current(readDesignLocation(new URLSearchParams(window.location.search)), controller.signal)
+			?.catch(() => {});
+		return () => controller.abort();
+	}, [routeKey]);
 
 	function agentEdit(input: unknown) {
 		if (active.current) throw new Error("An editor operation is already running.");
@@ -398,7 +484,7 @@ export function useDesignStudio() {
 		if (edit.action === "select") {
 			setSaved(undefined);
 			setSavedFingerprint("");
-			history.replaceState(history.state, "", `/design?style=${encodeURIComponent(edit.source)}`);
+			markLocation({ kind: "style", id: edit.source });
 		}
 		setError("");
 		setNotice("Your agent's changes were applied. You can keep editing or undo them.");
@@ -613,6 +699,12 @@ export function useDesignStudio() {
 		changeLayers,
 		generate,
 		select,
+		selection,
+		remix,
+		community,
+		communityLoading,
+		communityError,
+		retryCommunity: () => setCommunityAttempt((value) => value + 1),
 		uploadReference,
 		generateArtwork,
 		save,

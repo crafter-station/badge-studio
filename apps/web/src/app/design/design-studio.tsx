@@ -407,18 +407,82 @@ export function DesignStudio() {
 						</>
 					) : null}
 					<details className="design-disclosure" open={!studio.proposals.length}>
-						<summary>The collection · {badgeDesignExamples.length} editable directions</summary>
+						<summary>
+							The collection · {badgeDesignExamples.length + studio.community.length} editable
+							directions
+						</summary>
+						{studio.community.length ? (
+							<>
+								<p className="design-collection-label">Community · Made to share</p>
+								<div className="design-seeds">
+									{studio.community.map((publication) => {
+										const selected =
+											studio.selection?.kind === "remix" && studio.selection.id === publication.id;
+										return (
+											<Button
+												key={publication.id}
+												className="design-seed"
+												variant={selected ? "secondary" : "ghost"}
+												size="sm"
+												disabled={pending}
+												onClick={() => void studio.remix(publication.id).catch(() => {})}
+												data-community-id={publication.id}
+												aria-pressed={selected}
+												aria-label={`${publication.snapshot.design.name} · Community`}
+											>
+												<span className="design-seed-art">
+													<BadgeSnapshot
+														data={{
+															...participantForDesign(
+																studio.participant,
+																publication.snapshot.design,
+															),
+															document: publication.snapshot.design,
+															artworkUrl: publication.images.artwork ?? undefined,
+														}}
+													/>
+												</span>
+												<span className="design-seed-name">{publication.snapshot.design.name}</span>
+												<span className="design-seed-author">By {publication.authorName}</span>
+											</Button>
+										);
+									})}
+								</div>
+							</>
+						) : null}
+						{studio.communityLoading ? (
+							<output className="design-collection-status">
+								<Spinner /> Loading Community…
+							</output>
+						) : null}
+						{studio.communityError ? (
+							<Alert variant="destructive" className="design-collection-status">
+								<AlertDescription>
+									{studio.communityError}
+									<Button variant="outline" size="sm" onClick={studio.retryCommunity}>
+										Try again
+									</Button>
+								</AlertDescription>
+							</Alert>
+						) : null}
+						<p className="design-collection-label">Studio · The original collection</p>
 						<div className="design-seeds">
 							{badgeDesignExamples.map((design) => (
 								<Button
 									key={design.name}
 									className="design-seed"
-									variant={design.name === studio.design.name ? "secondary" : "ghost"}
+									variant={
+										studio.selection?.kind === "style" && studio.selection.id === design.source
+											? "secondary"
+											: "ghost"
+									}
 									size="sm"
 									disabled={pending}
 									onClick={() => studio.select(design)}
 									data-design-source={design.source}
-									aria-pressed={design.name === studio.design.name}
+									aria-pressed={
+										studio.selection?.kind === "style" && studio.selection.id === design.source
+									}
 									aria-label={design.name}
 								>
 									<span className="design-seed-art">
