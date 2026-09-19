@@ -81,21 +81,21 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 			) : (
 				<UploadSimple data-icon="inline-start" />
 			)}
-			{profile.uploading ? "Preparando…" : profile.portraitUrl ? "Cambiar foto" : "Subir mi foto"}
+			{profile.uploading ? "Preparing…" : profile.portraitUrl ? "Change photo" : "Upload my photo"}
 		</Button>
 	);
 
 	return (
 		<section
 			className={welcome ? "design-welcome" : "design-profile"}
-			aria-label="Tu perfil para todos los badges"
+			aria-label="Your profile for every badge"
 		>
 			<input
 				ref={input}
 				id="participant-photo"
 				type="file"
 				accept="image/png,image/jpeg,image/webp"
-				aria-label="Tu foto para todos los estilos"
+				aria-label="Your photo for every style"
 				hidden
 				onChange={(event) => {
 					const file = event.target.files?.[0];
@@ -106,20 +106,20 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 			{welcome ? (
 				<>
 					<div className="design-welcome-copy">
-						<p className="design-welcome-eyebrow">Una foto. Todas tus versiones.</p>
-						<h1>Empieza por ti.</h1>
+						<p className="design-welcome-eyebrow">One photo. Every version of you.</p>
+						<h1>Start with you.</h1>
 						<p className="design-welcome-description">
-							Tu foto en {designPresets.length} estilos con personalidad. Sube una, encuentra el
-							tuyo y hazlo único.
+							Your photo in {designPresets.length} styles with personality. Upload one, find yours
+							and make it unique.
 						</p>
 						<Field>
 							<FieldLabel htmlFor="participant-name">
-								Tu nombre <span className="design-help">opcional</span>
+								Your name <span className="design-help">optional</span>
 							</FieldLabel>
 							<Input
 								id="participant-name"
 								autoComplete="name"
-								placeholder="Así aparecerás en los badges"
+								placeholder="How you will appear on the badges"
 								maxLength={80}
 								value={profile.identity.name}
 								onChange={(event) => profile.updateIdentity({ name: event.target.value })}
@@ -127,7 +127,7 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 						</Field>
 						<div className="design-welcome-upload">
 							{upload}
-							<span>o arrastra tu foto aquí</span>
+							<span>or drag your photo here</span>
 						</div>
 						<Button
 							className="design-example-photo"
@@ -136,12 +136,12 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 							onClick={() => void profile.useExamplePhoto()}
 						>
 							<img src={sampleParticipant.portraitUrl} alt="" width={28} height={28} />
-							Probar con foto de ejemplo
+							Try with a sample photo
 						</Button>
 						<p className="design-welcome-privacy">
-							JPG, PNG o WebP · hasta 8 MB
+							JPG, PNG or WebP · up to 8 MB
 							<br />
-							Tu foto se queda en este navegador.
+							Your photo stays in this browser.
 						</p>
 						<Button
 							className="design-welcome-skip"
@@ -150,7 +150,7 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 							disabled={profile.uploading}
 							onClick={() => profile.updateIdentity({ started: true })}
 						>
-							Explorar sin foto
+							Explore without a photo
 						</Button>
 						<ProfileFeedback />
 					</div>
@@ -167,7 +167,7 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 								</div>
 							))}
 						</div>
-						<p>Una misma persona. Una identidad en cada estilo.</p>
+						<p>The same person. One identity in every style.</p>
 					</div>
 				</>
 			) : (
@@ -182,28 +182,28 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 						/>
 						<div className="design-profile-name">
 							<label htmlFor="participant-name" className="sr-only">
-								Tu nombre en todos los badges
+								Your name on every badge
 							</label>
 							<Input
 								id="participant-name"
 								autoComplete="name"
-								placeholder="Tu nombre"
+								placeholder="Your name"
 								maxLength={80}
 								value={profile.identity.name}
 								onChange={(event) => profile.updateIdentity({ name: event.target.value })}
 							/>
-							<span>Tu perfil en {designPresets.length} estilos</span>
+							<span>Your profile in {designPresets.length} styles</span>
 						</div>
 						<p className="design-profile-saved" aria-live="polite">
 							{profile.saving ? (
 								<>
-									<Spinner /> Guardando en este navegador…
+									<Spinner /> Saving in this browser…
 								</>
 							) : profile.warning ? (
-								"Disponible en esta sesión"
+								"Available for this session"
 							) : (
 								<>
-									<Check /> Guardado en este navegador
+									<Check /> Saved in this browser
 								</>
 							)}
 						</p>
@@ -216,14 +216,14 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 									disabled={profile.uploading}
 									onClick={() => void profile.useExamplePhoto()}
 								>
-									Usar ejemplo
+									Use sample
 								</Button>
 							) : null}
 							{profile.portraitUrl ? (
 								<Button
 									size="icon-sm"
 									variant="ghost"
-									aria-label="Quitar mi foto de todos los badges"
+									aria-label="Remove my photo from every badge"
 									onClick={profile.removePhoto}
 								>
 									<X />
@@ -237,8 +237,8 @@ export function DesignProfile({ welcome = false }: { welcome?: boolean }) {
 			{dragging ? (
 				<output className="design-photo-drop">
 					<Image size={40} />
-					<strong>Suelta tu foto.</strong>
-					<span>La aplicaremos a todos tus badges.</span>
+					<strong>Drop your photo.</strong>
+					<span>It will be applied to all your badges.</span>
 				</output>
 			) : null}
 		</section>

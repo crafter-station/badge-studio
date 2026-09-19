@@ -15,47 +15,47 @@ import type { useDesignStudio } from "./use-design-studio";
 
 export function layerLabel(layer: BadgeLayer) {
 	const kinds = {
-		text: "Texto",
-		portrait: "Retrato",
-		shape: "Forma",
-		qr: "Código QR",
-		image: "Ilustración",
-		effect: "Efecto",
-		graphic: "Gráfico",
-		gradient: "Degradado",
+		text: "Text",
+		portrait: "Portrait",
+		shape: "Shape",
+		qr: "QR code",
+		image: "Artwork",
+		effect: "Effect",
+		graphic: "Graphic",
+		gradient: "Gradient",
 	};
 	if (layer.kind === "text" && "binding" in layer && layer.binding) {
 		const labels: Record<string, string> = {
-			name: "Nombre",
-			role: "Rol",
-			organization: "Organización",
-			number: "Número",
-			event: "Evento",
-			roleOrganization: "Rol y organización",
-			admissionRole: "Acceso",
-			location: "Lugar",
-			date: "Fecha",
-			website: "Sitio web",
-			bio: "Biografía",
-			signature: "Firma",
-			roleCode: "Código de rol",
+			name: "Name",
+			role: "Role",
+			organization: "Organization",
+			number: "Number",
+			event: "Event",
+			roleOrganization: "Role and organization",
+			admissionRole: "Access",
+			location: "Location",
+			date: "Date",
+			website: "Website",
+			bio: "Bio",
+			signature: "Signature",
+			roleCode: "Role code",
 		};
 		return labels[String(layer.binding)] || layer.text?.slice(0, 26) || kinds.text;
 	}
 	if (layer.kind === "graphic") {
 		const labels: Record<string, string> = {
-			sky: "Cielo y pradera",
-			window: "Ventana",
-			grain: "Grano",
-			path: "Trazado",
-			paper: "Papel",
-			"chromatic-paper": "Cintas cromáticas",
-			checkerboard: "Damero",
-			terrain: "Topografía",
-			seal: "Sello",
-			stamp: "Estampilla",
-			grid: "Cuadrícula",
-			scanlines: "Líneas de escaneo",
+			sky: "Sky and meadow",
+			window: "Window",
+			grain: "Grain",
+			path: "Path",
+			paper: "Paper",
+			"chromatic-paper": "Chromatic ribbons",
+			checkerboard: "Checkerboard",
+			terrain: "Topography",
+			seal: "Seal",
+			stamp: "Stamp",
+			grid: "Grid",
+			scanlines: "Scanlines",
 		};
 		return labels[layer.pattern] || kinds.graphic;
 	}
@@ -81,7 +81,7 @@ export function DesignInspector({
 	}
 	const pending = Boolean(studio.phase);
 	return (
-		<aside ref={inspector} className="design-inspector" aria-label="Elementos y participantes">
+		<aside ref={inspector} className="design-inspector" aria-label="Elements and participant">
 			{studio.error ? (
 				<p className="design-inspector-error" role="alert">
 					{studio.error}
@@ -95,10 +95,10 @@ export function DesignInspector({
 				size="sm"
 				variant="outline"
 				spacing={0}
-				aria-label="Panel de edición"
+				aria-label="Editing panel"
 			>
-				<ToggleGroupItem value="layers">Elementos</ToggleGroupItem>
-				<ToggleGroupItem value="person">Participante</ToggleGroupItem>
+				<ToggleGroupItem value="layers">Elements</ToggleGroupItem>
+				<ToggleGroupItem value="person">Participant</ToggleGroupItem>
 			</ToggleGroup>
 			{tab === "layers" && selected ? (
 				<DesignSelectedLayer
@@ -115,36 +115,36 @@ export function DesignInspector({
 			) : tab === "layers" ? (
 				<>
 					<div className="design-section-heading">
-						<h2>{side === "front" ? "Frente" : "Reverso"}</h2>
-						<span>{layers.length} capas</span>
+						<h2>{side === "front" ? "Front" : "Back"}</h2>
+						<span>{layers.length} layers</span>
 					</div>
 					<p className="design-help">
-						Selecciona una capa para editarla. El ojo muestra u oculta; el candado protege.
+						Select a layer to edit it. The eye shows or hides; the lock protects.
 					</p>
 					<select
 						className="design-select"
-						aria-label="Añadir elemento"
+						aria-label="Add element"
 						value=""
 						disabled={pending}
 						onChange={(event) => studio.changeLayers(side, "add", event.target.value)}
 					>
 						<option value="" disabled>
-							Añadir elemento…
+							Add element…
 						</option>
-						<option value="text">Texto</option>
-						<option value="shape">Forma</option>
-						<option value="portrait">Detalle de la foto</option>
-						<option value="graphic">Gráfico</option>
-						<option value="effect">Efecto vivo</option>
-						<option value="gradient">Degradado</option>
-						<option value="image">Ilustración</option>
+						<option value="text">Text</option>
+						<option value="shape">Shape</option>
+						<option value="portrait">Photo detail</option>
+						<option value="graphic">Graphic</option>
+						<option value="effect">Live effect</option>
+						<option value="gradient">Gradient</option>
+						<option value="image">Artwork</option>
 					</select>
 					<details className="design-disclosure">
-						<summary>Fondo y material</summary>
+						<summary>Background and material</summary>
 						<FieldGroup className="design-layer-details">
 							<Field>
 								<FieldLabel htmlFor="design-background">
-									Fondo del {side === "front" ? "frente" : "reverso"}
+									{side === "front" ? "Front" : "Back"} background
 								</FieldLabel>
 								<Input
 									id="design-background"
@@ -165,16 +165,16 @@ export function DesignInspector({
 										studio.setMaterial(event.target.value as "satin" | "prism" | "chrome")
 									}
 								>
-									<option value="satin">Papel satinado</option>
-									<option value="prism">Prisma</option>
-									<option value="chrome">Cromo</option>
+									<option value="satin">Satin paper</option>
+									<option value="prism">Prism</option>
+									<option value="chrome">Chrome</option>
 								</select>
 							</Field>
 							{(
 								[
-									["roughness", "Rugosidad", 1],
-									["iridescence", "Iridiscencia", 0.65],
-									["speed", "Velocidad", 1],
+									["roughness", "Roughness", 1],
+									["iridescence", "Iridescence", 0.65],
+									["speed", "Speed", 1],
 								] as const
 							).map(([key, label, max]) => (
 								<Field key={key}>
@@ -200,7 +200,7 @@ export function DesignInspector({
 									disabled={pending}
 									onCheckedChange={studio.toggleMaterialLock}
 								/>{" "}
-								Conservar material
+								Keep material
 							</label>
 						</FieldGroup>
 					</details>
@@ -217,7 +217,7 @@ export function DesignInspector({
 									size="sm"
 									className="design-layer-select"
 									disabled={pending}
-									aria-label={`Editar ${layerLabel(layer)} (${layer.id})`}
+									aria-label={`Edit ${layerLabel(layer)} (${layer.id})`}
 									onClick={() => openLayer(layer.id)}
 								>
 									<Stack data-icon="inline-start" />
@@ -237,7 +237,7 @@ export function DesignInspector({
 					{studio.locks.front.length + studio.locks.back.length ? (
 						<p className="design-help design-lock-note">
 							<LockSimple aria-hidden="true" />{" "}
-							{studio.locks.front.length + studio.locks.back.length} elementos protegidos
+							{studio.locks.front.length + studio.locks.back.length} protected elements
 						</p>
 					) : null}
 
@@ -247,22 +247,23 @@ export function DesignInspector({
 						disabled={pending || !studio.past.length}
 						onClick={studio.undo}
 					>
-						<ArrowCounterClockwise data-icon="inline-start" /> Deshacer
+						<ArrowCounterClockwise data-icon="inline-start" /> Undo
 					</Button>
 				</>
 			) : (
 				<>
 					<div className="design-section-heading">
-						<h2>Tus datos, en todos los estilos</h2>
+						<h2>Your details, in every style</h2>
 					</div>
 					<p className="design-help">
-						La foto y el nombre se cambian arriba. Tus datos se conservan al explorar la colección.
+						Photo and name are changed above. Your details are kept while you explore the
+						collection.
 					</p>
 					<FieldGroup>
 						{(
 							[
-								["role", "Rol"],
-								["organization", "Organización"],
+								["role", "Role"],
+								["organization", "Organization"],
 							] as const
 						).map(([key, label]) => (
 							<Field key={key}>
@@ -288,7 +289,7 @@ export function DesignInspector({
 							</Field>
 						))}
 						<Field>
-							<FieldLabel htmlFor="participant-number">Número</FieldLabel>
+							<FieldLabel htmlFor="participant-number">Number</FieldLabel>
 							<Input
 								id="participant-number"
 								type="number"
@@ -310,13 +311,13 @@ export function DesignInspector({
 							/>
 						</Field>
 						<Field>
-							<FieldLabel htmlFor="participant-url">Destino del QR</FieldLabel>
+							<FieldLabel htmlFor="participant-url">QR destination</FieldLabel>
 							<Input
 								id="participant-url"
 								type="url"
 								value={urlDraft}
 								maxLength={300}
-								placeholder="https://tu-evento.com"
+								placeholder="https://your-event.com"
 								onChange={(event) => {
 									const value = event.target.value;
 									setUrlDraft(value);
@@ -327,7 +328,7 @@ export function DesignInspector({
 										setUrlError("");
 										studio.setParticipant((person) => ({ ...person, publicUrl: url.href }));
 									} catch {
-										setUrlError("Usa una URL completa con https://. Conservamos el QR anterior.");
+										setUrlError("Use a full URL starting with https://. The previous QR is kept.");
 									}
 								}}
 								aria-invalid={Boolean(urlError)}

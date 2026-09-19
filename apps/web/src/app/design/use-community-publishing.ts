@@ -41,7 +41,7 @@ export function useCommunityPublishing(studio: Studio) {
 
 	function workSignal(signal?: AbortSignal) {
 		if (!mounted.current || !lifetime.current)
-			throw new Error("CANCELLED: El editor ya no está activo.");
+			throw new Error("CANCELLED: The editor is no longer active.");
 		return AbortSignal.any([
 			lifetime.current.signal,
 			AbortSignal.timeout(30_000),
@@ -82,7 +82,7 @@ export function useCommunityPublishing(studio: Studio) {
 				await retain({ ...value, receipt: result.receipt }, signal);
 				updatePhase(result.receipt.state);
 				throw new Error(
-					"ALREADY_COMPLETED: La operación ya terminó. Conservamos su comprobante; puedes retirar la publicación si lo deseas.",
+					"ALREADY_COMPLETED: The operation already finished. Its receipt was kept; you can withdraw the publication if you wish.",
 				);
 			}
 		}
@@ -101,8 +101,7 @@ export function useCommunityPublishing(studio: Studio) {
 				updatePhase(value.receipt?.state ?? "prepared");
 			})
 			.catch(() => {
-				if (!controller.signal.aborted)
-					updateError("No pudimos recuperar una publicación preparada.");
+				if (!controller.signal.aborted) updateError("Could not recover a prepared publication.");
 			})
 			.finally(() => {
 				if (!controller.signal.aborted) recovering.current = false;
@@ -119,7 +118,7 @@ export function useCommunityPublishing(studio: Studio) {
 	) {
 		const signal = workSignal(inputSignal);
 		if (busy.current || recovering.current)
-			throw new Error("BUSY: La publicación todavía se está preparando.");
+			throw new Error("BUSY: The publication is still being prepared.");
 		busy.current = true;
 		updateError("");
 		try {
@@ -151,7 +150,7 @@ export function useCommunityPublishing(studio: Studio) {
 				: null,
 			error: errorRef.current || null,
 			disclosure:
-				"Se publicarán la foto, el nombre, los datos, ambas caras y las capas editables. Cualquier persona podrá verlos y reutilizar el diseño.",
+				"The photo, name, details, both faces and the editable layers will be published. Anyone will be able to see them and reuse the design.",
 		};
 	}
 
@@ -185,7 +184,7 @@ export function useCommunityPublishing(studio: Studio) {
 				return {
 					...describe(value, status.state),
 					authorizationUrl: await authorizationUrl(value),
-					next: "Abre este enlace en el navegador del usuario para iniciar sesión y confirmar la vista previa. El editor permanece abierto.",
+					next: "Open this link in the user's browser to sign in and confirm the preview. The editor stays open.",
 				};
 			}
 			if (value.snapshot && !value.uploaded) {
@@ -212,7 +211,7 @@ export function useCommunityPublishing(studio: Studio) {
 			return {
 				...describe(value, "review"),
 				authorizationUrl: await authorizationUrl(value),
-				next: "Las imágenes están preparadas. Confirma la vista previa en la página de publicación.",
+				next: "The images are prepared. Confirm the preview on the publication page.",
 			};
 		} catch (reason) {
 			const message = reason instanceof Error ? reason.message : "No pudimos publicar.";
@@ -232,7 +231,7 @@ export function useCommunityPublishing(studio: Studio) {
 			...(value?.consented && !value.receipt
 				? {
 						authorizationUrl: await authorizationUrl(value),
-						next: "Abre la página de publicación en el navegador del usuario. La preparación continúa en segundo plano; consulta status para obtener el resultado.",
+						next: "Open the publication page in the user's browser. Preparation continues in the background; call status to get the result.",
 					}
 				: {}),
 		};
@@ -262,7 +261,7 @@ export function useCommunityPublishing(studio: Studio) {
 		const signal = workSignal(inputSignal);
 		const value = current.current;
 		if (!value || value.intent.snapshotHash !== snapshotHash)
-			throw new Error("STALE_SNAPSHOT: Prepara el badge antes de publicarlo.");
+			throw new Error("STALE_SNAPSHOT: Prepare the badge before publishing it.");
 		if (!consent) throw new Error("CONSENT_REQUIRED: Pregunta si quiere publicar este badge.");
 		if (busy.current) return advance();
 		busy.current = true;
@@ -280,7 +279,8 @@ export function useCommunityPublishing(studio: Studio) {
 		inputSignal?: AbortSignal,
 	) {
 		const signal = workSignal(inputSignal);
-		if (busy.current || recovering.current) throw new Error("BUSY: Espera a la operación actual.");
+		if (busy.current || recovering.current)
+			throw new Error("BUSY: Wait for the current operation.");
 		busy.current = true;
 		try {
 			const publication = await communityRequest<CommunityPublication>(
@@ -290,7 +290,7 @@ export function useCommunityPublishing(studio: Studio) {
 				signal,
 			);
 			if (publication.version !== expectedVersion)
-				throw new Error("VERSION_CONFLICT: Consulta la versión actual.");
+				throw new Error("VERSION_CONFLICT: Check the current version.");
 			const value: PreparedPublication = {
 				intent: {
 					action: "withdraw",
@@ -317,7 +317,7 @@ export function useCommunityPublishing(studio: Studio) {
 
 	async function remix(publicationId: string, inputSignal?: AbortSignal) {
 		const signal = workSignal(inputSignal);
-		if (busy.current) throw new Error("BUSY: Espera a la operación actual.");
+		if (busy.current) throw new Error("BUSY: Wait for the current operation.");
 		busy.current = true;
 		const fingerprint = () =>
 			JSON.stringify([latest.current.design, latest.current.locks, latest.current.participant]);
@@ -332,7 +332,7 @@ export function useCommunityPublishing(studio: Studio) {
 			const design = structuredClone(publication.snapshot.design);
 			if (publication.images.artwork) {
 				const response = await fetch(publication.images.artwork, { signal });
-				if (!response.ok) throw new Error("No pudimos copiar la ilustración.");
+				if (!response.ok) throw new Error("Could not copy the artwork.");
 				const image = await response.blob();
 				const form = new FormData();
 				form.set("reference", image, "community.webp");
@@ -346,7 +346,7 @@ export function useCommunityPublishing(studio: Studio) {
 			signal.throwIfAborted();
 			if (fingerprint() !== before)
 				throw new Error(
-					"STALE_REVISION: El badge cambió mientras se cargaba el diseño. Conservamos tus cambios.",
+					"STALE_REVISION: The badge changed while the design was loading. Your changes were kept.",
 				);
 			flushSync(() => {
 				latest.current.select(design);
@@ -394,7 +394,7 @@ export function useCommunityPublishing(studio: Studio) {
 		prepareWithdrawal,
 		remix,
 		clear: async (inputSignal?: AbortSignal) => {
-			if (busy.current) throw new Error("La publicación sigue en curso.");
+			if (busy.current) throw new Error("The publication is still in progress.");
 			const signal = workSignal(inputSignal);
 			busy.current = true;
 			try {

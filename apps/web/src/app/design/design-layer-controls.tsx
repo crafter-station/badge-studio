@@ -18,7 +18,7 @@ export function DesignLayerControls({
 				<>
 					{layer.binding === "none" || layer.binding === "template" ? (
 						<Field>
-							<FieldLabel htmlFor="layer-text">Texto</FieldLabel>
+							<FieldLabel htmlFor="layer-text">Text</FieldLabel>
 							<Textarea
 								id="layer-text"
 								rows={2}
@@ -29,10 +29,10 @@ export function DesignLayerControls({
 							/>
 						</Field>
 					) : (
-						<p className="design-help">Vinculado a los datos del participante: {layer.binding}.</p>
+						<p className="design-help">Bound to participant data: {layer.binding}.</p>
 					)}
 					<Field>
-						<FieldLabel htmlFor="layer-font">Tipografía</FieldLabel>
+						<FieldLabel htmlFor="layer-font">Typeface</FieldLabel>
 						<select
 							id="layer-font"
 							className="design-select"
@@ -42,16 +42,16 @@ export function DesignLayerControls({
 						>
 							<option value="sans">Sans</option>
 							<option value="serif">Editorial serif</option>
-							<option value="mono">Monoespaciada</option>
+							<option value="mono">Monospace</option>
 							<option value="display">Display</option>
-							<option value="brand">Grotesca GTM / Andes</option>
-							<option value="script">Caligrafía Next Craft</option>
-							<option value="archive">Archivo Next Craft</option>
-							<option value="pixel">Desktop Vibecode</option>
+							<option value="brand">GTM / Andes grotesque</option>
+							<option value="script">Next Craft script</option>
+							<option value="archive">Next Craft archive</option>
+							<option value="pixel">Vibecode desktop</option>
 						</select>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="layer-size">Tamaño</FieldLabel>
+						<FieldLabel htmlFor="layer-size">Size</FieldLabel>
 						<Input
 							id="layer-size"
 							type="number"
@@ -63,7 +63,7 @@ export function DesignLayerControls({
 						/>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="layer-binding">Contenido</FieldLabel>
+						<FieldLabel htmlFor="layer-binding">Content</FieldLabel>
 						<select
 							id="layer-binding"
 							className="design-select"
@@ -89,19 +89,19 @@ export function DesignLayerControls({
 								"template",
 							].map((value) => (
 								<option value={value} key={value}>
-									{value === "none" ? "Texto libre" : value}
+									{value === "none" ? "Free text" : value}
 								</option>
 							))}
 						</select>
 					</Field>
 					{(
 						[
-							["align", "Alineación", ["left", "center", "right"]],
-							["weight", "Peso", ["400", "500", "600", "700", "800", "900"]],
-							["fit", "Composición", ["wrap", "shrink", "spread"]],
-							["transform", "Mayúsculas", ["none", "uppercase", "lowercase"]],
-							["segment", "Parte del nombre", ["all", "first", "last"]],
-							["baseline", "Línea de base", ["top", "alphabetic"]],
+							["align", "Alignment", ["left", "center", "right"]],
+							["weight", "Weight", ["400", "500", "600", "700", "800", "900"]],
+							["fit", "Fit", ["wrap", "shrink", "spread"]],
+							["transform", "Case", ["none", "uppercase", "lowercase"]],
+							["segment", "Name part", ["all", "first", "last"]],
+							["baseline", "Baseline", ["top", "alphabetic"]],
 						] as const
 					).map(([key, label, options]) => (
 						<Field key={key}>
@@ -123,8 +123,8 @@ export function DesignLayerControls({
 					))}
 					{(
 						[
-							["tracking", "Espaciado", -8, 40, 0.5, 0],
-							["lineHeight", "Interlineado", 0.7, 2, 0.05, 1.15],
+							["tracking", "Tracking", -8, 40, 0.5, 0],
+							["lineHeight", "Line height", 0.7, 2, 0.05, 1.15],
 						] as const
 					).map(([key, label, min, max, step, fallback]) => (
 						<Field key={key}>
@@ -145,7 +145,7 @@ export function DesignLayerControls({
 			) : null}
 			{"color" in layer ? (
 				<Field>
-					<FieldLabel htmlFor="layer-color">Tinta</FieldLabel>
+					<FieldLabel htmlFor="layer-color">Ink</FieldLabel>
 					<Input
 						id="layer-color"
 						type="color"
@@ -158,7 +158,7 @@ export function DesignLayerControls({
 			{layer.kind === "portrait" ? (
 				<>
 					<Field>
-						<FieldLabel htmlFor="layer-filter">Tratamiento del retrato</FieldLabel>
+						<FieldLabel htmlFor="layer-filter">Portrait treatment</FieldLabel>
 						<select
 							id="layer-filter"
 							className="design-select"
@@ -175,18 +175,18 @@ export function DesignLayerControls({
 							}
 						>
 							<option value="original">Original</option>
-							<option value="mono">Monocromo</option>
-							<option value="rose">Rosa editorial</option>
-							<option value="blue">Azul tinta</option>
-							<option value="warm">Vintage cálido</option>
-							<option value="thermal">Térmico original</option>
-							<option value="silver">Plata metálica</option>
-							<option value="cyanotype">Cianotipo fotográfico</option>
-							<option value="vintage">Película vintage</option>
+							<option value="mono">Monochrome</option>
+							<option value="rose">Editorial rose</option>
+							<option value="blue">Ink blue</option>
+							<option value="warm">Warm vintage</option>
+							<option value="thermal">Original thermal</option>
+							<option value="silver">Metallic silver</option>
+							<option value="cyanotype">Photographic cyanotype</option>
+							<option value="vintage">Vintage film</option>
 						</select>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="portrait-clip">Silueta</FieldLabel>
+						<FieldLabel htmlFor="portrait-clip">Silhouette</FieldLabel>
 						<select
 							id="portrait-clip"
 							className="design-select"
@@ -194,14 +194,14 @@ export function DesignLayerControls({
 							disabled={disabled}
 							onChange={(event) => update({ clip: event.target.value as typeof layer.clip })}
 						>
-							<option value="rectangle">Rectángulo</option>
-							<option value="arch">Arco</option>
-							<option value="ellipse">Elipse</option>
+							<option value="rectangle">Rectangle</option>
+							<option value="arch">Arch</option>
+							<option value="ellipse">Ellipse</option>
 						</select>
 					</Field>
 					{(["x", "y", "zoom"] as const).map((key) => (
 						<Field key={key}>
-							<FieldLabel htmlFor={`portrait-crop-${key}`}>Recorte {key}</FieldLabel>
+							<FieldLabel htmlFor={`portrait-crop-${key}`}>Crop {key}</FieldLabel>
 							<Input
 								id={`portrait-crop-${key}`}
 								type="range"
@@ -227,7 +227,7 @@ export function DesignLayerControls({
 					{(["x", "top", "bottom"] as const).map((key) => (
 						<Field key={key}>
 							<FieldLabel htmlFor={`portrait-fade-${key}`}>
-								Difuminado {key === "x" ? "lateral" : key === "top" ? "superior" : "inferior"}
+								{key === "x" ? "Side" : key === "top" ? "Top" : "Bottom"} fade
 							</FieldLabel>
 							<Input
 								id={`portrait-fade-${key}`}
@@ -253,11 +253,11 @@ export function DesignLayerControls({
 					))}
 					{(
 						[
-							["contrast", "Contraste", 0.5, 2, 0.05, 1.16],
-							["brightness", "Luz", 0.3, 1.8, 0.05, 1],
-							["blur", "Desenfoque", 0, 24, 1, 0],
-							["saturation", "Saturación", 0, 2, 0.05, 1],
-							["tintOpacity", "Intensidad del tinte", 0, 1, 0.05, 1],
+							["contrast", "Contrast", 0.5, 2, 0.05, 1.16],
+							["brightness", "Brightness", 0.3, 1.8, 0.05, 1],
+							["blur", "Blur", 0, 24, 1, 0],
+							["saturation", "Saturation", 0, 2, 0.05, 1],
+							["tintOpacity", "Tint intensity", 0, 1, 0.05, 1],
 						] as const
 					).map(([key, label, min, max, step, fallback]) => (
 						<Field key={key}>
@@ -275,7 +275,7 @@ export function DesignLayerControls({
 						</Field>
 					))}
 					<Field>
-						<FieldLabel htmlFor="portrait-tint">Tinte</FieldLabel>
+						<FieldLabel htmlFor="portrait-tint">Tint</FieldLabel>
 						<Input
 							id="portrait-tint"
 							type="color"
@@ -285,7 +285,7 @@ export function DesignLayerControls({
 						/>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="portrait-tint-mode">Mezcla del tinte</FieldLabel>
+						<FieldLabel htmlFor="portrait-tint-mode">Tint blend</FieldLabel>
 						<select
 							id="portrait-tint-mode"
 							className="design-select"
@@ -295,7 +295,7 @@ export function DesignLayerControls({
 								update({ tintMode: event.target.value as typeof layer.tintMode })
 							}
 						>
-							<option value="multiply">Multiplicar</option>
+							<option value="multiply">Multiply</option>
 							<option value="color">Color</option>
 						</select>
 					</Field>
@@ -303,7 +303,7 @@ export function DesignLayerControls({
 			) : null}
 			{layer.kind === "shape" ? (
 				<Field>
-					<FieldLabel htmlFor="layer-shape">Forma</FieldLabel>
+					<FieldLabel htmlFor="layer-shape">Shape</FieldLabel>
 					<select
 						id="layer-shape"
 						className="design-select"
@@ -322,7 +322,7 @@ export function DesignLayerControls({
 			{layer.kind === "graphic" ? (
 				<>
 					<Field>
-						<FieldLabel htmlFor="layer-pattern">Gráfico</FieldLabel>
+						<FieldLabel htmlFor="layer-pattern">Graphic</FieldLabel>
 						<select
 							id="layer-pattern"
 							className="design-select"
@@ -353,7 +353,7 @@ export function DesignLayerControls({
 						</select>
 					</Field>
 					<Field>
-						<FieldLabel htmlFor="layer-accent">Acento</FieldLabel>
+						<FieldLabel htmlFor="layer-accent">Accent</FieldLabel>
 						<Input
 							id="layer-accent"
 							type="color"
@@ -364,7 +364,7 @@ export function DesignLayerControls({
 					</Field>
 					{layer.pattern === "path" ? (
 						<Field>
-							<FieldLabel htmlFor="layer-path">Trazado vectorial</FieldLabel>
+							<FieldLabel htmlFor="layer-path">Vector path</FieldLabel>
 							<Textarea
 								id="layer-path"
 								rows={3}
@@ -376,7 +376,7 @@ export function DesignLayerControls({
 						</Field>
 					) : null}
 					<Field>
-						<FieldLabel htmlFor="layer-seed">Semilla</FieldLabel>
+						<FieldLabel htmlFor="layer-seed">Seed</FieldLabel>
 						<Input
 							id="layer-seed"
 							type="number"
@@ -392,7 +392,7 @@ export function DesignLayerControls({
 			{layer.kind === "gradient" ? (
 				<>
 					<Field>
-						<FieldLabel htmlFor="gradient-direction">Dirección</FieldLabel>
+						<FieldLabel htmlFor="gradient-direction">Direction</FieldLabel>
 						<select
 							id="gradient-direction"
 							className="design-select"
@@ -427,7 +427,7 @@ export function DesignLayerControls({
 							/>
 							<Input
 								type="range"
-								aria-label={`Opacidad del color ${index + 1}`}
+								aria-label={`Color ${index + 1} opacity`}
 								min={0}
 								max={255}
 								step={1}
@@ -455,7 +455,7 @@ export function DesignLayerControls({
 			{layer.kind === "effect" ? (
 				<>
 					<Field>
-						<FieldLabel htmlFor="layer-effect">Efecto</FieldLabel>
+						<FieldLabel htmlFor="layer-effect">Effect</FieldLabel>
 						<select
 							id="layer-effect"
 							className="design-select"
@@ -463,11 +463,11 @@ export function DesignLayerControls({
 							disabled={disabled}
 							onChange={(event) => update({ effect: event.target.value as typeof layer.effect })}
 						>
-							<option value="ribbons">Cintas fluidas</option>
-							<option value="contours">Topografía</option>
-							<option value="orbits">Órbitas</option>
-							<option value="grain">Grano</option>
-							<option value="chromatic-flow">Flujo GTM</option>
+							<option value="ribbons">Fluid ribbons</option>
+							<option value="contours">Topography</option>
+							<option value="orbits">Orbits</option>
+							<option value="grain">Grain</option>
+							<option value="chromatic-flow">GTM flow</option>
 						</select>
 					</Field>
 					<div className="design-effect-colors">
@@ -494,7 +494,7 @@ export function DesignLayerControls({
 			) : null}
 			{"radius" in layer ? (
 				<Field>
-					<FieldLabel htmlFor="layer-radius">Radio</FieldLabel>
+					<FieldLabel htmlFor="layer-radius">Radius</FieldLabel>
 					<Input
 						id="layer-radius"
 						type="number"
@@ -508,7 +508,7 @@ export function DesignLayerControls({
 			) : null}
 			{layer.kind === "shape" || layer.kind === "graphic" ? (
 				<Field>
-					<FieldLabel htmlFor="layer-stroke">Trazo</FieldLabel>
+					<FieldLabel htmlFor="layer-stroke">Stroke</FieldLabel>
 					<Input
 						id="layer-stroke"
 						type="number"
@@ -523,7 +523,7 @@ export function DesignLayerControls({
 			) : null}
 			{layer.kind !== "qr" ? (
 				<Field>
-					<FieldLabel htmlFor="layer-rotation">Rotación</FieldLabel>
+					<FieldLabel htmlFor="layer-rotation">Rotation</FieldLabel>
 					<Input
 						id="layer-rotation"
 						type="number"
@@ -538,7 +538,7 @@ export function DesignLayerControls({
 			) : null}
 			{
 				<Field>
-					<FieldLabel htmlFor="layer-opacity">Opacidad</FieldLabel>
+					<FieldLabel htmlFor="layer-opacity">Opacity</FieldLabel>
 					<Input
 						id="layer-opacity"
 						type="range"

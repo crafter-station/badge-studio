@@ -49,7 +49,7 @@ describe("public studio browser storage", () => {
 		expect((await reopened.get(entry.id)).design.artwork?.assetId).toBe(id);
 		await expect(
 			store.save({ design: { ...design, artwork: { assetId: crypto.randomUUID() } } }),
-		).rejects.toThrow("Falta la ilustración");
+		).rejects.toThrow("The artwork is missing");
 		expect(await store.list()).toHaveLength(1);
 	});
 
@@ -88,10 +88,10 @@ describe("public studio browser storage", () => {
 		const store = new BrowserDesignStore(new IDBFactory());
 		for (const value of [null, {}, { design: {} }, { design, designId: "bad-id" }])
 			await expect(store.save(value)).rejects.toThrow();
-		await expect(store.get(crypto.randomUUID())).rejects.toThrow("No encontramos");
+		await expect(store.get(crypto.randomUUID())).rejects.toThrow("Could not find");
 		await expect(
 			store.save({ design, designId: crypto.randomUUID(), expectedVersion: 1 }),
-		).rejects.toThrow("No encontramos");
+		).rejects.toThrow("Could not find");
 		await expect(store.putAsset(new Blob(["bad"], { type: "text/html" }))).rejects.toThrow("PNG");
 		await expect(store.putAsset(new Blob([], { type: "image/png" }))).rejects.toThrow("6 MB");
 		await expect(

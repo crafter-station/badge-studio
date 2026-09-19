@@ -24,9 +24,9 @@ export function DesignLayerActions({
 				variant="ghost"
 				size="icon-sm"
 				disabled={disabled}
-				aria-label={`${visible ? "Ocultar" : "Mostrar"} ${label}`}
+				aria-label={`${visible ? "Hide" : "Show"} ${label}`}
 				aria-pressed={visible}
-				title={visible ? "Ocultar capa" : "Mostrar capa"}
+				title={visible ? "Hide layer" : "Show layer"}
 				onClick={onVisibility}
 			>
 				{visible ? <Eye /> : <EyeSlash />}
@@ -35,9 +35,9 @@ export function DesignLayerActions({
 				variant="ghost"
 				size="icon-sm"
 				disabled={disabled}
-				aria-label={`${locked ? "Desbloquear" : "Bloquear"} ${label}`}
+				aria-label={`${locked ? "Unlock" : "Lock"} ${label}`}
 				aria-pressed={locked}
-				title={locked ? "Desbloquear para editar" : "Proteger esta capa al editar y generar"}
+				title={locked ? "Unlock to edit" : "Protect this layer while editing and generating"}
 				onClick={onLock}
 			>
 				{locked ? <LockSimple weight="fill" /> : <LockSimpleOpen />}

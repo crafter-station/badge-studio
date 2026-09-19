@@ -36,7 +36,7 @@ test("portable bundles preserve source bytes and reject oversized sources instea
 		expect(bundle.images.portrait.base64).toBe(Buffer.from(bytes).toString("base64"));
 		expect((await validateBadgeBundle(bundle)).bundle).toEqual(bundle);
 		source = new Blob([new Uint8Array(3_000_001)], { type: "image/png" });
-		await expect(createBadgeBundle(design, participant)).rejects.toThrow("menos de 3 MB");
+		await expect(createBadgeBundle(design, participant)).rejects.toThrow("under 3 MB");
 	} finally {
 		globalThis.fetch = originalFetch;
 		if (originalWindow) Object.defineProperty(globalThis, "window", originalWindow);

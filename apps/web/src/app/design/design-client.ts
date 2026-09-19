@@ -43,7 +43,7 @@ export async function designRequest<T>(path = "", init?: RequestInit): Promise<T
 	try {
 		data = await response.json();
 	} catch {
-		throw new Error("La conexión se interrumpió. Tu diseño sigue aquí; vuelve a intentarlo.");
+		throw new Error("The connection was interrupted. Your design is still here; try again.");
 	}
 	if (!response.ok) {
 		const message = (data as { error?: unknown })?.error;
@@ -54,12 +54,12 @@ export async function designRequest<T>(path = "", init?: RequestInit): Promise<T
 
 export function parseDesigns(value: unknown, count: number): BadgeDesign[] {
 	if (!Array.isArray(value) || value.length !== count) {
-		throw new Error("La exploración no devolvió todas las propuestas. Inténtalo otra vez.");
+		throw new Error("The exploration did not return every proposal. Try again.");
 	}
 	return value.map((design) => {
 		const result = badgeDesignSchema.safeParse(design);
 		if (!result.success) {
-			throw new Error("Una propuesta necesita corregirse antes de poder mostrarla.");
+			throw new Error("A proposal needs fixing before it can be shown.");
 		}
 		return result.data;
 	});
