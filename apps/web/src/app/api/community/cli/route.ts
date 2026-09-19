@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 			const query = new URL(request.url).searchParams;
 			const operationId = query.get("operationId");
 			if (operationId) return cliPublicationStatus(request, operationId);
-			if (query.has("account")) {
+			if (query.has("account") || request.headers.has("authorization")) {
 				const actor = await cliActor(request);
 				return { id: actor.ownerId, name: actor.authorName };
 			}
