@@ -5,6 +5,7 @@ import { useParticipantProfile } from "@/components/participant-profile-provider
 import { applyParticipantIdentity } from "@/lib/participant-profile";
 import type { demoBadgeForDesign } from "@/lib/studio-participant";
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import "./live-badge.css";
 
 const Material = lazy(() =>
 	import("@crafter-station/badge-studio-renderer").then((module) => ({

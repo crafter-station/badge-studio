@@ -51,20 +51,6 @@
 	background: var(--muted);
 	color: var(--muted-foreground);
 }
-.gallery-preview .live-badge,
-.gallery-preview .live-badge > span {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 100%;
-}
-.gallery-preview :is(canvas, img) {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	object-fit: contain;
-}
 .gallery-face {
 	position: absolute;
 	bottom: 12px;
