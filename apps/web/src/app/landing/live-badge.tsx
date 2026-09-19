@@ -100,7 +100,7 @@ export function LiveBadge({
 
 	return (
 		<span ref={element} className="live-badge" data-badge-source={source} data-live={live}>
-			{fallback}
+			<span className="live-badge-fallback">{fallback}</span>
 			{profile.ready && personalized?.document?.source === source && mounted ? (
 				<Suspense fallback={null}>
 					<Material

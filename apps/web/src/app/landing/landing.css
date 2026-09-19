@@ -138,12 +138,19 @@
 	margin: -170px 0 0 -128px;
 	background: transparent;
 }
-.live-badge,
-.live-badge > span {
+.live-badge {
 	display: block;
 	position: relative;
 	width: 100%;
 	height: 100%;
+}
+.live-badge > span {
+	display: block;
+	position: absolute;
+	inset: 0;
+}
+.live-badge:has(> [data-material-status="ready"]) > .live-badge-fallback {
+	visibility: hidden;
 }
 .live-badge canvas,
 .live-badge img {
@@ -153,6 +160,12 @@
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
+}
+.live-badge-fallback .badge-snapshot {
+	inset: 50% auto auto 50%;
+	width: 85%;
+	height: 81.5%;
+	transform: translate(-50%, -50%);
 }
 .live-badge img {
 	pointer-events: none;

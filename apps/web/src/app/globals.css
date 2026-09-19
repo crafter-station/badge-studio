@@ -250,11 +250,3 @@
 	background: var(--muted);
 	border-radius: 16px;
 }
-
-.live-badge [data-material-status] canvas {
-	transition: opacity 320ms ease;
-}
-
-.live-badge[data-live="false"] [data-material-status] canvas {
-	opacity: 0;
-}
