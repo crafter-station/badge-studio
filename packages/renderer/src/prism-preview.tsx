@@ -79,12 +79,14 @@ export function PrismPreview({
 
 	return (
 		<span data-material-status={status} data-material-active={active}>
-			{status !== "ready" ? (fallback ?? <img src={fallbackUrl} alt="" draggable={false} />) : null}
+			{status !== "ready" && fallback !== null
+				? (fallback ?? <img src={fallbackUrl} alt="" draggable={false} />)
+				: null}
 			<canvas
 				ref={canvas}
 				tabIndex={-1}
 				aria-hidden="true"
-				style={{ opacity: status === "ready" ? 1 : 0 }}
+				style={{ opacity: status === "ready" ? undefined : 0 }}
 			/>
 		</span>
 	);

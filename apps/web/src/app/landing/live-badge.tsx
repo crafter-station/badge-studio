@@ -37,6 +37,7 @@ export function LiveBadge({
 	const [visible, setVisible] = useState(false);
 	const [data, setData] = useState<ReturnType<typeof demoBadgeForDesign>>();
 	const [entered, setEntered] = useState(false);
+	const [mounted, setMounted] = useState(false);
 	const fallbackUrl = custom
 		? `/prism/showcase/previews/${source}-${side}.webp`
 		: side === "back"
@@ -52,6 +53,13 @@ export function LiveBadge({
 		observer.observe(target);
 		return () => observer.disconnect();
 	}, []);
+
+	const live = visible && enabled;
+	useEffect(() => {
+		if (live === mounted) return;
+		const timer = setTimeout(() => setMounted(live), live ? 200 : 700);
+		return () => clearTimeout(timer);
+	}, [live, mounted]);
 
 	useEffect(() => {
 		if (!entered || (!enabled && !profile.identity.started) || data?.document?.source === source)
@@ -91,20 +99,19 @@ export function LiveBadge({
 		);
 
 	return (
-		<span ref={element} className="live-badge" data-badge-source={source}>
-			{profile.ready && personalized?.document?.source === source && visible && enabled ? (
-				<Suspense fallback={fallback}>
+		<span ref={element} className="live-badge" data-badge-source={source} data-live={live}>
+			{fallback}
+			{profile.ready && personalized?.document?.source === source && mounted ? (
+				<Suspense fallback={null}>
 					<Material
 						data={personalized}
-						active={visible}
+						active={live}
 						fallbackUrl={fallbackUrl}
-						fallback={fallback}
+						fallback={null}
 						side={side}
 					/>
 				</Suspense>
-			) : (
-				fallback
-			)}
+			) : null}
 		</span>
 	);
 }
