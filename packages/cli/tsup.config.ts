@@ -7,5 +7,6 @@ export default defineConfig({
 	target: "node22",
 	clean: true,
 	noExternal: ["@crafter-station/badge-studio-design"],
+	external: ["@napi-rs/keyring"],
 	loader: { ".md": "text", ".txt": "text" },
 });

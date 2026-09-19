@@ -1,6 +1,5 @@
 import { SiteHeader } from "@/components/site-header";
 import { fontAnalog, fontBody, fontMono, fontPixel } from "@/lib/fonts";
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -55,13 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			suppressHydrationWarning
 			className={`${fontBody.variable} ${fontMono.variable} ${fontPixel.variable} ${fontAnalog.variable}`}
 		>
-			<body>
-				{process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY ? (
-					<ClerkProvider>{content}</ClerkProvider>
-				) : (
-					content
-				)}
-			</body>
+			<body>{content}</body>
 		</html>
 	);
 }

@@ -40,7 +40,7 @@ See [the CLI guide](packages/cli/README.md), [CLI contract](docs/cli-contract.md
 
 ## Publish with your agent
 
-When you like the result, your agent offers to publish it. Say yes once and the agent prepares the complete badge, guides you through Clerk sign-in when needed, verifies both faces and submits it through WebMCP. The public gallery includes editable layers, the selected name and photo, and both faces.
+At the first preview, your agent asks whether to change anything or publish. Say yes once: `badgio publish --file badge.badge.json --yes` uploads the complete local bundle directly and returns the public URL. The first run opens Clerk device login; subsequent runs reuse the OS credential store. No Publish button or open editor is required. The public gallery includes editable layers, the selected name and photo, and both faces.
 
 Browsing, designing and saving locally remain anonymous. Publishing requires your account. Only the author can update or withdraw a badge. Retries use the same prepared operation; a lost response does not create another publication. Remixing a public design preserves the visitor's own photo and name.
 
@@ -95,16 +95,17 @@ bun run build
 Verify a packed or published CLI with npm and npx in an isolated consumer:
 
 ```sh
-npm run test:npm -- /absolute/path/to/badgio-0.2.2.tgz
-npm run test:npm -- badgio@0.2.2
+npm run test:npm -- /absolute/path/to/badgio-0.3.0.tgz
+npm run test:npm -- badgio@0.3.0
 ```
 
 ## Service boundary
 
-The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos remain local until you explicitly publish a badge. Agent-supplied images travel through the local preview connection when it is used. Browser panels may partition storage. Export JSON and images to keep a separate copy. Public server-side AI generation and automatic draft sync are not enabled. The community collection uses Neon and a private Cloudflare R2 bucket.
+The public studio uses browser storage by default (`NEXT_PUBLIC_BADGE_STORAGE=browser`) to save designs and illustrations in IndexedDB. Participant photos and profile details are also stored locally, separately from the editable design documents. Photos remain local until you explicitly publish a badge. Agent-supplied images travel through the local preview connection when it is used. Browser panels may partition storage. Use `badgio studio save --url "$BADGE_STUDIO_URL" --out badge.badge.json` to keep a complete portable copy, including images. Public server-side AI generation and automatic draft sync are not enabled. The community collection uses Neon and a private Cloudflare R2 bucket.
 
 To enable community publishing, configure these values in `apps/web/.env.local` and Vercel:
 
+- `BADGIO_OAUTH_CLIENT_ID`, `BADGIO_OAUTH_ISSUER`: a dedicated public Clerk OAuth application with device authorization enabled and `profile offline_access` scopes.
 - `DATABASE_URL`: the dedicated Neon PostgreSQL connection.
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`: keys from the same Clerk instance. Use development locally and production for the public domain.
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`: a dedicated Standard R2 bucket and an object read/write credential scoped to that bucket. Keep both the `r2.dev` URL and custom-domain public access disabled. The server checks publication or owner access before serving each image.

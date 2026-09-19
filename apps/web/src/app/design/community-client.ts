@@ -1,6 +1,7 @@
 import type { BadgeDesign } from "@crafter-station/badge-studio-design/badge-design";
 import type { PrismBadgeData } from "@crafter-station/badge-studio-renderer";
 import {
+	type BadgeBundle,
 	COMMUNITY_IMAGE_LIMIT,
 	COMMUNITY_JSON_LIMIT,
 	type CommunityIntent,
@@ -130,7 +131,7 @@ export async function publicationCheckpoint(
 	}
 }
 
-async function sourceImage(url: string, signal?: AbortSignal) {
+async function sourceImage(url: string, signal?: AbortSignal, preserveOriginal = false) {
 	if (!url) throw new Error("Añade una foto antes de publicar.");
 	const resolved = new URL(url, window.location.origin);
 	if (resolved.protocol !== "blob:" && resolved.origin !== window.location.origin)
@@ -141,6 +142,10 @@ async function sourceImage(url: string, signal?: AbortSignal) {
 	if (!["image/png", "image/jpeg", "image/webp"].includes(image.type))
 		throw new Error("Usa imágenes PNG, JPEG o WebP.");
 	if (image.size > COMMUNITY_IMAGE_LIMIT) {
+		if (preserveOriginal)
+			throw new Error(
+				"Para guardar el paquete completo, importa una versión de la imagen de menos de 3 MB y revisa la vista previa.",
+			);
 		const bitmap = await createImageBitmap(image);
 		try {
 			if (bitmap.width * bitmap.height > 24_000_000)
@@ -173,12 +178,13 @@ export async function preparePublication(
 	participant: PrismBadgeData,
 	target?: { publicationId: string; expectedVersion: number },
 	signal?: AbortSignal,
+	preserveOriginal = false,
 ): Promise<PreparedPublication> {
 	const document = structuredClone(design);
 	const person = publicParticipant(participant);
-	const portrait = await sourceImage(participant.portraitUrl ?? "", signal);
+	const portrait = await sourceImage(participant.portraitUrl ?? "", signal, preserveOriginal);
 	const artwork = document.artwork
-		? await sourceImage(designAssetUrl(document.artwork.assetId), signal)
+		? await sourceImage(designAssetUrl(document.artwork.assetId), signal, preserveOriginal)
 		: undefined;
 	const snapshot = communitySnapshotSchema.parse({
 		format: 1,
@@ -217,4 +223,32 @@ export async function authorizationUrl(prepared: PreparedPublication) {
 		}),
 	}).toString();
 	return url.href;
+}
+
+export async function createBadgeBundle(
+	design: BadgeDesign,
+	participant: PrismBadgeData,
+	signal?: AbortSignal,
+): Promise<BadgeBundle> {
+	const prepared = await preparePublication(design, participant, undefined, signal, true);
+	async function image(blob?: Blob) {
+		if (!blob) return null;
+		const bytes = new Uint8Array(await blob.arrayBuffer());
+		let binary = "";
+		for (const byte of bytes) binary += String.fromCharCode(byte);
+		return {
+			mimeType: blob.type as BadgeBundle["images"]["portrait"]["mimeType"],
+			base64: btoa(binary),
+		};
+	}
+	const portrait = await image(prepared.files.portrait);
+	if (!prepared.snapshot || !portrait) throw new Error("The badge needs a portrait.");
+	const artwork = await image(prepared.files.artwork);
+	signal?.throwIfAborted();
+	return {
+		format: "badge-studio-bundle",
+		version: 1,
+		snapshot: prepared.snapshot,
+		images: { portrait, artwork },
+	};
 }

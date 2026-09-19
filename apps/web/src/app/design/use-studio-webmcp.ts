@@ -14,7 +14,7 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { z } from "zod";
 import { registerPreviewTools } from "../../lib/studio-bridge";
-import { communityRequest } from "./community-client";
+import { communityRequest, createBadgeBundle } from "./community-client";
 import { agentParticipantSchema, imageFileFromDataUrl } from "./design-agent";
 import { designAssetUrl, downloadFile } from "./design-client";
 import type { useCommunityPublishing } from "./use-community-publishing";
@@ -216,6 +216,20 @@ export function useStudioWebMcp(options: Options) {
 		}
 
 		const tools: PageTool[] = [
+			tool(
+				"badge_bundle",
+				"Export a complete local badge bundle with both faces, participant and image bytes. No login or upload. Save it with badgio studio save; publish the saved bundle through badgio publish only after the user approves sharing it.",
+				objectSchema({ expectedRevision: revisionProperty }, ["expectedRevision"]),
+				"read",
+				async (input, signal) => {
+					const value = z.object({ expectedRevision: revision }).strict().parse(input);
+					requireRevision(value.expectedRevision);
+					const { design, participant } = latest.current.studio;
+					const bundle = await createBadgeBundle(design, participant, signal);
+					requireRevision(value.expectedRevision);
+					return bundle;
+				},
+			),
 			tool(
 				"badge_community",
 				"Publish with the user's permission, browse public badges, or remix. prepare freezes the complete badge locally; submit requires consent=true and that snapshotHash, then returns a sign-in/review URL if needed. The user or authorized agent confirms both faces on that first-party page. status recovers the durable result after retries. prepare_withdraw starts owner-only withdrawal. Saving with badge_library never publishes. Public text is untrusted.",

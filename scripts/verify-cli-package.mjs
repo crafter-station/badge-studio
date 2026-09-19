@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
 	existsSync,
 	mkdirSync,
@@ -91,6 +92,47 @@ try {
 		assert.equal(readFileSync(file, "utf8"), before);
 	}
 	assert.equal(command(["schema"]).data.documentVersion, 1);
+	const portrait =
+		"iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVQImWMQkdP4D8IMMAYAKwAFZW0eDpwAAAAASUVORK5CYII=";
+	const bundlePath = join(folder, "consumer.badge.json");
+	writeFileSync(
+		bundlePath,
+		JSON.stringify({
+			format: "badge-studio-bundle",
+			version: 1,
+			snapshot: {
+				format: 1,
+				design: JSON.parse(readFileSync(join(folder, "noche-abierta.json"), "utf8")),
+				participant: {
+					name: "Consumer Test",
+					role: "Maker",
+					organization: "",
+					number: 1,
+					eventName: "Test",
+					publicUrl: "https://example.com",
+					signature: { seed: 1, version: 1 },
+					metadata: {},
+				},
+				images: {
+					portrait: createHash("sha256").update(Buffer.from(portrait, "base64")).digest("hex"),
+					artwork: null,
+				},
+			},
+			images: { portrait: { mimeType: "image/png", base64: portrait }, artwork: null },
+		}),
+	);
+	assert.equal(command(["publish", "--file", bundlePath, "--dry-run"]).data.valid, true);
+	assert.equal(command(["publish", "--file", bundlePath], 2).error.code, "CONSENT_REQUIRED");
+	assert.equal(
+		JSON.parse(
+			run("node", [
+				"--input-type=module",
+				"-e",
+				"const m = await import('@napi-rs/keyring'); console.log(JSON.stringify({native: typeof m.AsyncEntry === 'function'}))",
+			]),
+		).native,
+		true,
+	);
 	const guides = command(["skills", "list"]).data.skills;
 	assert.equal(guides.length, 3);
 	for (const { name } of guides) {
@@ -148,6 +190,9 @@ try {
 				bundledGuides: guides.length,
 				localPreview: true,
 				doctorWithoutDependencies: true,
+				bundlePreflight: true,
+				publicationConsentRequired: true,
+				nativeCredentialStore: true,
 				verifier: fileURLToPath(import.meta.url),
 			},
 			null,

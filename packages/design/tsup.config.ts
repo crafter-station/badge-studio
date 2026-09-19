@@ -3,6 +3,7 @@ export default defineConfig({
 	entry: [
 		"src/index.ts",
 		"src/catalog.ts",
+		"src/community.ts",
 		"src/badge-design.ts",
 		"src/badge-design-examples.ts",
 		"src/prism-style.ts",

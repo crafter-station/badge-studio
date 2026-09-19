@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { Suspense } from "react";
 import { AuthorizePublication } from "./publication-authorization";
 import "../community.css";
@@ -9,13 +10,15 @@ export const metadata = {
 };
 
 export default function AuthorizePage() {
+	const configured = Boolean(
+		process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+	);
+	if (!configured) return <AuthorizePublication configured={false} />;
 	return (
-		<Suspense>
-			<AuthorizePublication
-				configured={Boolean(
-					process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-				)}
-			/>
-		</Suspense>
+		<ClerkProvider>
+			<Suspense>
+				<AuthorizePublication configured />
+			</Suspense>
+		</ClerkProvider>
 	);
 }

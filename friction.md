@@ -15,3 +15,5 @@
 - Landing now shows only the nine event reference badges, following the user’s correction. Five custom directions remain available inside the editor. Pins and other formats are future scope.
 
 - Restored the original thermal palette, faceted prism and polished chrome as editable material documents. Recipes without a procedural field use the existing native physical shader path; text and metadata stay independent layers. New portrait filter values reuse the existing photographic pixel transforms.
+
+- September 19: direct CLI publication has a defined bundle/receipt contract and a discovered Clerk OAuth boundary. Device authorization is available on the linked instance after explicitly enabling the grant on a dedicated public OAuth client. Preserve browser review for manual submissions; the CLI uses explicit conversational consent and the same hash-bound store. Tokens use the OS credential store, with environment access tokens for headless environments. No shared passwords, long-lived app secrets or browser-cookie extraction.

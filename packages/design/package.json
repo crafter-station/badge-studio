@@ -44,6 +44,11 @@
 			"bun": "./src/qr.ts",
 			"types": "./dist/qr.d.ts",
 			"import": "./dist/qr.js"
+		},
+		"./community": {
+			"bun": "./src/community.ts",
+			"types": "./dist/community.d.ts",
+			"import": "./dist/community.js"
 		}
 	},
 	"scripts": {

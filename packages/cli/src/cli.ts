@@ -12,9 +12,11 @@ import { designCatalog, findDesign } from "@crafter-station/badge-studio-design/
 import type { ZodTypeAny } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { version } from "../package.json";
+import { CloudError, connectAccount, logout } from "./cloud";
 import { InputError } from "./errors";
 import { extractImage, imageParams } from "./images";
 import { banner, column, machineOutput, style } from "./presentation";
+import { publishBadge, saveBundle } from "./publish";
 import { getSkill, skills } from "./skills";
 import { openBrowser, startStudio, studioRequest } from "./studio";
 
@@ -26,6 +28,12 @@ const commands = [
 	"studio tools --url <session-url>",
 	"studio call <tool> --url <session-url> --params <json|@file>",
 	"studio stop --url <session-url>",
+	"studio save --url <session-url> --out <badge.badge.json>",
+	"publish --file <badge.badge.json> --yes [--no-open]",
+	"publish --file <badge.badge.json> --dry-run",
+	"publish status --file <badge.badge.json>",
+	"login [--no-open]",
+	"logout",
 	"image params --file <image> --state <state.json> [--target portrait|artwork]",
 	"image extract --file <image-response.json> --out <new-file>",
 	"styles list",
@@ -73,6 +81,7 @@ async function run() {
 			params: { type: "string" },
 			state: { type: "string" },
 			target: { type: "string" },
+			yes: { type: "boolean" },
 		},
 	});
 	const json = machineOutput(Boolean(values.json));
@@ -106,6 +115,11 @@ From a built checkout: npm run studio -- <command>`,
 		"studio tools": ["url"],
 		"studio call": ["url", "params"],
 		"studio stop": ["url"],
+		"studio save": ["url", "out"],
+		publish: ["file", "yes", "dry-run", "site", "no-open"],
+		"publish status": ["file", "site"],
+		login: ["site", "no-open"],
+		logout: ["site"],
 		"image params": ["file", "state", "target"],
 		"image extract": ["file", "out"],
 		"styles list": [],
@@ -117,6 +131,60 @@ From a built checkout: npm run studio -- <command>`,
 	for (const flag of Object.keys(values))
 		if (!["json", "help", "version", ...allowed[command]].includes(flag))
 			throw new InputError(`--${flag} is not supported by ${command}`);
+	const progress = (data: unknown) => process.stderr.write(`${JSON.stringify(data)}\n`);
+	if (command === "login" || command === "logout") {
+		const site = values.site ?? "https://badge-studio.crafter.run";
+		const result =
+			command === "logout"
+				? await logout(site)
+				: (await connectAccount(site, { login: true, noOpen: values["no-open"], progress }))
+						.account;
+		emit(
+			result,
+			["badgio publish --file badge.badge.json --yes"],
+			"name" in result ? `Connected as ${result.name}.` : "Signed out.",
+			json,
+		);
+		return;
+	}
+	if (command === "studio save") {
+		if (!values.url || !values.out)
+			throw new InputError("Supply --url and a new --out bundle path.");
+		await newPath(values.out);
+		const result = await saveBundle(values.url, values.out);
+		emit(
+			result,
+			[
+				`badgio publish --file ${JSON.stringify(result.path)} --dry-run`,
+				"Ask whether to change anything or publish. Use --yes only after publication is approved.",
+			],
+			`Saved complete badge: ${result.path}`,
+			json,
+		);
+		return;
+	}
+	if (command === "publish" || command === "publish status") {
+		if (!values.file)
+			throw new InputError(
+				"Supply --file with a complete .badge.json bundle saved by badgio studio save.",
+			);
+		const result = await publishBadge({
+			file: values.file,
+			site: values.site,
+			yes: values.yes,
+			dryRun: values["dry-run"],
+			status: command === "publish status",
+			noOpen: values["no-open"],
+			progress,
+		});
+		emit(
+			result,
+			["Keep the saved bundle for revisions and publication status."],
+			JSON.stringify(result, null, 2),
+			json,
+		);
+		return;
+	}
 	if (command === "skills list") {
 		const entries = Object.entries(skills).map(([name, { description }]) => ({
 			name,
@@ -369,7 +437,11 @@ run().catch((error: Error & { code?: string }) => {
 	const payload = {
 		ok: false,
 		version,
-		error: { code: userError ? "INVALID_INPUT" : "SYSTEM_FAILURE", message: error.message },
+		error: {
+			code:
+				error instanceof CloudError ? error.code : userError ? "INVALID_INPUT" : "SYSTEM_FAILURE",
+			message: error.message,
+		},
 		nextSteps,
 	};
 	if (machineOutput(process.argv.includes("--json")))

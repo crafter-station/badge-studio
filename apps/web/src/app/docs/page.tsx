@@ -69,9 +69,9 @@ export default function ToolkitPage() {
 				<section>
 					<h2>Like it? Let your agent publish it.</h2>
 					<p>
-						When the badge is ready, your agent offers to share it with the community. Say yes, sign
-						in with Clerk and confirm the actual front and back. Your agent handles the design and
-						image uploads, then returns the public link.
+						Your first preview comes with a choice: change anything or publish it. Say yes and your
+						agent publishes the complete saved badge directly from the CLI. Connect your account
+						once when asked; the upload continues automatically and returns your public link.
 					</p>
 					<blockquote>“I love it. Publish this badge to the community gallery.”</blockquote>
 					<p>

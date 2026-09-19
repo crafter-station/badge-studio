@@ -116,6 +116,7 @@ export async function authorizePublication(
 	actor: Actor,
 	secretHash: string,
 	intent: CommunityIntent,
+	renewExpired = false,
 ) {
 	return communityTransaction(async (client) => {
 		await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [secretHash]);
@@ -139,13 +140,24 @@ export async function authorizePublication(
 			)
 				throw new CommunityError("Esta operación pertenece a otra autorización.", 409);
 			if (prior.receipt) return { authorized: true, receipt: prior.receipt };
-			requireActiveGrant(prior);
 			if (prior.session_id !== actor.sessionId)
 				throw new CommunityError("La cuenta cambió. Prepara una nueva publicación.", 409);
+			if (renewExpired && !prior.revoked_at && new Date(prior.expires_at).getTime() <= Date.now()) {
+				const expiresAt = new Date(Date.now() + COMMUNITY_PREPARATION_TTL);
+				await client.query("UPDATE community_grants SET expires_at=$2 WHERE operation_id=$1", [
+					prior.operation_id,
+					expiresAt,
+				]);
+				prior.expires_at = expiresAt;
+			}
+			requireActiveGrant(prior);
 			return { authorized: true };
 		}
 		const expiresAt = publicationExpiry(secretHash);
-		if (expiresAt <= Date.now() || expiresAt > Date.now() + COMMUNITY_PREPARATION_TTL)
+		if (
+			(!renewExpired && expiresAt <= Date.now()) ||
+			expiresAt > Date.now() + COMMUNITY_PREPARATION_TTL
+		)
 			throw new CommunityError("EXPIRED: Prepara la publicación de nuevo.", 410);
 		const count = await client.query<{ count: string }>(
 			"SELECT count(*) FROM community_grants WHERE owner_id = $1 AND created_at > now() - interval '1 hour'",

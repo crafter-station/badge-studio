@@ -23,7 +23,6 @@ export const config = {
 	matcher: [
 		"/badge/:path*",
 		"/studio/:path*",
-		"/design/:path*",
 		"/badges/:path*",
 		"/api/prism/:path*",
 		"/api/designs/:path*",

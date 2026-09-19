@@ -58,8 +58,21 @@ Most commands return `{ok:true,version,data,nextSteps}` or `{ok:false,version,er
 
 ## Publish with your agent
 
-When you like the result, the skill offers to submit it to the public gallery. Say “Publish this badge.” Your agent prepares the complete document and images through `badge_community`, opens Clerk sign-in only when needed, and confirms the actual public preview. Anyone can browse and design without an account. Only the author can update or withdraw a publication.
+Your agent closes the first preview with “Want to change anything or publish it?” It saves a portable bundle containing the design, participant, portrait and artwork before publication:
 
-Local saves stay local. Public submission explicitly shares the selected photo, participant details and editable design. Your agent checks the durable publication receipt and public page before calling it done.
+```sh
+badgio studio save --url "$BADGE_STUDIO_URL" --out badge.badge.json
+badgio publish --file badge.badge.json --dry-run
+badgio publish --file badge.badge.json --yes
+badgio publish status --file badge.badge.json
+```
+
+`--yes` means you approved sharing this exact badge, including its photo, name and editable design. Publication runs directly from the bundle, even after the editor closes. Retries reuse the same operation and return the same public URL.
+
+The first publication opens Clerk device login in your default browser and continues automatically once you connect. There is no manual Publish button. Subsequent publications reuse the OS credential store. `badgio login --no-open` prints the verification link for a session browser; `badgio logout` revokes the connection. `BADGIO_TOKEN` supports existing OAuth access tokens in headless environments. Credentials never appear on stdout or in the local operation log.
+
+Creation, local saving, editing and export remain anonymous. `--dry-run` validates the actual bundle without authentication or network calls. `BADGIO_DISABLE_PUBLISH=1` disables public writes. `BADGIO_STATE_DIR` overrides the local operation/receipt directory; keep it private. JSON progress events are on stderr; the final result and durable receipt are on stdout.
+
+The existing editor tools still support author-only updates and withdrawal. Your agent verifies the public link before calling publication complete.
 
 The package is `badgio`; `badge-studio` remains a command alias. Licensed under AGPL-3.0-only. [Source and skill](https://github.com/crafter-station/badge-studio).
