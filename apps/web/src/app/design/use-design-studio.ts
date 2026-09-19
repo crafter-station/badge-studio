@@ -458,7 +458,7 @@ export function useDesignStudio() {
 				layer = {
 					...base,
 					kind: "text",
-					text: "Tu texto",
+					text: "Your text",
 					binding: "none",
 					font: "sans",
 					color: "#888888",

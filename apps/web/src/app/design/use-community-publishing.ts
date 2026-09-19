@@ -214,7 +214,7 @@ export function useCommunityPublishing(studio: Studio) {
 				next: "The images are prepared. Confirm the preview on the publication page.",
 			};
 		} catch (reason) {
-			const message = reason instanceof Error ? reason.message : "No pudimos publicar.";
+			const message = reason instanceof Error ? reason.message : "Could not publish.";
 			updateError(message);
 			updatePhase("error");
 			throw reason;

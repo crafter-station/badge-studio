@@ -47,7 +47,7 @@ export async function designRequest<T>(path = "", init?: RequestInit): Promise<T
 	}
 	if (!response.ok) {
 		const message = (data as { error?: unknown })?.error;
-		throw new Error(typeof message === "string" ? message : "No pudimos completar esta solicitud.");
+		throw new Error(typeof message === "string" ? message : "Could not complete this request.");
 	}
 	return data as T;
 }
