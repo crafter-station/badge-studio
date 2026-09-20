@@ -122,5 +122,21 @@ export function drawFiltered(
 	if (width <= 0 || height <= 0) return;
 	const pixels = ctx.getImageData(x, y, width, height);
 	filterStackPixels(pixels.data, stack);
-	ctx.putImageData(pixels, x, y);
+	// `putImageData` ignores the active clip, so writing the rectangle back
+	// directly would repaint the paper around clipped shapes (heart, winter).
+	// Blit through a scratch canvas with `drawImage`, which honours the clip.
+	const scratch = document.createElement("canvas");
+	scratch.width = width;
+	scratch.height = height;
+	const surface = scratch.getContext("2d");
+	if (!surface) {
+		ctx.putImageData(pixels, x, y);
+		return;
+	}
+	surface.putImageData(pixels, 0, 0);
+	ctx.save();
+	ctx.globalAlpha = 1;
+	ctx.globalCompositeOperation = "source-over";
+	ctx.drawImage(scratch, x, y);
+	ctx.restore();
 }
