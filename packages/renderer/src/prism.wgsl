@@ -173,10 +173,10 @@ fn materialSample(uv: vec2f) -> vec4f {
 }
 
 fn ribbonColor(h: f32, uv: vec2f) -> vec3f {
-  let pink = exp(-pow((h + 0.03) / 0.22, 2.0)) * 0.92;
-  let violet = exp(-pow((h - 0.13) / 0.15, 2.0)) * 0.54;
-  let cyan = exp(-pow((h - 0.35) / 0.13, 2.0)) * 0.72;
-  let halo = exp(-pow((h + 0.31) / 0.14, 2.0)) * 0.48;
+  let pink = exp(-pow(abs((h + 0.03) / 0.22), 2.0)) * 0.92;
+  let violet = exp(-pow(abs((h - 0.13) / 0.15), 2.0)) * 0.54;
+  let cyan = exp(-pow(abs((h - 0.35) / 0.13), 2.0)) * 0.72;
+  let halo = exp(-pow(abs((h + 0.31) / 0.14), 2.0)) * 0.48;
   var color = mix(vec3f(0.975, 0.94, 0.955), vec3f(0.96, 0.39, 0.99), pink);
   color = mix(color, vec3f(0.71, 0.49, 0.98), violet);
   color = mix(color, vec3f(0.57, 0.96, 0.98), cyan);
@@ -262,13 +262,13 @@ fn proceduralCard(p: vec3f, rd: vec3f, geometric: vec3f) -> vec3f {
     let reflectance = mix(0.038 + fresnel * 0.3, 0.016, f32(satin));
     coating += environment * reflectance * (1.0 - roughness * 0.65);
     coating += film * params.coating.z * (0.055 + 0.09 * (1.0 - facing));
-    let caustic = exp(-pow((field.x - 0.12) / 0.055, 2.0)) * params.coating.y;
+    let caustic = exp(-pow(abs((field.x - 0.12) / 0.055), 2.0)) * params.coating.y;
     coating += mix(vec3f(0.8, 0.91, 1.0), film, params.coating.z) * caustic * 0.08;
   }
   var color = mix(photo, coating, mask);
   if (params.topographic > 0.5) {
     let contour = 1.0 - smoothstep(0.01, 0.045, abs(fract(field.x * 13.0) - 0.5));
-    let lightSweep = exp(-pow((uv.x - 0.5 - params.light.x * 0.7) * 3.0, 2.0));
+    let lightSweep = exp(-pow(abs((uv.x - 0.5 - params.light.x * 0.7) * 3.0), 2.0));
     let trace = mix(vec3f(0.20, 0.30, 0.48), vec3f(0.48, 0.64, 0.96), lightSweep);
     color += trace * contour * (1.0 - identity) * footer * 0.20;
   }
@@ -294,7 +294,7 @@ fn smoothCard(p: vec3f, rd: vec3f, geometric: vec3f) -> vec3f {
   let faceCenter = vec2f((params.faceRegion.x - 0.5) * 1.49, (0.5 - params.faceRegion.y) * 2.26);
   let offset = p.xy - faceCenter;
   let radius = max(params.faceRegion.z, 0.1);
-  let identity = exp(-pow(offset.x / (radius * 1.6), 4.0) - pow(offset.y / (radius * 2.6), 4.0));
+  let identity = exp(-pow(abs(offset.x / (radius * 1.6)), 4.0) - pow(abs(offset.y / (radius * 2.6)), 4.0));
   let warp = params.fluidity * 0.045;
   let wave = vec2f(
     sin(p.y * 2.2 + params.time * 0.22 + params.signature.z * 6.28) * warp,
@@ -312,9 +312,9 @@ fn smoothCard(p: vec3f, rd: vec3f, geometric: vec3f) -> vec3f {
   var color = photo * (0.96 + grain);
   if (chrome) {
     let sweep = p.x + p.y * 0.38 - params.light.x * 1.2 + params.light.y * 0.35;
-    let broad = exp(-pow((sweep + 0.39) / 0.31, 2.0));
-    let strip = exp(-pow((sweep - 0.53) / (0.055 + params.customMaterial.x * 0.11), 2.0));
-    let darkBand = exp(-pow((sweep - 0.16) / 0.19, 2.0));
+    let broad = exp(-pow(abs((sweep + 0.39) / 0.31), 2.0));
+    let strip = exp(-pow(abs((sweep - 0.53) / (0.055 + params.customMaterial.x * 0.11)), 2.0));
+    let darkBand = exp(-pow(abs((sweep - 0.16) / 0.19), 2.0));
     let metallic = vec3f(0.88, 0.94, 1.0) * (0.025 + broad * 0.31 + strip * 0.42);
     let portraitMask = 1.0 - identity * 0.72;
     let footerMask = 1.0 - smoothstep(0.65, 0.86, uv.y) * 0.93;
@@ -386,10 +386,10 @@ fn applyDesignEffects(inputColor: vec3f, uv: vec2f, back: bool, protectedMask: f
         let offset = position - params.light * vec2f(0.745, -1.13);
         let touch = exp(-dot(offset, offset) * 4.0) * (params.light.x * 0.20 - params.light.y * 0.12);
         let flow = (position.x * 0.9 + bend + touch) * scale;
-        let pink = exp(-pow((flow + 0.03) / 0.22, 2.0)) * 0.92;
-        let violet = exp(-pow((flow - 0.13) / 0.15, 2.0)) * 0.54;
-        let cyan = exp(-pow((flow - 0.35) / 0.13, 2.0)) * 0.72;
-        let halo = exp(-pow((flow + 0.31) / 0.14, 2.0)) * 0.48;
+        let pink = exp(-pow(abs((flow + 0.03) / 0.22), 2.0)) * 0.92;
+        let violet = exp(-pow(abs((flow - 0.13) / 0.15), 2.0)) * 0.54;
+        let cyan = exp(-pow(abs((flow - 0.35) / 0.13), 2.0)) * 0.72;
+        let halo = exp(-pow(abs((flow + 0.31) / 0.14), 2.0)) * 0.48;
         art = mix(a, b, pink);
         art = mix(art, mix(b, c, 0.34), violet);
         art = mix(art, c, cyan);
@@ -444,7 +444,7 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   }
   let shadowPosition = screen - vec2f(0.02 + params.angles.y * 0.09, -0.92) * framing;
   let shadowFade = smoothstep(-1.0, -0.90, screen.y) * smoothstep(0.0, 0.18, aspect - abs(screen.x));
-  let shadow = exp(-pow(shadowPosition.x / (0.55 * framing), 2.0) - pow(shadowPosition.y / (0.10 * framing), 2.0)) * 0.18 * shadowFade;
+  let shadow = exp(-pow(abs(shadowPosition.x / (0.55 * framing)), 2.0) - pow(abs(shadowPosition.y / (0.10 * framing)), 2.0)) * 0.18 * shadowFade;
   if (!hit) {
     let plane = ro + rd * (-ro.z / rd.z);
     let slot = roundedRect(plane.xy - vec2f(0.0, 1.008), vec2f(0.156, 0.025), 0.024);
@@ -463,7 +463,7 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   let faceCenter = vec2f((params.faceRegion.x - 0.5) * 1.49, (0.5 - params.faceRegion.y) * 2.26);
   let faceRadius = max(params.faceRegion.z, 0.1);
   let faceOffset = p.xy - faceCenter;
-  let identity = exp(-pow(faceOffset.x / (faceRadius * 1.49), 4.0) - pow(faceOffset.y / (faceRadius * 2.26), 4.0));
+  let identity = exp(-pow(abs(faceOffset.x / (faceRadius * 1.49)), 4.0) - pow(abs(faceOffset.y / (faceRadius * 2.26)), 4.0));
   let flowPhase = params.time * 0.38 + params.signature.z * 6.283;
   let flow = vec2f(
     sin(p.y * 7.2 + p.x * 2.8 + flowPhase) * 0.55 + cos(p.y * 4.1 - p.x * 6.3 - flowPhase * 0.73) * 0.45,
@@ -481,8 +481,8 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   let fresnel = dielectricFresnel(1.52, facing);
   let dispersion = 0.095 * params.spectral;
   let depth = (0.025 + facets.z * 0.48) * footer;
-  let eyeLeft = exp(-pow((faceOffset.x + faceRadius * 0.67) / (faceRadius * 0.48), 4.0) - pow((faceOffset.y - faceRadius * 0.28) / (faceRadius * 0.26), 4.0));
-  let eyeRight = exp(-pow((faceOffset.x - faceRadius * 0.67) / (faceRadius * 0.48), 4.0) - pow((faceOffset.y - faceRadius * 0.28) / (faceRadius * 0.26), 4.0));
+  let eyeLeft = exp(-pow(abs((faceOffset.x + faceRadius * 0.67) / (faceRadius * 0.48)), 4.0) - pow(abs((faceOffset.y - faceRadius * 0.28) / (faceRadius * 0.26)), 4.0));
+  let eyeRight = exp(-pow(abs((faceOffset.x - faceRadius * 0.67) / (faceRadius * 0.48)), 4.0) - pow(abs((faceOffset.y - faceRadius * 0.28) / (faceRadius * 0.26)), 4.0));
   let transmissionNormal = normalize(mix(geometric, normal, 0.50 * (1.0 - max(identity * 0.82, max(eyeLeft, eyeRight) * 0.92))));
   let r = transmission(p, rd, transmissionNormal, 1.52 - dispersion, depth);
   let g = transmission(p, rd, transmissionNormal, 1.52, depth);
@@ -492,7 +492,7 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   let printEdge = roundedRect(p.xy, vec2f(0.737, 1.12), 0.10);
   let printOpacity = 1.0 - smoothstep(-0.006, 0.008, printEdge);
   let reflectedDirection = toWorld(reflect(rd, normal));
-  let headRegion = exp(-pow(faceOffset.x / (faceRadius * 1.76), 4.0) - pow(faceOffset.y / (faceRadius * 3.04), 6.0));
+  let headRegion = exp(-pow(abs(faceOffset.x / (faceRadius * 1.76)), 4.0) - pow(abs(faceOffset.y / (faceRadius * 3.04)), 6.0));
   let reflection = studio(reflectedDirection) * (1.0 - headRegion * 0.80);
   let rimEnvironment = studio(toWorld(refract(rd, geometric, 1.0 / 1.52)));
   let clearEdge = linear(background()) * vec3f(0.48, 0.56, 0.66) + rimEnvironment * 0.12;
@@ -504,7 +504,7 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   let filmAmount = params.spectral * (0.008 + pow(1.0 - facing, 1.5) * 0.085);
   let fresnelRgb = clamp(vec3f(fresnel) + film * filmAmount, vec3f(0.0), vec3f(1.0));
   var color = transmitted * (vec3f(1.0) - fresnelRgb) + reflection * fresnelRgb;
-  let pearlEdge = exp(-pow((abs(p.x) - 0.65) / 0.13, 2.0)) * (1.0 - identity);
+  let pearlEdge = exp(-pow(abs((abs(p.x) - 0.65) / 0.13), 2.0)) * (1.0 - identity);
   let pearlLight = studio(toWorld(reflect(rd, geometric))) * vec3f(0.024, 0.026, 0.030);
   color += pearlLight * pearlEdge * face * footer;
   let panelLuminance = dot(reflection, vec3f(0.2126, 0.7152, 0.0722));
@@ -513,16 +513,16 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
 
   let focusX = -0.42 + params.light.x * 0.58;
   let focusY = -0.23 - params.light.y * 0.60 + sin(params.time * 0.27) * 0.10;
-  let leftSpot = exp(-pow((p.x - focusX) / 0.28, 2.0) - pow((p.y - focusY) / 0.50, 2.0));
-  let rightSpot = exp(-pow((p.x - 0.53 + params.light.x * 0.2) / 0.19, 2.0) - pow((p.y - 0.62 + params.light.y * 0.5) / 0.32, 2.0));
-  let seam = exp(-pow((facets.w - 0.005) / 0.010, 2.0));
+  let leftSpot = exp(-pow(abs((p.x - focusX) / 0.28), 2.0) - pow(abs((p.y - focusY) / 0.50), 2.0));
+  let rightSpot = exp(-pow(abs((p.x - 0.53 + params.light.x * 0.2) / 0.19), 2.0) - pow(abs((p.y - 0.62 + params.light.y * 0.5) / 0.32), 2.0));
+  let seam = exp(-pow(abs((facets.w - 0.005) / 0.010), 2.0));
   let litFacet = smoothstep(0.035, 0.30, dot(opticalNormal, normalize(vec2f(-0.8 + params.light.x, 0.45 - params.light.y))));
   let caustic = seam * (leftSpot + rightSpot * 0.55) * litFacet * face * footer * (1.0 - identity * 0.86);
   let rainbow = spectrum(facets.w * 22.0 + dot(opticalNormal, vec2f(0.35, -0.25)) + params.light.x * 0.4);
   color += rainbow * caustic * params.spectral * 0.30;
   let ribbonCoordinate = p.x - focusX + (p.y - focusY) * 0.24 + sin(p.y * 5.0 + flowPhase) * mix(0.015, 0.08, params.fluidity);
-  let ribbon = exp(-pow(ribbonCoordinate / 0.035, 2.0)) * exp(-pow((p.y - focusY) / 0.29, 2.0));
-  let ribbonHalo = exp(-pow(ribbonCoordinate / 0.12, 2.0)) * exp(-pow((p.y - focusY) / 0.42, 2.0));
+  let ribbon = exp(-pow(abs(ribbonCoordinate / 0.035), 2.0)) * exp(-pow(abs((p.y - focusY) / 0.29), 2.0));
+  let ribbonHalo = exp(-pow(abs(ribbonCoordinate / 0.12), 2.0)) * exp(-pow(abs((p.y - focusY) / 0.42), 2.0));
   let ribbonColor = mix(vec3f(0.82, 0.90, 1.0), spectrum(ribbonCoordinate * 7.0 + 0.12), params.spectral * 0.75);
   color += (ribbon * 0.29 + ribbonHalo * 0.028) * ribbonColor * face * footer * (1.0 - identity);
 
@@ -544,7 +544,7 @@ fn layeredDesignCard(p: vec3f, rd: vec3f, normal: vec3f) -> vec3f {
   color += innerRim * vec3f(0.09, 0.12, 0.17);
   color += polishedRim * vec3f(0.55, 0.63, 0.74) * rimLight;
   let glintY = 0.61 - params.light.y * 0.85 + sin(params.time * 0.23) * 0.15;
-  let edgeGlint = exp(-pow((p.y - glintY) / 0.19, 2.0)) * smoothstep(0.58, 0.73, abs(p.x));
+  let edgeGlint = exp(-pow(abs((p.y - glintY) / 0.19), 2.0)) * smoothstep(0.58, 0.73, abs(p.x));
   color += (rim + polishedRim) * edgeGlint * mix(vec3f(1.0), film * 0.8 + 0.25, params.spectral * 0.65) * 0.75;
   let slotEdge = abs(roundedRect(p.xy - vec2f(0.0, 1.008), vec2f(0.163, 0.032), 0.028));
   color += exp(-slotEdge * 360.0) * rimEnvironment * 0.16;
