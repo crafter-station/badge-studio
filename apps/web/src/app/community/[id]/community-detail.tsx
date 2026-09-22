@@ -60,9 +60,12 @@ export function CommunityDetail({ id }: { id: string }) {
 	return (
 		<main className="community-detail">
 			<div className="community-detail-nav">
-				<Link href="/community" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+				<Link
+					href="/gallery?filter=community"
+					className={buttonVariants({ variant: "ghost", size: "sm" })}
+				>
 					<ArrowLeft data-icon="inline-start" />
-					Community
+					Gallery
 				</Link>
 				<span>Made to be made yours.</span>
 			</div>
