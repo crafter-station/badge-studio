@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { drawFiltered } from "./canvas-filter";
 import { materialSignature } from "./signature";
 import type { PrismAppearance, PrismBadgeData, PrismEdition } from "./types";
 
@@ -224,24 +225,28 @@ function photo(
 	const sw = (sourceAspect > aspect ? image.height * aspect : image.width) / appearance.crop.zoom;
 	const sh = sw / aspect;
 	ctx.save();
-	ctx.filter = {
-		mono: "grayscale(1) contrast(1.16)",
-		warm: "grayscale(1) sepia(0.5) contrast(1.07)",
-		rose: "grayscale(1) contrast(1.2)",
-		blue: "grayscale(1) contrast(1.16)",
-	}[edition.portrait];
-	ctx.drawImage(
-		image,
-		(image.width - sw) * appearance.crop.x,
-		(image.height - sh) * appearance.crop.y,
-		sw,
-		sh,
-		x,
-		y,
-		width,
-		height,
+	drawFiltered(
+		ctx,
+		{
+			mono: { grayscale: 1, contrast: 1.16 },
+			warm: { grayscale: 1, sepia: 0.5, contrast: 1.07 },
+			rose: { grayscale: 1, contrast: 1.2 },
+			blue: { grayscale: 1, contrast: 1.16 },
+		}[edition.portrait],
+		{ x, y, width, height },
+		() =>
+			ctx.drawImage(
+				image,
+				(image.width - sw) * appearance.crop.x,
+				(image.height - sh) * appearance.crop.y,
+				sw,
+				sh,
+				x,
+				y,
+				width,
+				height,
+			),
 	);
-	ctx.filter = "none";
 	if (edition.portrait === "rose" || edition.portrait === "blue") {
 		ctx.globalCompositeOperation = "color";
 		ctx.globalAlpha = 0.5;
@@ -498,9 +503,12 @@ function editorialPortrait(
 	const cropY = Math.max(0, Math.min(image.height - eyeHeight, eyeY - eyeHeight / 2));
 	const detailY = poster ? 251 : 214;
 	ctx.save();
-	ctx.filter = "grayscale(1) contrast(1.14)";
-	ctx.drawImage(image, cropX, cropY, eyeWidth, eyeHeight, 94, detailY, 349, 94);
-	ctx.filter = "none";
+	drawFiltered(
+		ctx,
+		{ grayscale: 1, contrast: 1.14 },
+		{ x: 94, y: detailY, width: 349, height: 94 },
+		() => ctx.drawImage(image, cropX, cropY, eyeWidth, eyeHeight, 94, detailY, 349, 94),
+	);
 	ctx.globalCompositeOperation = "multiply";
 	ctx.fillStyle = "#cf8eb5";
 	ctx.fillRect(94, detailY, 349, 94);

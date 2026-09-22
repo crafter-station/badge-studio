@@ -1,4 +1,5 @@
 import type { BadgeLayer } from "@crafter-station/badge-studio-design/badge-design";
+import { type CanvasFilterStack, drawFiltered } from "./canvas-filter";
 import { filterPixels } from "./filters";
 
 type PortraitLayer = Extract<BadgeLayer, { kind: "portrait" }>;
@@ -35,18 +36,18 @@ export function paintDesignPhoto(
 	photo.height = Math.ceil(layer.h);
 	const surface = photo.getContext("2d");
 	if (!surface) return;
-	const filters = [];
-	if (["mono", "rose", "blue", "warm"].includes(layer.filter)) filters.push("grayscale(1)");
-	if (layer.filter === "warm") filters.push("sepia(0.5)");
-	filters.push(
-		`contrast(${layer.contrast ?? (layer.filter === "original" ? 1 : layer.filter === "warm" ? 1.07 : 1.16)})`,
+	const stack: CanvasFilterStack = {
+		contrast:
+			layer.contrast ?? (layer.filter === "original" ? 1 : layer.filter === "warm" ? 1.07 : 1.16),
+		saturate: layer.saturation,
+		brightness: layer.brightness,
+		blur: layer.blur || undefined,
+	};
+	if (["mono", "rose", "blue", "warm"].includes(layer.filter)) stack.grayscale = 1;
+	if (layer.filter === "warm") stack.sepia = 0.5;
+	drawFiltered(surface, stack, { x: 0, y: 0, width: layer.w, height: layer.h }, () =>
+		coverDesignImage(surface, image, layer.w, layer.h, layer),
 	);
-	if (layer.saturation !== undefined) filters.push(`saturate(${layer.saturation})`);
-	if (layer.brightness !== undefined) filters.push(`brightness(${layer.brightness})`);
-	if (layer.blur) filters.push(`blur(${layer.blur}px)`);
-	surface.filter = filters.join(" ");
-	coverDesignImage(surface, image, layer.w, layer.h, layer);
-	surface.filter = "none";
 	if (["thermal", "silver", "cyanotype", "vintage"].includes(layer.filter)) {
 		const pixels = surface.getImageData(0, 0, photo.width, photo.height);
 		filterPixels(
