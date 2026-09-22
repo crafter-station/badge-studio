@@ -1,5 +1,4 @@
-import { CommunityGallery } from "./community-gallery";
-import "./community.css";
+import { redirect } from "next/navigation";
 
 export const metadata = {
 	title: "Community",
@@ -7,5 +6,5 @@ export const metadata = {
 };
 
 export default function CommunityPage() {
-	return <CommunityGallery />;
+	redirect("/gallery?filter=community");
 }

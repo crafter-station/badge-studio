@@ -79,7 +79,7 @@ export default function ToolkitPage() {
 						badge details and editable layers. Only its author can update or withdraw it. Others can
 						use the layout with their own photo and name.
 					</p>
-					<Link href="/community">Explore community badges ↗</Link>
+					<Link href="/gallery?filter=community">Explore community badges ↗</Link>
 				</section>
 				<section>
 					<h2>A starting point, never a ceiling.</h2>

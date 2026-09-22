@@ -32,6 +32,33 @@
 	gap: 16px;
 	margin-bottom: 24px;
 }
+.gallery-status,
+.gallery-empty {
+	margin-bottom: 24px;
+	color: var(--muted-foreground);
+	font-size: 13px;
+	line-height: 1.6;
+}
+.gallery-empty h2 {
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--foreground);
+	margin: 0 0 8px;
+}
+.gallery-empty p {
+	margin: 0 0 16px;
+}
+.gallery-item-heading a {
+	color: inherit;
+	text-decoration: none;
+}
+.gallery-item-heading a:hover {
+	text-decoration: underline;
+}
+.gallery-preview .community-badge {
+	width: 100%;
+	height: 100%;
+}
 .gallery-grid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
