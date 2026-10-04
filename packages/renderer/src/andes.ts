@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { drawFiltered } from "./canvas-filter";
 import type { PrismAppearance, PrismBadgeData } from "./types";
 
 const ink = "#f6f3ee";
@@ -116,9 +117,12 @@ export function createAndesPortrait(
 	const size = Math.min(image.width, image.height) / appearance.crop.zoom;
 	const sx = (image.width - size) * appearance.crop.x;
 	const sy = (image.height - size) * appearance.crop.y;
-	ctx.filter = "grayscale(1) contrast(1.14) brightness(0.94)";
-	ctx.drawImage(image, sx, sy, size, size, 20, 228, 984, 984);
-	ctx.filter = "none";
+	drawFiltered(
+		ctx,
+		{ grayscale: 1, contrast: 1.14, brightness: 0.94 },
+		{ x: 20, y: 228, width: 984, height: 984 },
+		() => ctx.drawImage(image, sx, sy, size, size, 20, 228, 984, 984),
+	);
 	const fade = ctx.createLinearGradient(0, 220, 0, 1220);
 	fade.addColorStop(0, "#080b10");
 	fade.addColorStop(0.13, "#080b1000");
